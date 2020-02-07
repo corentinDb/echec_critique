@@ -1,2 +1,2 @@
 # echec_critique
-échec critique !!
+échec critique de notre projet !!
