@@ -29,5 +29,5 @@
     password.addEventListener('change', () => formRegistrationMod.checkPassword(password, confirmPassword));
     confirmPassword.addEventListener('change', () => formRegistrationMod.checkPassword(password, confirmPassword));
     email.addEventListener('change', () => formRegistrationMod.checkEmail(email));
-    document.getElementById("formRegistration").addEventListener('submit', () => formRegistrationMod.checkSubmit(form, socket));
+    document.getElementById("formRegistration").addEventListener('submit', () => formRegistrationMod.checkSubmit(form));
 })();
