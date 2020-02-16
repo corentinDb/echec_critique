@@ -173,7 +173,6 @@ app.get('/menu', (req, res, next) => {
 
 
 app.get('/destroy', (req, res, next) => {
-    console.log('testeux');
     let index = connectedUserList.indexOf(req.session.pseudo);
     connectedUserList.splice(index, 1);
     req.session.destroy(function (err) {
