@@ -42,7 +42,7 @@ let formRegistrationMod = (function () {
             }
         },
 
-        checkSubmit(formTab, socket) {
+        checkSubmit(formTab) {
             let pseudoIsValid = formRegistrationMod.checkPseudo(formTab['pseudo']);
             let passwordLenghtIsValid = formRegistrationMod.checkPassword(formTab['password'], formTab['confirmPassword']);
             let passwordCorrespondenceIsValid = formRegistrationMod.checkPassword(formTab['password'], formTab['confirmPassword']);
