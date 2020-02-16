@@ -2,34 +2,40 @@
 <html lang="fr">
 <head>
     <meta charset="UTF-8">
-    <title>Connexion</title>
+    <title>Rejoins-Nous !</title>
+
+    <link rel="stylesheet" type="text/css" href="../css/form.css"/>
 </head>
 <body>
-<form method="post" action="" id="formRegistration">
-    <label for="userName">Pseudo</label>
-    <input id="userName" type="text" name="userName" size="42" maxlength="255" placeholder="ptdr t ki ?" required>
+<form id="formRegistration" action="/registration" method="post">
+    <label for="pseudo">Pseudo</label>
+    <input id="pseudo" type="text" name="pseudo" size="20" maxlength="20" placeholder="ptdr t ki ?" required> <span class="error" id="pseudoError"></span>
     <br>
     <br>
 
     <label for="password">Mot de passe</label>
-    <input id="password" type="password" name="password" size="42" maxlength="255" placeholder="Promis c'est sécur" required>
+    <input id="password" type="text" name="password" size="42" maxlength="42" placeholder="Promis c'est sécur" required> <span class="error" id="passwordError"></span>
     <br>
     <br>
 
     <label for="confirmPassword">Retapez votre mot de passe</label>
-    <input id="confirmPassword" type="password" name="confirmPassword" size="42" maxlength="255" placeholder="Promis c'est sécur" required>
+    <input id="confirmPassword" type="password" name="confirmPassword" size="42" maxlength="42" placeholder="Promis c'est sécur" required> <span class="error" id="confirmPasswordError"></span>
     <br>
     <br>
 
     <label for="email">Adresse email</label>
-    <input id="email" type="text" name="email" size="42" maxlength="255" placeholder="Tkt y a pas de spam" required>
+    <input id="email" type="password" name="email" size="42" maxlength="255" placeholder="Tkt y a pas de spam" required> <span class="error" id="emailError"></span>
     <br>
     <br>
 
     <input type="submit" name="submitRegistration" value="Inscription">
     <input type="reset" name="resetRegistration" value="Annuler">
 </form>
+<br>
+<div id="errorReturn" class="error"></div>
 
+<script src="/socket.io/socket.io.js"></script>
+<script src="../js/url.js"></script>
 <script src="../js/registration.js"></script>
 </body>
 </html>

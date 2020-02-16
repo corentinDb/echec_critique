@@ -1,51 +1,33 @@
-let formRegistrationMod = (function () {
-    function escapeHtml(text) { //Fonction pour convertir les caractères spéciaux en entités HTML et pour retirer les epsaces avant et après le texte afin d'éviter les problèmes avec les noms
-        let map = {
-            '&': '&amp;',
-            '<': '&lt;',
-            '>': '&gt;',
-            '"': '&quot;',
-            "'": '&#039;'
-        };
+(function () {
+    let pseudo = document.getElementById("pseudo");
+    let password = document.getElementById("password");
+    let confirmPassword = document.getElementById("confirmPassword");
+    let email = document.getElementById("email");
 
-        return text.replace(/[&<>"']/g, function (m) {
-            return map[m];
-        }).trim();
+    let form = [];
+    form['pseudo'] = pseudo;
+    form['password'] = password;
+    form['confirmPassword'] = confirmPassword;
+    form['email'] = email;
+
+    let error = getURLData('error');
+
+
+    if(error === 'wrongPseudo'){
+        document.getElementById('errorReturn').innerHTML = 'Pseudo déjà utilisé !';
+    } else if (error === 'wrongEmail'){
+        document.getElementById('errorReturn').innerHTML = 'Email déjà utilisé !';
+    } else {
+        document.getElementById('errorReturn').innerHTML = '';
     }
 
-    return {
-        checkEmail(email) {
-            let regExp = /^[a-zA-Z0-9._-]+@[a-z0-9._-]{2,}\.[a-z]{2,4}$/;
-            if (!regExp.test(email.value)) {
-                console.log("email faux !");
-            }
-        },
-
-        checkPseudo(pseudo) {
-            if (pseudo.value.length < 3) {
-                console.log('pseudo trop court');
-            } else if (pseudo.value.length > 16) {
-                console.log('pseudo trop long');
-            } else if(escapeHtml(pseudo.value) === ''){
-                console.log('Le mot de passe ne peut pas être composé uniquement d\'espace');
-            }
-        },
-
-        checkPasswordLength(pwd) {
-            if (pwd.value.length < 4) {
-                console.log('Mot de passe trop court');
-            }
-        },
-
-        checkPasswordCorrespondence(pwd, confirmPwd) {
-            if (pwd !== confirmPwd) {
-                console.log('Mots de passe différents');
-            }
-        }
+    if (error === 'undefined'){
+        document.getElementById('errorReturn').innerHTML = 'Une erreur inconnue est survenue, merci de recommencer<br>Si cette erreur persiste, merci de contacter un admin';
     }
+
+    pseudo.addEventListener('change', () => formRegistrationMod.checkPseudo(pseudo));
+    password.addEventListener('change', () => formRegistrationMod.checkPassword(password, confirmPassword));
+    confirmPassword.addEventListener('change', () => formRegistrationMod.checkPassword(password, confirmPassword));
+    email.addEventListener('change', () => formRegistrationMod.checkEmail(email));
+    document.getElementById("formRegistration").addEventListener('submit', () => formRegistrationMod.checkSubmit(form, socket));
 })();
-
-document.getElementById("userName").addEventListener('change', () => formRegistrationMod.checkPseudo(this));
-document.getElementById("password").addEventListener('change', ()=> formRegistrationMod.checkPasswordLength(this));
-document.getElementById("confirmPassword").addEventListener('change', ()=> formRegistrationMod.checkPasswordCorrespondence((this)));
-document.getElementById("email").addEventListener('change', () => formRegistrationMod.checkEmail(this));
