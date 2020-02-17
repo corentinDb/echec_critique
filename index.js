@@ -144,7 +144,6 @@ app.get('/menu', (req, res, next) => {
             '<head>\n' +
             '<meta charset="UTF-8">\n' +
             '<title>Menu</title>\n' +
-            '<link rel="stylesheet" type="text/css" href="../css/menu.css"/>\n' +
             '<link rel="stylesheet" type="text/css" href="../css/main.css"/>\n\n' +
             '</head>\n' +
             '<body id="mainContener">\n' +
