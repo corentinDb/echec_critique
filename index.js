@@ -15,8 +15,8 @@ const mysql = require('mysql');
 const sha512 = require('js-sha512');
 
 app.use(express.static(__dirname + '/assets/'));
-app.use(express.json()); // for parsing application/json
-app.use(express.urlencoded({extended: true})); // for parsing application/x-www-form-urlencoded
+app.use(express.json());
+app.use(express.urlencoded({extended: true}));
 
 app.use(session({secret: 'Error 418 I\'m a teapot !', cookie: {maxAge: 60 * 60 * 1000}}));
 
@@ -41,8 +41,11 @@ con.connect((err) => {
 app.get('/p', (req, res, next) => {
     res.redirect('http://localhost/phpmyadmin');
 });
-//TEMPORAIRE !!!
 
+app.get('/error', (req, res, next) => {
+    res.send('Une erreur inconnue s\'est produite !');
+});
+//TEMPORAIRE !!!
 
 app.get('/', (req, res, next) => {
     if (req.session.connectionID) {
@@ -144,25 +147,37 @@ app.get('/menu', (req, res, next) => {
             '<head>\n' +
             '<meta charset="UTF-8">\n' +
             '<title>Menu</title>\n' +
-            '<link rel="stylesheet" type="text/css" href="../css/main.css"/>\n\n' +
+            '<link rel="stylesheet" type="text/css" href="../css/menu.css"/>\n' +
+            '<link rel="stylesheet" type="text/css" href="../css/main.css"/>\n' +
             '</head>\n' +
-            '<body id="mainContener">\n' +
-            '<div id="divUser">' +
-            '<input type="button" value="déconnexion" id="deconnection">\n' +
-            '<p id="pseudo">Votre peusdo : </p>\n' +
-            '<table id="tablePlayer">\n' +
-            '<tr><td>Autre utilisateur :</td></tr>' +
-            '</table>' +
-            '</div>' +
+            '<body>\n' +
+            '    <div id="divUser">\n' +
+            '        <input type="button" value="déconnexion" id="deconnection">\n' +
+            '        <p id="pseudo">Votre peusdo : </p>\n' +
+            '        <table>\n' +
+            '            <thead>\n' +
+            '            <tr><th>Autre utilisateur :</th></tr>\n' +
+            '            </thead>\n' +
+            '            <tbody id="tablePlayer">\n' +
+            '            </tbody>\n' +
+            '        </table>\n' +
+            '    </div>\n' +
+            '    <div id="mainChatBox">\n' +
+            '    </div>\n' +
+            '    <script src="/socket.io/socket.io.js"></script>\n' +
+            '    <script>\n' +
+            '        function returnPseudo() {\n' +
+            '            return \'' + req.session.pseudo + '\';\n' +
+            '        }\n' +
+            '        function returnListConnectedUser() {\n' +
+            '            return \'' + connectedUserList + '\';\n' +
+            '        }\n' +
+            '        function returnColor() {\n' +
+            '           return \'#' + sha512(req.session.pseudo).substring(0, 6) + '\'\n' +
+            '        }\n' +
+            '    </script>\n' +
+            '    <script src="../js/menu.js"></script>\n' +
             '</body>\n' +
-            '<script src="/socket.io/socket.io.js"></script>\n' +
-            '<script>function returnPseudo() {\n' +
-            '    return \'' + req.session.pseudo + '\';\n' +
-            '}\n' +
-            'function returnListConnectedUser() {\n' +
-            '    return \'' + connectedUserList + '\';\n' +
-            '}</script>\n' +
-            '<script src="../js/menu.js"></script>\n' +
             '</html>'
         );
         res.end();
@@ -188,6 +203,10 @@ io.sockets.on('connection', (socket) => {
 
     socket.on('removeUserRequest', (user) => {
         io.emit('removeUserResponse', user);
+    });
+
+    socket.on('sendMessage', (msg, sender, receiver, color) => {
+        io.emit('receiveMessage', msg, sender, receiver, color);
     });
 });
 

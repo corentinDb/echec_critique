@@ -47,13 +47,15 @@ let formRegistrationMod = (function () {
             let passwordLenghtIsValid = formRegistrationMod.checkPassword(formTab['password'], formTab['confirmPassword']);
             let passwordCorrespondenceIsValid = formRegistrationMod.checkPassword(formTab['password'], formTab['confirmPassword']);
             let emailIsValid = formRegistrationMod.checkEmail(formTab['email']);
-            if (!pseudoIsValid || !passwordLenghtIsValid || !passwordCorrespondenceIsValid || !emailIsValid) {
-                event.preventDefault();
-                console.log('Formulaire non valide');
-                    document.getElementById('errorReturn').innerHTML = 'Le formulaire n\'est pas valide !';
-            } else {
+            if (pseudoIsValid && passwordLenghtIsValid && passwordCorrespondenceIsValid && emailIsValid) {
+                document.getElementById("pseudoError").innerHTML = '';
+                document.getElementById("confirmPasswordError").innerHTML = '';
+                document.getElementById("passwordError").innerHTML = '';
+                document.getElementById("emailError").innerHTML = '';
                 document.getElementById('errorReturn').innerHTML = '';
-                console.log('Formulaire valide');
+            } else {
+                event.preventDefault();
+                document.getElementById('errorReturn').innerHTML = 'Le formulaire n\'est pas valide !';
             }
         }
     }

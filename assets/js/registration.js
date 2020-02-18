@@ -10,18 +10,21 @@
     form['confirmPassword'] = confirmPassword;
     form['email'] = email;
 
+    document.getElementById('return').addEventListener('click', () => {
+        window.location = '/';
+    });
+
     let error = getURLData('error');
 
-
-    if(error === 'wrongPseudo'){
+    if (error === 'wrongPseudo') {
         document.getElementById('errorReturn').innerHTML = 'Pseudo déjà utilisé !';
-    } else if (error === 'wrongEmail'){
+    } else if (error === 'wrongEmail') {
         document.getElementById('errorReturn').innerHTML = 'Email déjà utilisé !';
     } else {
         document.getElementById('errorReturn').innerHTML = '';
     }
 
-    if (error === 'undefined'){
+    if (error === 'undefined') {
         document.getElementById('errorReturn').innerHTML = 'Une erreur inconnue est survenue, merci de recommencer<br>Si cette erreur persiste, merci de contacter un admin';
     }
 
