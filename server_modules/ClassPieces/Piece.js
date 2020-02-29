@@ -5,7 +5,7 @@ class Piece {
         this.x = x;
         this.y = y;
         this.moveList = [];
-        this.name = "";
+        this.name = " ";
     }
 
     //Renvoie la couleur de la pièce
@@ -45,7 +45,7 @@ class Piece {
     }
 
     //On déclare la fonction qui sera utilisée pour retourner la liste des mouvements possibles d'une pièce
-    getMoveList();
+    getMoveList() {};
 }
 
 module.exports = Piece;
