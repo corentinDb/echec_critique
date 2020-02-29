@@ -6,7 +6,19 @@ class Knight extends Piece {
         this.name = "Knight";
     }
 
-    //Se déplace en "L"
+    getMoveList () {
+        //Remplacer les commentaires par la fonction qui vérifie si une case est vide
+        if (x < 7 && y < 6 /*&& pas de pièce alliée*/) {this.moveList += [this.x + 1, this.y + 2];}
+        if (x > 0 && y < 6 /*&& pas de pièce alliée*/) {this.moveList += [this.x - 1, this.y + 2];}
+        if (x > 1 && y < 7 /*&& pas de pièce alliée*/) {this.moveList += [this.x - 2, this.y + 1];}
+        if (x > 1 && y > 0 /*&& pas de pièce alliée*/) {this.moveList += [this.x - 2, this.y - 1];}
+        if (x < 6 && y < 7 /*&& pas de pièce alliée*/) {this.moveList += [this.x + 2, this.y + 1];}
+        if (x < 6 && y > 0 /*&& pas de pièce alliée*/) {this.moveList += [this.x + 2, this.y - 1];}
+        if (x < 7 && y > 1 /*&& pas de pièce alliée*/) {this.moveList += [this.x + 1, this.y - 2];}
+        if (x > 0 && y > 1 /*&& pas de pièce alliée*/) {this.moveList += [this.x - 1, this.y - 2];}
+
+        return this.moveList;
+    }
 }
 
 module.exports = Knight;
