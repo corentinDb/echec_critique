@@ -1,4 +1,4 @@
-function hashPassword(msg) {
+function hashPassword(msg) {    //Hashage avec salage
     let string1 = 'Okay, Houston, we\'ve had a problem here !';
     let string2 = 'On a un echec critique numéro ' + msg.length;
     return sha512(msg + string1 + string2).toUpperCase();
@@ -22,19 +22,20 @@ app.use(session({secret: 'Error 418 I\'m a teapot !', cookie: {maxAge: 60 * 60 *
 
 let connectedUserList = [];
 
-const con = mysql.createConnection({
+const con = mysql.createConnection({    //Création de la base de donnée
     host: 'localhost',
     user: 'root',
     password: '',
     database: 'echecritique'
 });
 
-con.connect((err) => {
+con.connect((err) => {  //Connexion à la base de donnée
     if (err) {
         console.error('Error connecting to DataBase : \n' + err);
         return;
+    } else {
+        console.log('Connection to DataBase established');
     }
-    console.log('Connection to DataBase established');
 });
 
 //TEMPORAIRE !!!
@@ -43,11 +44,11 @@ app.get('/p', (req, res, next) => {
 });
 
 app.get('/error', (req, res, next) => {
-    res.send('Une erreur inconnue s\'est produite !');
+    res.send('Une erreur inconnue s\'est produite !<br>Merci de contacter un admin !');
 });
 //TEMPORAIRE !!!
 
-app.get('/', (req, res, next) => {
+app.get('/', (req, res, next) => {      //Page principale du serveur = page de connexion
     if (req.session.connectionID) {
         res.redirect('/menu');
     } else {
@@ -55,17 +56,17 @@ app.get('/', (req, res, next) => {
     }
 });
 
-app.post('/', (req, res, next) => {
-    if (req.session.connectionID) {
+app.post('/', (req, res, next) => {     //Traitement des informations de connexion
+    if (req.session.connectionID) {     //Si l'utilisateur est déjà connecté on l'envoie directement sur le menu
         res.redirect('/menu');
     } else {
-        if (req.body.login !== undefined && req.body.password !== undefined) {
+        if (req.body.login !== undefined && req.body.password !== undefined) {  //On vérifie si les informations de connexion existe bien (condition normalement toujours vrai car vérifié avant l'envoie du formulaire mais au cas où on revérifie)
             con.query('SELECT * FROM connection', (error, responseSelect) => {
                 let connectionSuccessful = false;
                 let existingConenction = false;
                 responseSelect.forEach((row) => {
-                    if (hashPassword(req.body.password) === row['password'] && (req.body.login === row['pseudo'] || req.body.login === row['email'])) {
-                        if (!connectedUserList.some((user) => user === row['pseudo'])) {
+                    if (hashPassword(req.body.password) === row['password'] && req.body.login === row['pseudo']) {  //On vérifie chaque couple pseudo/password enregistré en BDD par rapport à celui entré par l'utilisateur
+                        if (!connectedUserList.some((user) => user === row['pseudo'])) {    //On vérifie que l'utilisateur est pas déjà connecté sur un autre ordinateur / navigateur
                             req.session.connectionID = row['userID'];
                             req.session.pseudo = row['pseudo'];
                             connectedUserList.push(row['pseudo']);
@@ -75,6 +76,7 @@ app.post('/', (req, res, next) => {
                         }
                     }
                 });
+                //Redirection en fonction des résultats de la tentative de connexion
                 if (connectionSuccessful) {
                     res.redirect('/menu');
                 } else if (existingConenction) {
@@ -90,7 +92,7 @@ app.post('/', (req, res, next) => {
 });
 
 
-app.get('/registration', (req, res, next) => {
+app.get('/registration', (req, res, next) => {      //Page de création de compte
     if (req.session.connectionID) {
         res.redirect('/menu');
     } else {
@@ -98,18 +100,18 @@ app.get('/registration', (req, res, next) => {
     }
 });
 
-app.post('/registration', (req, res, next) => {
-    if (req.session.connectionID) {
+app.post('/registration', (req, res, next) => {     //Traitement des informations de création de compte
+    if (req.session.connectionID) {     //Si l'utilisateur est déjà connecté on l'envoie directement sur le menu
         res.redirect('/menu');
     } else {
-        if (req.body.pseudo !== undefined && req.body.password !== undefined && req.body.email !== undefined) {
+        if (req.body.pseudo !== undefined && req.body.password !== undefined && req.body.email !== undefined) {     //On vérifie si les informations de connexion existe bien (condition normalement toujours vrai car vérifié avant l'envoie du formulaire mais au cas où on revérifie)
             con.query('SELECT * FROM connection', (error, responseSelect) => {
                 if (error) throw error;
                 let validUser = true;
                 let validMail = true;
                 let errorMsg = '';
 
-                responseSelect.forEach((row) => {
+                responseSelect.forEach((row) => {       //On vérifie qu'un utilistateur avec ce pseudo ou cet email n'existe pas déjà
                     if (row['pseudo'] === req.body.pseudo) {
                         validUser = false;
                         errorMsg = 'wrongPseudo';
@@ -121,7 +123,7 @@ app.post('/registration', (req, res, next) => {
 
                 if (validUser && validMail) {
                     let data = [req.body.pseudo, hashPassword(req.body.password), req.body.email];
-                    con.query('INSERT INTO connection (`pseudo`, `password`, `email`) VALUES (?)', [data], (error, resp) => {
+                    con.query('INSERT INTO connection (`pseudo`, `password`, `email`) VALUES (?)', [data], (error, resp) => {   //On ajoute l'utilisteur en base de donnée
                         if (error) throw error;
                         req.session.connectionID = resp.insertId;
                         req.session.pseudo = req.body.pseudo;
@@ -139,10 +141,10 @@ app.post('/registration', (req, res, next) => {
 });
 
 
-app.get('/menu', (req, res, next) => {
-    if (req.session.connectionID) {
+app.get('/menu', (req, res, next) => {      //Page du menu principal
+    if (req.session.connectionID) {         //Si l'utilisateur est bien connecté
         res.setHeader('Content-Type', 'text/html');
-        res.write('<!DOCTYPE html>\n' +
+        res.write('<!DOCTYPE html>\n' +     //Code html
             '<html lang="en">\n' +
             '<head>\n' +
             '<meta charset="UTF-8">\n' +
@@ -166,13 +168,13 @@ app.get('/menu', (req, res, next) => {
             '    </div>\n' +
             '    <script src="/socket.io/socket.io.js"></script>\n' +
             '    <script>\n' +
-            '        function returnPseudo() {\n' +
+            '        function returnPseudo() {\n' +     //Récupération du pseudo de l'utilisateur
             '            return \'' + req.session.pseudo + '\';\n' +
             '        }\n' +
-            '        function returnListConnectedUser() {\n' +
+            '        function returnListConnectedUser() {\n' +      //Récupération de la liste des utilisateurs connectés au serveur
             '            return \'' + connectedUserList + '\';\n' +
             '        }\n' +
-            '        function returnColor() {\n' +
+            '        function returnColor() {\n' +      //Récupération d'un code couleur héxadécimal en fonction du pseudo
             '           return \'#' + sha512(req.session.pseudo).substring(0, 6) + '\'\n' +
             '        }\n' +
             '    </script>\n' +
@@ -187,25 +189,25 @@ app.get('/menu', (req, res, next) => {
 });
 
 
-app.get('/destroy', (req, res, next) => {
+app.get('/destroy', (req, res, next) => {       //Page de déconnexion
     let index = connectedUserList.indexOf(req.session.pseudo);
-    connectedUserList.splice(index, 1);
-    req.session.destroy(function (err) {
+    connectedUserList.splice(index, 1);     //On retire le pseudo de la liste des utilisateurs
+    req.session.destroy(function (err) {    //Suppression de la session
         res.redirect('/');
     })
 });
 
 
 io.sockets.on('connection', (socket) => {
-    socket.on('newUserRequest', (user) => {
+    socket.on('newUserRequest', (user) => {     //Quand un utilisateur se connecte, on prévient les autres
         io.emit('newUserResponse', user);
     });
 
-    socket.on('removeUserRequest', (user) => {
+    socket.on('removeUserRequest', (user) => {  //Quand un utilisateur se déconnecte, on prévient les autres
         io.emit('removeUserResponse', user);
     });
 
-    socket.on('sendMessage', (msg, sender, receiver, color) => {
+    socket.on('sendMessage', (msg, sender, receiver, color) => {    //Quand un utilisateur envoie un message, on prévient les autres
         io.emit('receiveMessage', msg, sender, receiver, color);
     });
 });

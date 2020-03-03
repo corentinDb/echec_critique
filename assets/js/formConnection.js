@@ -1,6 +1,6 @@
 let formConnectionMod = (function () {
     return {
-        checkLogin(login) {
+        checkLogin(login) {     //Vérification de la validité du login
             let reg = /^[a-zA-Z0-9_-]+$/;
             if (login.value.length < 3) {
                 document.getElementById("loginError").innerHTML = 'Le pseudo ne peux pas exister : trop court';
@@ -17,7 +17,7 @@ let formConnectionMod = (function () {
             }
         },
 
-        checkPasswordConnection(pwd) {
+        checkPasswordConnection(pwd) {      //Vérification de la validité du mot de passe
             if (pwd.value.length < 4) {
                 document.getElementById("passwordError").innerHTML = 'Le mot de passe ne peut pas faire moins de 4 caractères';
                 return false;
@@ -27,14 +27,11 @@ let formConnectionMod = (function () {
             }
         },
 
-        checkSubmitConnection(login, pwd) {
+        checkSubmitConnection(login, pwd) {     //Vérification des informations avant l'envoi du formulaire
             let loginIsValid = formConnectionMod.checkLogin(login);
             let passwordIsValid = formConnectionMod.checkPasswordConnection(pwd);
-            if (loginIsValid && passwordIsValid) {
-                document.getElementById('errorReturn').innerHTML = '';
-                document.getElementById("loginError").innerHTML = '';
-                document.getElementById("passwordError").innerHTML = '';
-            } else {
+
+            if (!loginIsValid && !passwordIsValid) {    //Si les informations ne sont pas valides, on bloque l'envoie du formulaire et on prévient l'utilisateur
                 event.preventDefault();
                 document.getElementById('errorReturn').innerHTML = 'Le formulaire n\'est pas valide !';
             }

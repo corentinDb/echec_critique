@@ -1,42 +1,42 @@
 (function () {
     const socket = io.connect('http://localhost:4269');
 
-    let userList = returnListConnectedUser();
-    let pseudo = returnPseudo();
-    const tempTab = userList.split(',');
+    let userList = returnListConnectedUser();   //Liste des utilisateurs connectées sous forme d'une chaine de caractère
+    let pseudo = returnPseudo();    //Pseudo de l'utilisateur
+    const tempTab = userList.split(',');    //Conversion de la chaine de caractère des utilisateurs en tableau
 
 
     if (tempTab.some((user) => user === pseudo)) {  //Si le pseudo est bien dans la liste des utilisateurs connectées
         socket.emit('newUserRequest', pseudo);          //On prévient les autres users qu'on se connecte
     } else {
-        window.location = '/error';
+        window.location = '/error';     //Sinon on redirige vers la page d'erreur
     }
 
-    const tabUser = tempTab.filter(user => user !== pseudo);
-    document.getElementById("pseudo").appendChild(document.createTextNode(pseudo));
+    const tabUser = tempTab.filter(user => user !== pseudo);    //On retire le pseudo de l'utilisateur de la liste
+    document.getElementById("pseudo").appendChild(document.createTextNode(pseudo));     //On affiche le pseudo de l'utilisateur
 
     let table = document.getElementById("tablePlayer");
-    tabUser.forEach((user) => {
+    tabUser.forEach((user) => {     //On affiche tous les autres utilisateurs connectées
         addUserRow(pseudo, user, table);
     });
 
 
-    socket.on('newUserResponse', (user) => {
+    socket.on('newUserResponse', (user) => {    //Si un nouveau utilisateur se connecte au serveur, on l'ajoute à la liste
         if (!document.getElementById(user) && user !== pseudo) {
             addUserRow(pseudo, user, table);
         }
     });
 
-    socket.on('removeUserResponse', (user) => {
+    socket.on('removeUserResponse', (user) => {     //Si un utilisateur se déconnecte du serveur, on le supprime de la liste
         if (document.getElementById(user)) {
-            if (user !== pseudo) {
+            // if (user !== pseudo) {
                 document.getElementById('mainChatBox').removeChild(document.getElementById('chatBox_' + user));
                 table.removeChild(document.getElementById(user));
-            }
+            // }
         }
     });
 
-    socket.on('receiveMessage', (msg, sender, receiver, color) => {
+    socket.on('receiveMessage', (msg, sender, receiver, color) => {     //Quand l'utilisateur reçoit un message, on l'affiche dans la zone de chat correspondant à l'expéditeur
         if (receiver === pseudo) {
             addMessage(msg, sender, sender, color);
             if (document.getElementById('chatBox_' + sender).style.display === 'none') {
@@ -48,7 +48,7 @@
         }
     });
 
-    document.getElementById("deconnection").addEventListener('click', () => {
+    document.getElementById("deconnection").addEventListener('click', () => {   //Bouton déconnexion
         socket.emit('removeUserRequest', pseudo);
         window.location = "http://localhost:4269/destroy";
     });
@@ -65,7 +65,7 @@
     //A DEBUGUER !!!!!!!
 })();
 
-function addUserRow(pseudo, user, table) {
+function addUserRow(pseudo, user, table) {      //Création d'une ligne pour un utilisateur connecté sur le serveur avec son nom et un bouton pour ouvrir un chat en direct avec lui
     let newRow = document.createElement("tr");
     table.appendChild(newRow);
     newRow.id = user.toString();
@@ -89,7 +89,7 @@ function addUserRow(pseudo, user, table) {
 
     createTabChat(pseudo, user);
 
-    linkChat.addEventListener('click', () => {
+    linkChat.addEventListener('click', () => {      //Bouton pour ouvrir le chat avec l'utilisateur
         let mainDivChat = document.getElementById('mainChatBox');
         if (mainDivChat.hasChildNodes()) {
             let listChatBox = mainDivChat.childNodes;
@@ -102,7 +102,7 @@ function addUserRow(pseudo, user, table) {
     });
 }
 
-function createTabChat(localUser, corresponding) {
+function createTabChat(localUser, corresponding) {      //Création d'une zone de chat entre l'utilisateur local (localUser) et un utilisateur connecté au serveur (corresponding)
     const socket = io.connect('http://localhost:4269');
 
     if (!document.getElementById('chatBox_' + corresponding)) {
@@ -154,7 +154,7 @@ function createTabChat(localUser, corresponding) {
     }
 }
 
-function addMessage(msg, sender, corresponding, color) {
+function addMessage(msg, sender, corresponding, color) {    //Ajout d'un message dans la zone de chat
     let divAllMessage = document.getElementById('messageBox_' + corresponding); //Div qui contient tous les messages
 
     let divNewMessage = document.createElement("div");  //Nouvelle div pour le message qu'on ajoute
@@ -162,7 +162,7 @@ function addMessage(msg, sender, corresponding, color) {
     divNewMessage.className = 'message';
     divAllMessage.scrollTop = divAllMessage.scrollHeight - divAllMessage.clientHeight;
 
-    let spanAuthor = document.createElement("span");
+    let spanAuthor = document.createElement("span");    //Affichage de l'auteur du message
     spanAuthor.className = 'author';
     spanAuthor.style.color = color;
     spanAuthor.appendChild(document.createTextNode(sender + ' :'));

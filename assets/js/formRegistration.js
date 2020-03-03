@@ -1,6 +1,6 @@
 let formRegistrationMod = (function () {
     return {
-        checkEmail(email) {
+        checkEmail(email) {     //Vérification du format de l'email
             let reg = /^[a-zA-Z0-9._-]+@[a-z0-9._-]{2,}\.[a-z]{2,6}$/;
             if (!reg.test(email.value)) {
                 document.getElementById("emailError").innerHTML = 'Email non valide !';
@@ -11,7 +11,7 @@ let formRegistrationMod = (function () {
             }
         },
 
-        checkPseudo(pseudo) {
+        checkPseudo(pseudo) {   //Vérification du format du pseudo
             let reg = /^[a-zA-Z0-9_-]+$/;
             if (pseudo.value.length < 3) {
                 document.getElementById("pseudoError").innerHTML = 'Pseudo trop court (3 caractères minimum)';
@@ -28,7 +28,7 @@ let formRegistrationMod = (function () {
             }
         },
 
-        checkPassword(pwd, confirmPwd) {
+        checkPassword(pwd, confirmPwd) {    //Vérification de la longueur et de la correspondance du mot de passe
             if (pwd.value.length < 4) {
                 document.getElementById("passwordError").innerHTML = 'Mot de passe trop court (4 caractères minimums)';
                 return false;
@@ -42,18 +42,13 @@ let formRegistrationMod = (function () {
             }
         },
 
-        checkSubmit(formTab) {
+        checkSubmit(formTab) {      //Vérification des informations avant l'envoie du formulaire
             let pseudoIsValid = formRegistrationMod.checkPseudo(formTab['pseudo']);
             let passwordLenghtIsValid = formRegistrationMod.checkPassword(formTab['password'], formTab['confirmPassword']);
             let passwordCorrespondenceIsValid = formRegistrationMod.checkPassword(formTab['password'], formTab['confirmPassword']);
             let emailIsValid = formRegistrationMod.checkEmail(formTab['email']);
-            if (pseudoIsValid && passwordLenghtIsValid && passwordCorrespondenceIsValid && emailIsValid) {
-                document.getElementById("pseudoError").innerHTML = '';
-                document.getElementById("confirmPasswordError").innerHTML = '';
-                document.getElementById("passwordError").innerHTML = '';
-                document.getElementById("emailError").innerHTML = '';
-                document.getElementById('errorReturn').innerHTML = '';
-            } else {
+
+            if (!pseudoIsValid && !passwordLenghtIsValid && !passwordCorrespondenceIsValid && !emailIsValid) {  //Si les informations ne sont pas valides, on bloque l'envoie du formulaire et on prévient l'utilisateur
                 event.preventDefault();
                 document.getElementById('errorReturn').innerHTML = 'Le formulaire n\'est pas valide !';
             }

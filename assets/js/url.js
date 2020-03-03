@@ -1,4 +1,4 @@
-function getURLData(param) {
+function getURLData(param) {    //Fonction pour récupérer les paramètres GET d'une URL
     let listGET = {};
     window.location.href.replace(location.hash, '').replace(
         /[?&]+([^=&]+)=?([^&]*)?/gi, // regexp
