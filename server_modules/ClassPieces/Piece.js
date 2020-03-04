@@ -5,7 +5,7 @@ class Piece {
         this.x = x;
         this.y = y;
         this.moveList = [];
-        this.name = " ";
+        this.name = "";
     }
 
     //Renvoie la couleur de la pièce

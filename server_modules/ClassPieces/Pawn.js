@@ -12,11 +12,12 @@ class Pawn extends Piece {
         this.firstMove = false;
     }
 
+    //Se déplace case par case en avant
     getMoveList() {
         //Déplacement classique
         if (y < 7 /*&& case vide*/) {this.moveList += [this.x, this.y];}
         //Premier déplacement
-        if (firstMove /*&& case vide*/) {this.moveList += [this.x, this.y + 2];}
+        if (this.firstMove /*&& case vide*/) {this.moveList += [this.x, this.y + 2];}
         //Déplacements pour manger
         if (x > 0 && y < 7 /*&& pièce ennemie*/) {this.moveList += [this.x - 1, this.y + 1];}
         if (x < 7 && y < 7 /*&& pièce ennemie*/) {this.moveList += [this.x + 1, this.y + 1];}
