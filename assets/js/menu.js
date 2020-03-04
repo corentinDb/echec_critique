@@ -29,10 +29,8 @@
 
     socket.on('removeUserResponse', (user) => {     //Si un utilisateur se déconnecte du serveur, on le supprime de la liste
         if (document.getElementById(user)) {
-            // if (user !== pseudo) {
-                document.getElementById('mainChatBox').removeChild(document.getElementById('chatBox_' + user));
-                table.removeChild(document.getElementById(user));
-            // }
+            document.getElementById('mainChatBox').removeChild(document.getElementById('chatBox_' + user));
+            table.removeChild(document.getElementById(user));
         }
     });
 
