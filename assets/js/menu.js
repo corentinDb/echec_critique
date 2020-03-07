@@ -5,6 +5,7 @@
     let pseudo = returnPseudo();    //Pseudo de l'utilisateur
     const tempTab = userList.split(',');    //Conversion de la chaine de caractère des utilisateurs en tableau
 
+    socket.emit('test', 'yolo test');
 
     if (tempTab.some((user) => user === pseudo)) {  //Si le pseudo est bien dans la liste des utilisateurs connectées
         socket.emit('newUserRequest', pseudo);          //On prévient les autres users qu'on se connecte
@@ -20,7 +21,6 @@
         addUserRow(pseudo, user, table);
     });
 
-
     socket.on('newUserResponse', (user) => {    //Si un nouveau utilisateur se connecte au serveur, on l'ajoute à la liste
         if (!document.getElementById(user) && user !== pseudo) {
             addUserRow(pseudo, user, table);
@@ -34,9 +34,9 @@
         }
     });
 
-    socket.on('receiveMessage', (msg, sender, receiver, color) => {     //Quand l'utilisateur reçoit un message, on l'affiche dans la zone de chat correspondant à l'expéditeur
+    socket.on('receiveMessage', (msg, sender, receiver) => {     //Quand l'utilisateur reçoit un message, on l'affiche dans la zone de chat correspondant à l'expéditeur
         if (receiver === pseudo) {
-            addMessage(msg, sender, sender, color);
+            addMessage(msg, sender, sender);
             if (document.getElementById('chatBox_' + sender).style.display === 'none') {
                 let waitingMsg = document.getElementById('waitingMsg_' + sender);
                 let oldCount = Number(waitingMsg.innerHTML);
@@ -145,14 +145,25 @@ function createTabChat(localUser, corresponding) {      //Création d'une zone d
             let msg = inputText.value;
             if (msg.trim() !== '') {
                 inputText.value = '';
-                addMessage(msg, localUser, corresponding, returnColor());
-                socket.emit('sendMessage', msg, localUser, corresponding, returnColor());
+                addMessage(msg, localUser, corresponding);
+                socket.emit('sendMessage', msg, localUser, corresponding);
+            }
+        });
+
+        //Ajout des messages déjà existant dans la session
+        socket.emit('loadMessageRequest', localUser);
+
+        socket.on('loadMessageResponse', (data) => {
+            if (data[corresponding] !== undefined) {     //Si il y a bien des messages enregistré entre l'utilisateur local et le correspondant, on les affiche
+                data[corresponding].forEach((elem) => {
+                    addMessage(elem['msg'], elem['sender'], corresponding);
+                });
             }
         });
     }
 }
 
-function addMessage(msg, sender, corresponding, color) {    //Ajout d'un message dans la zone de chat
+function addMessage(msg, sender, corresponding) {    //Ajout d'un message dans la zone de chat
     let divAllMessage = document.getElementById('messageBox_' + corresponding); //Div qui contient tous les messages
 
     let divNewMessage = document.createElement("div");  //Nouvelle div pour le message qu'on ajoute
@@ -162,7 +173,6 @@ function addMessage(msg, sender, corresponding, color) {    //Ajout d'un message
 
     let spanAuthor = document.createElement("span");    //Affichage de l'auteur du message
     spanAuthor.className = 'author';
-    spanAuthor.style.color = color;
     spanAuthor.appendChild(document.createTextNode(sender + ' :'));
 
     divNewMessage.appendChild(spanAuthor);

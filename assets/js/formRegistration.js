@@ -48,7 +48,7 @@ let formRegistrationMod = (function () {
             let passwordCorrespondenceIsValid = formRegistrationMod.checkPassword(formTab['password'], formTab['confirmPassword']);
             let emailIsValid = formRegistrationMod.checkEmail(formTab['email']);
 
-            if (!pseudoIsValid && !passwordLenghtIsValid && !passwordCorrespondenceIsValid && !emailIsValid) {  //Si les informations ne sont pas valides, on bloque l'envoie du formulaire et on prévient l'utilisateur
+            if (!pseudoIsValid || !passwordLenghtIsValid || !passwordCorrespondenceIsValid || !emailIsValid) {  //Si les informations ne sont pas valides, on bloque l'envoie du formulaire et on prévient l'utilisateur
                 event.preventDefault();
                 document.getElementById('errorReturn').innerHTML = 'Le formulaire n\'est pas valide !';
             }

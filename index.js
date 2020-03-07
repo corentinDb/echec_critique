@@ -4,6 +4,31 @@ function hashPassword(msg) {    //Hashage avec salage
     return sha512(msg + string1 + string2).toUpperCase();
 }
 
+function resetMessage(user) {   //Fonction qui peut ajouter un utilisateur au fichier message.json mais aussi supprimer les messages enregistrés pour l'utilisateur 'user'
+    fs.readFile('message.json', (err, data) => {
+        if (err) {
+            console.log("An error occured while reading JSON File.");
+            return console.log(err);
+        }
+        let jsonParsed = JSON.parse(data);
+        jsonParsed[user] = {};
+        for (let userList in jsonParsed) {
+            if (userList !== user) {
+                jsonParsed[user][userList] = [];
+                jsonParsed[userList][user] = [];
+            }
+        }
+        let jsonContent = JSON.stringify(jsonParsed);
+        fs.writeFile('message.json', jsonContent, 'utf8', (err) => {
+            if (err) {
+                console.log("An error occured while writing JSON Object to File.");
+                return console.log(err);
+            }
+            console.log("JSON file has been saved.");
+        });
+    });
+}
+
 const port = 4269;
 
 const express = require('express');
@@ -13,6 +38,7 @@ const server = require('http').createServer(app);
 const io = require('socket.io')(server);
 const mysql = require('mysql');
 const sha512 = require('js-sha512');
+const fs = require('fs');
 
 app.use(express.static(__dirname + '/assets/'));
 app.use(express.json());
@@ -44,7 +70,7 @@ app.get('/p', (req, res, next) => {
 });
 
 app.get('/error', (req, res, next) => {
-    res.send('Une erreur inconnue s\'est produite !<br>Merci de contacter un admin !');
+    res.send('Une erreur inconnue s\'est produite !<br>Merci de nous contacter : nicolas.bouillet@isen.yncrea.fr');
 });
 //TEMPORAIRE !!!
 
@@ -78,6 +104,7 @@ app.post('/', (req, res, next) => {     //Traitement des informations de connexi
                 });
                 //Redirection en fonction des résultats de la tentative de connexion
                 if (connectionSuccessful) {
+                    resetMessage(req.session.pseudo);   //Par précaution, on reset les messages
                     res.redirect('/menu');
                 } else if (existingConenction) {
                     res.redirect('/?error=existing');
@@ -125,9 +152,13 @@ app.post('/registration', (req, res, next) => {     //Traitement des information
                     let data = [req.body.pseudo, hashPassword(req.body.password), req.body.email];
                     con.query('INSERT INTO connection (`pseudo`, `password`, `email`) VALUES (?)', [data], (error, resp) => {   //On ajoute l'utilisteur en base de donnée
                         if (error) throw error;
+                        let pseudo = req.body.pseudo;
                         req.session.connectionID = resp.insertId;
-                        req.session.pseudo = req.body.pseudo;
+                        req.session.pseudo = pseudo;
                         connectedUserList.push(req.body.pseudo);
+
+                        resetMessage(pseudo);   //Ajout de l'utilisateur dans le fichier message.json
+
                         res.redirect('/menu');
                     });
                 } else {
@@ -174,9 +205,6 @@ app.get('/menu', (req, res, next) => {      //Page du menu principal
             '        function returnListConnectedUser() {\n' +      //Récupération de la liste des utilisateurs connectés au serveur
             '            return \'' + connectedUserList + '\';\n' +
             '        }\n' +
-            '        function returnColor() {\n' +      //Récupération d'un code couleur héxadécimal en fonction du pseudo
-            '           return \'#' + sha512(req.session.pseudo).substring(0, 6) + '\'\n' +
-            '        }\n' +
             '    </script>\n' +
             '    <script src="../js/menu.js"></script>\n' +
             '</body>\n' +
@@ -190,11 +218,15 @@ app.get('/menu', (req, res, next) => {      //Page du menu principal
 
 
 app.get('/destroy', (req, res, next) => {       //Page de déconnexion
-    let index = connectedUserList.indexOf(req.session.pseudo);
-    connectedUserList.splice(index, 1);     //On retire le pseudo de la liste des utilisateurs
-    req.session.destroy(function (err) {    //Suppression de la session
-        res.redirect('/');
-    })
+    let user = req.session.pseudo;
+    if (user !== undefined && user !== null) {  //Si le pseudo n'est pas undefined ou null, pour éviter les bugs si l'utilisateur charge cette page sans être connecté
+        let index = connectedUserList.indexOf(user);
+        connectedUserList.splice(index, 1);     //On retire le pseudo de la liste des utilisateurs
+        req.session.destroy(function (err) {    //Suppression de la session
+            resetMessage(user);     //Suppression des messages de l'utilisateur 'user'
+            res.redirect('/');
+        })
+    }
 });
 
 
@@ -207,11 +239,38 @@ io.sockets.on('connection', (socket) => {
         io.emit('removeUserResponse', user);
     });
 
-    socket.on('sendMessage', (msg, sender, receiver, color) => {    //Quand un utilisateur envoie un message, on prévient les autres
-        io.emit('receiveMessage', msg, sender, receiver, color);
+    socket.on('sendMessage', (msg, sender, receiver) => {    //Quand un utilisateur envoie un message, on prévient les autres
+        fs.readFile('message.json', (err, data) => {    //Enregistrement du message dans le fichier message.json
+            if (err) {
+                console.log("An error occured while reading JSON File.");
+                return console.log(err);
+            }
+            let jsonParsed = JSON.parse(data);
+            let msgJson = {};
+            msgJson['sender'] = sender;
+            msgJson['msg'] = msg;
+            jsonParsed[sender][receiver].push(msgJson);
+            jsonParsed[receiver][sender].push(msgJson);
+            let jsonContent = JSON.stringify(jsonParsed);
+            fs.writeFile('message.json', jsonContent, 'utf8', (err) => {
+                if (err) {
+                    console.log("An error occured while writing JSON Object to File.");
+                    return console.log(err);
+                }
+                console.log("JSON file has been saved.");
+            });
+        });
+        io.emit('receiveMessage', msg, sender, receiver);
+    });
+
+    socket.on('loadMessageRequest', (user) => {
+        fs.readFile('message.json', (err, data) => {
+            let jsonParsed = JSON.parse(data);
+            let dataToSend = jsonParsed[user];
+            socket.emit('loadMessageResponse', dataToSend);     //Envoie des messages enregistrés pour l'utilisateur 'user'
+        });
     });
 });
-
 
 server.listen(port);
 console.log('Server Instantiated');

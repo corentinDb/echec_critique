@@ -31,7 +31,7 @@ let formConnectionMod = (function () {
             let loginIsValid = formConnectionMod.checkLogin(login);
             let passwordIsValid = formConnectionMod.checkPasswordConnection(pwd);
 
-            if (!loginIsValid && !passwordIsValid) {    //Si les informations ne sont pas valides, on bloque l'envoie du formulaire et on prévient l'utilisateur
+            if (!loginIsValid || !passwordIsValid) {    //Si les informations ne sont pas valides, on bloque l'envoie du formulaire et on prévient l'utilisateur
                 event.preventDefault();
                 document.getElementById('errorReturn').innerHTML = 'Le formulaire n\'est pas valide !';
             }
