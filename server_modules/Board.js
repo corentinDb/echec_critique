@@ -41,32 +41,27 @@ class Board {
         delete this.board[point.x][point.y];
     }
 
-    //permet de déplacer un pion d'une case à une autre ( augmente ou diminue le nombre de tour et ajoute ou supprime le mouvement du replay en fonction du parametre booléen rewind)
+    //permet de déplacer un pion d'une case à une autre (augmente le nombre de tour et ajoute le mouvement dans replay)
     move(move) {
 
         let origin = move.getOrigin();
         let destination = move.getDestination();
 
-        this.replay[this.turn] = move;
-        this.turn++;
-
         this.insert(this.getCase(origin), destination);
         this.destruct(origin);
+
+        this.replay[this.turn] = move;
+        this.turn++;
 
     }
 
     //reset le plateau
     reset(){
-        for (let i = 0; i < 8; i++) this.board[i] = new Array(8);
-        let array = [1, 2, 3, 4, 5, 3, 2, 1];
-        for (let i = 0; i < 8; i++) {
-            this.insert(array[i], new Point(i, 7));
-            this.insert(array[i] + 6, new Point(i, 0));
-            this.insert(6, new Point(i, 6));
-            this.insert(12, new Point(i, 1));
-        }
-        this.turn = 0;
-        this.replay = [];
+
+        let newBoard = new Board();
+        this.board = newBoard.board;
+        this.turn = newBoard.turn;
+        this.replay = newBoard.replay;
 
     }
 

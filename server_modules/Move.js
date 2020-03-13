@@ -11,7 +11,7 @@ class Move {
 
     //renvoie l'origin
     getOrigin() {
-        return (this.origin);
+        return (this.origin);     
     }
 
     //renvoie la desination
