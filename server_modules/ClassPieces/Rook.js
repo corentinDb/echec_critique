@@ -4,7 +4,7 @@ class Rook extends Piece {
     constructor(color, x, y) {
         super(color, x, y);
         this.castling = true;
-        this.name = "Rook";
+        this.name = 'Rook';
     }
 
     moved() {

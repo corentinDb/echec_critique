@@ -5,7 +5,7 @@ class Piece {
         this.x = x;
         this.y = y;
         this.moveList = [];
-        this.name = "";
+        this.name = '';
     }
 
     //Renvoie la couleur de la pièce
@@ -24,7 +24,7 @@ class Piece {
     }
 
     //Donne les coordonnées sous la forme D4 pour x = 4 et y = 4 par exemple
-    getPositionAlpha() {
+    getPositionB() {
         return `${'ABCDEFGH'[this.x]}${this.y + 1}`;
     }
 
@@ -35,7 +35,7 @@ class Piece {
     }
 
     //Change les coordonées à partir d'une entrée telle que E5 ou c6
-    setPositionAlpha(alpha) {
+    setPositionB(alpha) {
         //On prend les deux premiers éléments de la chaine et on les met dans un tableau en upper case
         const [x, y] = alpha.toUpperCase();
         //x prend la valeur de l'index de la lettre dans la chaine ci-dessous

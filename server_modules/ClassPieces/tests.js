@@ -12,8 +12,10 @@ if (name !== 'King') {console.error('bad name : expected King, got ' + name);}
 
 console.log('Nature de la pièce : ' + roiBlanc.getName());
 console.log('Couleur de la pièce : ' + roiBlanc.getColor());
-console.log('La pièce est en ' + roiBlanc.getPositionAlpha());
+console.log('La pièce est en ' + roiBlanc.getPositionB());
 console.log('Déplacement de la pièce en ' + move);
-roiBlanc.setPositionAlpha(move);
+roiBlanc.setPositionB(move);
 console.log('La pièce est en ', roiBlanc.getPosition());
-console.log('La pièce est en ' + roiBlanc.getPositionAlpha());
+console.log('La pièce est en ' + roiBlanc.getPositionB());
+console.log('Déplacements possibles de la pièce en', roiBlanc.getPositionB(), ':');
+console.log(roiBlanc.getMoveList());
