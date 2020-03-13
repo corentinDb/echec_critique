@@ -1,8 +1,11 @@
 (function () {
-    const socket = io.connect('http://localhost:8100');
-    socket.on('hello', (message) => {
-        alert('le serveur a un message pour vous : ' + message);
-    })
+
+    const socket = io.connect('http://localhost:4269');
+
+    socket.on('returnPoint', (message) => {
+        console.log(message);
+    });
+
     function clicked() {
         console.log('clicked');
         socket.emit('private message', 'Nico', 'Salut serveur, comment va ?');
