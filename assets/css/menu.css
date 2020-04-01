@@ -3,6 +3,10 @@ body {
     justify-content: space-between;
 }
 
+#userList, #pseudo {
+    display: none;
+}
+
 #divUser {
     flex: 1;
 }

@@ -40,6 +40,9 @@ const mysql = require('mysql');
 const sha512 = require('js-sha512');
 const fs = require('fs');
 
+app.set('views', __dirname + '/assets/views');
+app.set('view engine', 'ejs');
+
 app.use(express.static(__dirname + '/assets/'));
 app.use(express.json());
 app.use(express.urlencoded({extended: true}));
@@ -57,22 +60,18 @@ const con = mysql.createConnection({    //Création de la base de donnée
 
 con.connect((err) => {  //Connexion à la base de donnée
     if (err) {
-        console.error('Error connecting to DataBase : \n' + err);
+        console.log('Error connecting to DataBase : \n' + err);
         return;
     } else {
         console.log('Connection to DataBase established');
     }
 });
 
-//TEMPORAIRE !!!
-app.get('/p', (req, res, next) => {
-    res.redirect('http://localhost/phpmyadmin');
-});
 
 app.get('/error', (req, res, next) => {
-    res.send('Une erreur inconnue s\'est produite !<br>Merci de nous contacter : nicolas.bouillet@isen.yncrea.fr');
+    res.sendFile(__dirname + '/assets/views/error.html');
 });
-//TEMPORAIRE !!!
+
 
 app.get('/', (req, res, next) => {      //Page principale du serveur = page de connexion
     if (req.session.connectionID) {
@@ -174,43 +173,7 @@ app.post('/registration', (req, res, next) => {     //Traitement des information
 
 app.get('/menu', (req, res, next) => {      //Page du menu principal
     if (req.session.connectionID) {         //Si l'utilisateur est bien connecté
-        res.setHeader('Content-Type', 'text/html');
-        res.write('<!DOCTYPE html>\n' +     //Code html
-            '<html lang="en">\n' +
-            '<head>\n' +
-            '<meta charset="UTF-8">\n' +
-            '<title>Menu</title>\n' +
-            '<link rel="stylesheet" type="text/css" href="../css/menu.css"/>\n' +
-            '<link rel="stylesheet" type="text/css" href="../css/main.css"/>\n' +
-            '</head>\n' +
-            '<body>\n' +
-            '    <div id="divUser">\n' +
-            '        <input type="button" value="déconnexion" id="deconnection">\n' +
-            '        <p id="pseudo">Votre peusdo : </p>\n' +
-            '        <table>\n' +
-            '            <thead>\n' +
-            '            <tr><th>Autre utilisateur :</th></tr>\n' +
-            '            </thead>\n' +
-            '            <tbody id="tablePlayer">\n' +
-            '            </tbody>\n' +
-            '        </table>\n' +
-            '    </div>\n' +
-            '    <div id="mainChatBox">\n' +
-            '    </div>\n' +
-            '    <script src="/socket.io/socket.io.js"></script>\n' +
-            '    <script>\n' +
-            '        function returnPseudo() {\n' +     //Récupération du pseudo de l'utilisateur
-            '            return \'' + req.session.pseudo + '\';\n' +
-            '        }\n' +
-            '        function returnListConnectedUser() {\n' +      //Récupération de la liste des utilisateurs connectés au serveur
-            '            return \'' + connectedUserList + '\';\n' +
-            '        }\n' +
-            '    </script>\n' +
-            '    <script src="../js/menu.js"></script>\n' +
-            '</body>\n' +
-            '</html>'
-        );
-        res.end();
+        res.render('menu', {pseudo: req.session.pseudo, userList: connectedUserList});
     } else {
         res.redirect('/');
     }

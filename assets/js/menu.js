@@ -1,11 +1,22 @@
 (function () {
     const socket = io.connect('http://localhost:4269');
 
-    let userList = returnListConnectedUser();   //Liste des utilisateurs connectées sous forme d'une chaine de caractère
-    let pseudo = returnPseudo();    //Pseudo de l'utilisateur
+    let userList = document.getElementById('userList').innerHTML;   //Liste des utilisateurs connectées sous forme d'une chaine de caractère
+    let pseudo = document.getElementById('pseudo').innerHTML;  //Pseudo de l'utilisateur
     const tempTab = userList.split(',');    //Conversion de la chaine de caractère des utilisateurs en tableau
 
-    socket.emit('test', 'yolo test');
+    let href = document.referrer;
+    let tabHref = href.split('/');
+    if (tabHref[2] !== 'localhost:4269'){
+        socket.emit('removeUserRequest', pseudo);
+        window.location = 'http://localhost:4269/destroy';
+    }
+
+    socket.on('test', (msg) => {
+        console.log(msg);
+    });
+
+    document.getElementById('pseudoGraphics').innerHTML += pseudo;
 
     if (tempTab.some((user) => user === pseudo)) {  //Si le pseudo est bien dans la liste des utilisateurs connectées
         socket.emit('newUserRequest', pseudo);          //On prévient les autres users qu'on se connecte
@@ -50,17 +61,6 @@
         socket.emit('removeUserRequest', pseudo);
         window.location = "http://localhost:4269/destroy";
     });
-
-    //A DEBUGUER !!!!!!!
-    /* Multiple problème :
-    -Fonctionne lorsque on recharge juste la page => il ne faudrait pas
-    -Ne permet pas de charger le contenu de la page '/destroy' qui provoque la fermeture de la session => c'est pourtant ce qu'on veut
-     */
-    // window.addEventListener('beforeunload', () => {
-    //     socket.emit('removeUserRequest', pseudo);
-    //     socket.emit('destroyRequest');
-    // })
-    //A DEBUGUER !!!!!!!
 })();
 
 function addUserRow(pseudo, user, table) {      //Création d'une ligne pour un utilisateur connecté sur le serveur avec son nom et un bouton pour ouvrir un chat en direct avec lui
