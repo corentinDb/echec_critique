@@ -1,9 +1,10 @@
+const Point = require('./../Point');
+
 class Piece {
     //Dans le constructeur : couleur, coordonnées de la pièce et liste des mouvements possibles
     constructor(color, x, y) {
         this.color = color;
-        this.x = x;
-        this.y = y;
+        this.position = new Point(x, y);
         this.moveList = [];
         this.name = '';
     }
@@ -15,7 +16,7 @@ class Piece {
 
     //Renvoie un objet avec comme attribut x et y (position.x et position.y)
     getPosition() {
-        return {x:this.x, y:this.y};
+        return this.position;
     }
 
     //Renvoie le nom de la pièce
@@ -30,14 +31,14 @@ class Piece {
 
     //Change les coordonnées de la pièce de manière bourrine
     setPosition(x, y) {
-        this.x = x;
-        this.y = y;
+        this.position.x = x;
+        this.position.y = y;
     }
 
     //Change les coordonées à partir d'une entrée telle que E5 ou c6
-    setPositionB(alpha) {
+    setPositionB(chain) {
         //On prend les deux premiers éléments de la chaine et on les met dans un tableau en upper case
-        const [x, y] = alpha.toUpperCase();
+        const [x, y] = chain.toUpperCase();
         //x prend la valeur de l'index de la lettre dans la chaine ci-dessous
         this.x = 'ABCDEFGH'.indexOf(x);
         //y prend la valeur du caractère converti en nombre moins 1

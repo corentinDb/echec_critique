@@ -1,4 +1,6 @@
 const Piece = require('./Piece');
+const Point = require('./../Point');
+const Move = require('./../Move');
 
 class Pawn extends Piece {
     constructor(color, x, y) {
@@ -23,8 +25,8 @@ class Pawn extends Piece {
             if (this.firstMove /*&& case vide*/) {this.moveList += [this.x, this.y + 2];}
             
             //Déplacements pour manger
-            if (this.x > 0 && this.y < 7 /*&& pièce ennemie*/) {this.moveList += [this.x - 1, this.y + 1];}
-            if (this.x < 7 && this.y < 7 /*&& pièce ennemie*/) {this.moveList += [this.x + 1, this.y + 1];}
+            if (this.x > 0 && this.y < 7 /*&& pièce ennemie && pièce != roi*/) {this.moveList += [this.x - 1, this.y + 1];}
+            if (this.x < 7 && this.y < 7 /*&& pièce ennemie && pièce != roi*/) {this.moveList += [this.x + 1, this.y + 1];}
 
         //S'il est noir
         } else if (this.color === 'black') {
@@ -32,8 +34,8 @@ class Pawn extends Piece {
             
             if (this.firstMove /*&& case vide*/) {this.moveList += [this.x, this.y - 2];}
             
-            if (this.x > 0 && this.y < 7 /*&& pièce ennemie*/) {this.moveList += [this.x - 1, this.y - 1];}
-            if (this.x < 7 && this.y < 7 /*&& pièce ennemie*/) {this.moveList += [this.x + 1, this.y - 1];}
+            if (this.x > 0 && this.y < 7 /*&& pièce ennemie && pièce != roi*/) {this.moveList += [this.x - 1, this.y - 1];}
+            if (this.x < 7 && this.y < 7 /*&& pièce ennemie && pièce != roi*/) {this.moveList += [this.x + 1, this.y - 1];}
 
         } else {
             console.error('Bad color : unknown color');

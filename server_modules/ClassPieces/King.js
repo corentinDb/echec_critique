@@ -1,4 +1,6 @@
 const Piece = require('./Piece');
+const Point = require('./../Point');
+const Move = require('./../Move');
 
 class King extends Piece {
     constructor(color, x, y) {
@@ -25,14 +27,30 @@ class King extends Piece {
     //Se déplace d'une case dans toute les directions s'il n'est pas en échec
     getMoveList() {
         //Remplacer les commentaires par les fonctions qui vérifient les conditions
-        if (this.x < 7 && this.y < 7 /*&& (case vide || pièce ennemie) && pas en échec*/) {this.moveList += [this.x + 1, this.y + 1];}
-        if (this.y < 7 /*&& (case vide || pièce ennemie) && pas en échec*/) {this.moveList += [this.x, this.y + 1];}
-        if (this.x > 0 && this.y < 7 /*&& (case vide || pièce ennemie) && pas en échec*/) {this.moveList += [this.x - 1, this.y + 1];}
-        if (this.x > 0 /*&& (case vide || pièce ennemie) && pas en échec*/) {this.moveList += [this.x - 1, this.y];}
-        if (this.x > 0 && this.y > 0 /*&& (case vide || pièce ennemie) && pas en échec*/) {this.moveList += [this.x - 1, this.y - 1];}
-        if (this.y > 0 /*&& (case vide || pièce ennemie) && pas en échec*/) {this.moveList += [this.x, this.y - 1];}
-        if (this.x < 7 && this.y > 0 /*&& (case vide || pièce ennemie) && pas en échec*/) {this.moveList += [this.x + 1, this.y - 1];}
-        if (this.x < 7 /*&& (case vide || pièce ennemie) && pas en échec*/) {this.moveList += [this.x + 1, this.y];}
+        if (this.x < 7 && this.y < 7 /*&& (case vide || pièce ennemie) && pas en échec*/) {
+            this.moveList += [this.x + 1, this.y + 1];
+        }
+        if (this.y < 7 /*&& (case vide || pièce ennemie sauf roi) && pas en échec*/) {
+            this.moveList += [this.x, this.y + 1];
+        }
+        if (this.x > 0 && this.y < 7 /*&& (case vide || pièce ennemie sauf roi) && pas en échec*/) {
+            this.moveList += [this.x - 1, this.y + 1];
+        }
+        if (this.x > 0 /*&& (case vide || pièce ennemie sauf roi) && pas en échec*/) {
+            this.moveList += [this.x - 1, this.y];
+        }
+        if (this.x > 0 && this.y > 0 /*&& (case vide || pièce ennemie sauf roi) && pas en échec*/) {
+            this.moveList += [this.x - 1, this.y - 1];
+        }
+        if (this.y > 0 /*&& (case vide || pièce ennemie sauf roi) && pas en échec*/) {
+            this.moveList += [this.x, this.y - 1];
+        }
+        if (this.x < 7 && this.y > 0 /*&& (case vide || pièce ennemie sauf roi) && pas en échec*/) {
+            this.moveList += [this.x + 1, this.y - 1];
+        }
+        if (this.x < 7 /*&& (case vide || pièce ennemie sauf roi) && pas en échec*/) {
+            this.moveList += [this.x + 1, this.y];
+        }
 
         return this.moveList;
     }

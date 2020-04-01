@@ -1,4 +1,6 @@
 const Piece = require('./Piece');
+const Point = require('./../Point');
+const Move = require('./../Move');
 
 class Bishop extends Piece {
     constructor(color, x, y) {
@@ -13,9 +15,9 @@ class Bishop extends Piece {
 
         for (let i = this.x + 1; i <= 7; i++) {
             for (let j = this.y + 1; j <= 7; j++) {
-                if (!stop /*&& case vide*/) {
+                if (!stop /*&& case vide sauf roi*/) {
                     this.moveList += [i, j];
-                } else if (!stop /*&& pièce ennemie*/) {
+                } else if (!stop /*&& pièce ennemie sauf roi*/) {
                     this.moveList += [i, j];
                     stop = true;
                 } else {
@@ -30,7 +32,7 @@ class Bishop extends Piece {
             for (let j = this.y - 1; j >= 0; j--) {
                 if (!stop /*&& case vide*/) {
                     this.moveList += [i, j];
-                } else if (!stop /*&& pièce ennemie*/) {
+                } else if (!stop /*&& pièce ennemie sauf roi*/) {
                     this.moveList += [i, j];
                     stop = true;
                 } else {
@@ -44,7 +46,7 @@ class Bishop extends Piece {
             for (let j = this.y - 1; j >= 0; j--) {
                 if (!stop /*&& case vide*/) {
                     this.moveList += [i, j];
-                } else if (!stop /*&& pièce ennemie*/) {
+                } else if (!stop /*&& pièce ennemie sauf roi*/) {
                     this.moveList += [i, j];
                     stop = true;
                 } else {
@@ -58,7 +60,7 @@ class Bishop extends Piece {
             for (let j = this.y + 1; j <= 7; j++) {
                 if (!stop /*&& case vide*/) {
                     this.moveList += [i, j];
-                } else if (!stop /*&& pièce ennemie*/) {
+                } else if (!stop /*&& pièce ennemie sauf roi*/) {
                     this.moveList += [i, j];
                     stop = true;
                 } else {
