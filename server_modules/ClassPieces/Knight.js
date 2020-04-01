@@ -1,4 +1,6 @@
 const Piece = require('./Piece');
+const Point = require('./../Point');
+const Move = require('./../Move');
 
 class Knight extends Piece {
     constructor(color, x, y) {
@@ -6,16 +8,24 @@ class Knight extends Piece {
         this.name = 'Knight';
     }
 
-    getMoveList () {
+    getMoveList() {
         //Remplacer les commentaires par la fonction qui vérifie si une case est vide
-        if (this.x < 7 && this.y < 6 /*&& (case vide || pièce ennemie)*/) {this.moveList += [this.x + 1, this.y + 2];}
-        if (this.x > 0 && this.y < 6 /*&& (case vide || pièce ennemie)*/) {this.moveList += [this.x - 1, this.y + 2];}
-        if (this.x > 1 && this.y < 7 /*&& (case vide || pièce ennemie)*/) {this.moveList += [this.x - 2, this.y + 1];}
-        if (this.x > 1 && this.y > 0 /*&& (case vide || pièce ennemie)*/) {this.moveList += [this.x - 2, this.y - 1];}
-        if (this.x < 6 && this.y < 7 /*&& (case vide || pièce ennemie)*/) {this.moveList += [this.x + 2, this.y + 1];}
-        if (this.x < 6 && this.y > 0 /*&& (case vide || pièce ennemie)*/) {this.moveList += [this.x + 2, this.y - 1];}
-        if (this.x < 7 && this.y > 1 /*&& (case vide || pièce ennemie)*/) {this.moveList += [this.x + 1, this.y - 2];}
-        if (this.x > 0 && this.y > 1 /*&& (case vide || pièce ennemie)*/) {this.moveList += [this.x - 1, this.y - 2];}
+        if (this.getPosition().x < 7 && this.getPosition().y < 6 /*&& (case vide || pièce ennemie)*/)
+            this.moveList.push(new Move(this.getPosition(), new Point(this.getPosition().x + 1, this.getPosition().y + 2)));
+        if (this.getPosition().x > 0 && this.getPosition().y < 6 /*&& (case vide || pièce ennemie)*/)
+            this.moveList.push(new Move(this.getPosition(), new Point(this.getPosition().x - 1, this.getPosition().y + 2)));
+        if (this.getPosition().x > 1 && this.getPosition().y < 7 /*&& (case vide || pièce ennemie)*/)
+            this.moveList.push(new Move(this.getPosition(), new Point(this.getPosition().x - 2, this.getPosition().y + 1)));
+        if (this.getPosition().x > 1 && this.getPosition().y > 0 /*&& (case vide || pièce ennemie)*/)
+            this.moveList.push(new Move(this.getPosition(), new Point(this.getPosition().x - 2, this.getPosition().y - 1)));
+        if (this.getPosition().x < 6 && this.getPosition().y < 7 /*&& (case vide || pièce ennemie)*/)
+            this.moveList.push(new Move(this.getPosition(), new Point(this.getPosition().x + 2, this.getPosition().y + 1)));
+        if (this.getPosition().x < 6 && this.getPosition().y > 0 /*&& (case vide || pièce ennemie)*/)
+            this.moveList.push(new Move(this.getPosition(), new Point(this.getPosition().x + 2, this.getPosition().y + -1)));
+        if (this.getPosition().x < 7 && this.getPosition().y > 1 /*&& (case vide || pièce ennemie)*/)
+            this.moveList.push(new Move(this.getPosition(), new Point(this.getPosition().x + 1, this.getPosition().y - 2)));
+        if (this.getPosition().x > 0 && this.getPosition().y > 1 /*&& (case vide || pièce ennemie)*/)
+            this.moveList.push(new Move(this.getPosition(), new Point(this.getPosition().x - 1, this.getPosition().y - 2)));
 
         return this.moveList;
     }
