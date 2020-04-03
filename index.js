@@ -61,7 +61,6 @@ const con = mysql.createConnection({    //Création de la base de donnée
 con.connect((err) => {  //Connexion à la base de donnée
     if (err) {
         console.log('Error connecting to DataBase : \n' + err);
-        return;
     } else {
         console.log('Connection to DataBase established');
     }

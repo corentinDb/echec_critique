@@ -5,28 +5,30 @@
     <title>Rejoins-Nous !</title>
 
     <link rel="stylesheet" type="text/css" href="../css/main.css"/>
+    <link rel="stylesheet" type="text/css" href="../css/form.css"/>
 </head>
 <body>
+<div id="menu">
     <button id="return">Retour</button>
     <br>
     <br>
     <form id="formRegistration" action="/registration" method="post">
-        <label for="pseudo">Pseudo</label>
+        <label for="pseudo">Pseudo</label><br>
         <input id="pseudo" type="text" name="pseudo" size="20" maxlength="20" placeholder="ptdr t ki ?" required> <span class="error" id="pseudoError"></span>
         <br>
         <br>
 
-        <label for="password">Mot de passe</label>
+        <label for="password">Mot de passe</label><br>
         <input id="password" type="password" name="password" size="42" maxlength="42" placeholder="Promis c'est sécur" required> <span class="error" id="passwordError"></span>
         <br>
         <br>
 
-        <label for="confirmPassword">Retapez votre mot de passe</label>
+        <label for="confirmPassword">Retapez votre mot de passe</label><br>
         <input id="confirmPassword" type="password" name="confirmPassword" size="42" maxlength="42" placeholder="Promis c'est sécur" required> <span class="error" id="confirmPasswordError"></span>
         <br>
         <br>
 
-        <label for="email">Adresse email</label>
+        <label for="email">Adresse email</label><br>
         <input id="email" type="text" name="email" size="42" maxlength="255" placeholder="Tkt y a pas de spam" required> <span class="error" id="emailError"></span>
         <br>
         <br>
@@ -36,10 +38,11 @@
     </form>
     <br>
     <div id="errorReturn" class="error"></div>
+</div>
 
-    <script src="/socket.io/socket.io.js"></script>
-    <script src="../js/url.js"></script>
-    <script src="../js/formRegistration.js"></script>
-    <script src="../js/registration.js"></script>
+<script src="/socket.io/socket.io.js"></script>
+<script src="../js/url.js"></script>
+<script src="../js/formRegistration.js"></script>
+<script src="../js/registration.js"></script>
 </body>
 </html>
