@@ -1,4 +1,5 @@
 const Point = require('./Point');
+const Piece = require('./ClassPieces/Piece');
 
 //Class plateau
 class Board {
@@ -10,14 +11,7 @@ class Board {
         this.board = new Array(8);
         for (let i = 0; i < 8; i++) this.board[i] = new Array(8);
 
-        let array = [1, 2, 3, 4, 5, 3, 2, 1];
-        for (let i = 0; i < 8; i++) {
-            this.insert(array[i], new Point(i, 7));
-            this.insert(array[i] + 6, new Point(i, 0));
-            this.insert(6, new Point(i, 6));
-            this.insert(12, new Point(i, 1));
-        }
-
+       
         //initialisation du nombre de tour à 0
         this.turn = 0;
 
@@ -31,8 +25,8 @@ class Board {
     }
 
     //permet d'inserer un pion pour une case donnée
-    insert(pion, point) {
-        this.board[point.x][point.y] = pion;
+    insert(piece, point) {
+        this.board[point.x][point.y] = piece;
     }
 
     //permet de detruire le pion d'une case donnée
@@ -48,6 +42,9 @@ class Board {
 
         this.insert(this.getCase(origin), destination);
         this.destruct(origin);
+
+        //change les coordonnées contenues dans la pièce
+        this.getCase(destination).setPosition(destination);
 
         this.replay[this.turn] = move;
         this.turn++;
@@ -81,6 +78,20 @@ class Board {
 
     }
 
+    //Permet de trouver une pièce sur l'échiquier
+    searchPiece(name, color) {
+        for (let i = 0; i < 8; i++) {
+            for (let j = 0; j < 8; j++) {
+                piece = this.getCase(new Point(i, j));
+                if (piece !== undefined && piece.name === name && piece.color === color) {
+                    return piece;
+                }
+            }
+        }
+
+        console.error('Unable to find ', name, ' of color', color);
+        return undefined;
+    }
 }
 
 module.exports = Board;

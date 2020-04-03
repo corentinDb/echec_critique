@@ -7,6 +7,7 @@ class Piece {
         this.position = new Point(x, y);
         this.moveList = [];
         this.name = '';
+        this.hasMoved = false;
     }
 
     //Renvoie la couleur de la pièce
@@ -22,6 +23,11 @@ class Piece {
     //Renvoie le nom de la pièce
     getName() {
         return this.name;
+    }
+
+    //Indique que la pièce s'est déplacé au moins une fois
+    moved() {
+        this.hasMoved = true;
     }
 
     //Donne les coordonnées sous la forme D4 pour x = 4 et y = 4 par exemple
@@ -45,8 +51,7 @@ class Piece {
     }
 
     //On déclare la fonction qui sera utilisée pour retourner la liste des mouvements possibles d'une pièce
-    getMoveList(board) {
-    };
+    getMoveList(board) {};
 }
 
 module.exports = Piece;

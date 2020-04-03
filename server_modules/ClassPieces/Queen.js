@@ -1,6 +1,7 @@
 const Piece = require('./Piece');
 const Point = require('./../Point');
 const Move = require('./../Move');
+const Board = require('./../Board');
 
 class Queen extends Piece {
     constructor(color, x, y) {
