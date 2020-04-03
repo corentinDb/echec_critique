@@ -10,7 +10,7 @@ class Rook extends Piece {
     }
 
     moved() {
-        castling = false;
+        this.castling = false;
     }
 
     //Se déplace à l'horizontale et la verticale
@@ -18,11 +18,11 @@ class Rook extends Piece {
         //Variable servant à arrêter l'ajout de case s'il y a une pièce sur le chemin
         let stop = false;
 
-        for (let i = this.x - 1; i >= 0; i--) {
-            if (!stop /*&& case vide*/) {
-                this.moveList += [i, this.y];
-            } else if (!stop /*&& pièce ennemie && pièce != roi*/) {
-                this.movelist += [i, this.y];
+        for (let i = this.getPosition().x - 1; i >= 0; i--) {
+            if (!stop && piece === undefined) {
+                this.moveList.push(new Move(this.getPosition(), new Point(i, this.getPosition().y)));
+            } else if (!stop && piece.color !== this.color && piece.name !== 'King') {
+                this.moveList.push(new Move(this.getPosition(), new Point(i, this.getPosition().y)));
                 stop = true;
             } else {
                 stop = true;
@@ -31,11 +31,11 @@ class Rook extends Piece {
         //Réinitialisation de la variable
         stop = false;
 
-        for (let i = this.x + 1; i <= 7; i++) {
-            if (!stop /*&& case vide*/) {
-                this.moveList += [i, this.y];
-            } else if (!stop /*&& pièce ennemie && pièce != roi*/) {
-                this.moveList += [i, this.y];
+        for (let i = this.getPosition().x + 1; i <= 7; i++) {
+            if (!stop && piece === undefined) {
+                this.moveList.push(new Move(this.getPosition(), new Point(i, this.getPosition().y)));
+            } else if (!stop && piece.color !== this.color && piece.name !== 'King') {
+                this.moveList.push(new Move(this.getPosition(), new Point(i, this.getPosition().y)));
                 stop = true;
             } else {
                 stop= true;
@@ -43,11 +43,11 @@ class Rook extends Piece {
         }
         stop = false;
 
-        for (let j = this.y - 1; j >= 0; j--) {
-            if (!stop /*&& case vide*/) {
-                this.moveList += [this.x, j];
-            } else if (!stop /*&& pièce ennemie && pièce != roi*/) {
-                this.moveList += [this.x, j];
+        for (let j = this.getPosition().y - 1; j >= 0; j--) {
+            if (!stop && piece === undefined) {
+                this.moveList.push(new Move(this.getPosition(), new Point(this.getPosition().x, j)));
+            } else if (!stop && piece.color !== this.color && piece.name !== 'King') {
+                this.moveList.push(new Move(this.getPosition(), new Point(this.getPosition().x, j)));
                 stop = true;
             } else {
                 stop = true;
@@ -55,11 +55,11 @@ class Rook extends Piece {
         }
         stop = false;
 
-        for (let j = this.y + 1; j <= 7; j++) {
-            if (!stop /*&& case vide*/) {
-                this.moveList += [this.x, j];
-            } else if (!stop /*&& pièce ennemie && pièce != roi*/) {
-                this.moveList += [this.x, j];
+        for (let j = this.getPosition().y + 1; j <= 7; j++) {
+            if (!stop && piece === undefined) {
+                this.moveList.push(new Move(this.getPosition(), new Point(this.getPosition().x, j)));
+            } else if (!stop && piece.color !== this.color && piece.name !== 'King') {
+                this.moveList.push(new Move(this.getPosition(), new Point(this.getPosition().x, j)));
                 stop = true;
             } else {
                 stop = true;

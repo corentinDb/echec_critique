@@ -9,18 +9,26 @@ class Bishop extends Piece {
     }
 
     //Se déplace en diagonale
-    getMoveList() {
+    getMoveList(board) {
         //Variable servant à arrêter l'ajout de case s'il y a une pièce sur le chemin
         let stop = false;
+        let piece = new Piece;
 
-        for (let i = this.x + 1; i <= 7; i++) {
-            for (let j = this.y + 1; j <= 7; j++) {
-                if (!stop /*&& case vide sauf roi*/) {
-                    this.moveList += [i, j];
-                } else if (!stop /*&& pièce ennemie sauf roi*/) {
-                    this.moveList += [i, j];
+        for (let i = this.getPosition().x + 1; i <= 7; i++) {
+            for (let j = this.getPosition().y + 1; j <= 7; j++) {
+                piece = board.getCase((i, j));
+
+                //Si la case est vide
+                if (!stop && piece === undefined) {
+                    this.moveList.push(new Move(this.getPosition(), new Point(i, j)));
+                } 
+                //Si c'est une pièce ennemie
+                else if (!stop && piece.color !== this.color && piece.name !== 'King') {
+                    this.moveList.push(new Move(this.getPosition(), new Point(i, j)));
                     stop = true;
-                } else {
+                }
+                //Si c'est une pièce alliée ou un roi
+                else {
                     stop = true;
                 }
             }
@@ -28,12 +36,12 @@ class Bishop extends Piece {
         //Réinitialisation de la variable
         stop = false;
 
-        for (let i = this.x + 1; i >= 7; i++) { 
-            for (let j = this.y - 1; j >= 0; j--) {
-                if (!stop /*&& case vide*/) {
-                    this.moveList += [i, j];
-                } else if (!stop /*&& pièce ennemie sauf roi*/) {
-                    this.moveList += [i, j];
+        for (let i = this.getPosition().x + 1; i >= 7; i++) {
+            for (let j = this.getPosition().y - 1; j >= 0; j--) {
+                if (!stop && piece === undefined) {
+                    this.moveList.push(new Move(this.getPosition(), new Point(i, j)));
+                } else if (!stop && piece.color !== this.color && piece.name !== 'King') {
+                    this.moveList.push(new Move(this.getPosition(), new Point(i, j)));
                     stop = true;
                 } else {
                     stop = true;
@@ -42,12 +50,12 @@ class Bishop extends Piece {
         }
         stop = false;
 
-        for (let i = this.x - 1; i >= 0; i--) {
-            for (let j = this.y - 1; j >= 0; j--) {
-                if (!stop /*&& case vide*/) {
-                    this.moveList += [i, j];
-                } else if (!stop /*&& pièce ennemie sauf roi*/) {
-                    this.moveList += [i, j];
+        for (let i = this.getPosition().x - 1; i >= 0; i--) {
+            for (let j = this.getPosition().y - 1; j >= 0; j--) {
+                if (!stop && piece === undefined) {
+                    this.moveList.push(new Move(this.getPosition(), new Point(i, j)));
+                } else if (!stop && piece.color !== this.color && piece.name !== 'King') {
+                    this.moveList.push(new Move(this.getPosition(), new Point(i, j)));
                     stop = true;
                 } else {
                     stop = true;
@@ -56,17 +64,17 @@ class Bishop extends Piece {
         }
         stop = false;
 
-        for (let i = this.x - 1; i >= 0; i--) {
-            for (let j = this.y + 1; j <= 7; j++) {
-                if (!stop /*&& case vide*/) {
-                    this.moveList += [i, j];
-                } else if (!stop /*&& pièce ennemie sauf roi*/) {
-                    this.moveList += [i, j];
+        for (let i = this.getPosition().x - 1; i >= 0; i--) {
+            for (let j = this.getPosition().y + 1; j <= 7; j++) {
+                if (!stop && piece === undefined) {
+                    this.moveList.push(new Move(this.getPosition(), new Point(i, j)));
+                } else if (!stop && piece.color !== this.color && piece.name !== 'King') {
+                    this.moveList.push(new Move(this.getPosition(), new Point(i, j)));
                     stop = true;
                 } else {
                     stop = true;
                 }
-            } 
+            }
         }
 
         return this.moveList;

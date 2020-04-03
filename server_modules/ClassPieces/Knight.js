@@ -8,31 +8,31 @@ class Knight extends Piece {
         this.name = 'Knight';
     }
 
-    getMoveList () {
+    getMoveList(board) {
         //Remplacer les commentaires par la fonction qui vérifie si une case est vide
-        if (this.x < 7 && this.y < 6 /*&& (case vide || (pièce ennemie && pièce != roi))*/) {
-            this.moveList += new Move(new Point(this.x, this.y), new Point(this.x + 1, this.y + 2));
+        if (this.getPosition().x < 7 && this.getPosition().y < 6 /*&& (case vide || (pièce ennemie && pièce != roi))*/) {
+            this.moveList.push(new Move(this.getPosition(), new Point(this.getPosition().x + 1, this.getPosition().y + 2)));
         }
-        if (this.x > 0 && this.y < 6 /*&& (case vide || (pièce ennemie && pièce != roi))*/) {
-            this.moveList += new Move(new Point(this.x, this.y), new Point(this.x - 1, this.y + 2));
+        if (this.getPosition().x > 0 && this.getPosition().y < 6 /*&& (case vide || (pièce ennemie && pièce != roi))*/) {
+            this.moveList.push(new Move(this.getPosition(), new Point(this.getPosition().x - 1, this.getPosition().y + 2)));
         }
-        if (this.x > 1 && this.y < 7 /*&& (case vide || (pièce ennemie && pièce != roi))*/) {
-            this.moveList += new Move(new Point(this.x, this.y), new Point(this.x - 2, this.y + 1));
+        if (this.getPosition().x > 1 && this.getPosition().y < 7 /*&& (case vide || (pièce ennemie && pièce != roi))*/) {
+            this.moveList.push(new Move(this.getPosition(), new Point(this.getPosition().x - 2, this.getPosition().y + 1)));
         }
-        if (this.x > 1 && this.y > 0 /*&& (case vide || (pièce ennemie && pièce != roi))*/) {
-            this.moveList += new Move(new Point(this.x, this.y), new Point(this.x - 2, this.y - 1));
+        if (this.getPosition().x > 1 && this.getPosition().y > 0 /*&& (case vide || (pièce ennemie && pièce != roi))*/) {
+            this.moveList.push(new Move(this.getPosition(), new Point(this.getPosition().x - 2, this.getPosition().y - 1)));
         }
-        if (this.x < 6 && this.y < 7 /*&& (case vide || (pièce ennemie && pièce != roi))*/) {
-            this.moveList += new Move(new Point(this.x, this.y), new Point(this.x + 2, this.y + 1));
+        if (this.getPosition().x < 6 && this.getPosition().y < 7 /*&& (case vide || (pièce ennemie && pièce != roi))*/) {
+            this.moveList.push(new Move(this.getPosition(), new Point(this.getPosition().x + 2, this.getPosition().y + 1)));
         }
-        if (this.x < 6 && this.y > 0 /*&& (case vide || (pièce ennemie && pièce != roi))*/) {
-            this.moveList += new Move(new Point(this.x, this.y), new Point(this.x + 2, this.y - 1));
+        if (this.getPosition().x < 6 && this.getPosition().y > 0 /*&& (case vide || (pièce ennemie && pièce != roi))*/) {
+            this.moveList.push(new Move(this.getPosition(), new Point(this.getPosition().x + 2, this.getPosition().y - 1)));
         }
-        if (this.x < 7 && this.y > 1 /*&& (case vide || (pièce ennemie && pièce != roi))*/) {
-            this.moveList += new Move(new Point(this.x, this.y), new Point(this.x + 1, this.y - 2));
+        if (this.getPosition().x < 7 && this.getPosition().y > 1 /*&& (case vide || (pièce ennemie && pièce != roi))*/) {
+            this.moveList.push(new Move(this.getPosition(), new Point(this.getPosition().x + 1, this.getPosition().y - 2)));
         }
-        if (this.x > 0 && this.y > 1 /*&& (case vide || (pièce ennemie && pièce != roi))*/) {
-            this.moveList += new Move(new Point(this.x, this.y), new Point(this.x - 1, this.y - 2));
+        if (this.getPosition().x > 0 && this.getPosition().y > 1 /*&& (case vide || (pièce ennemie && pièce != roi))*/) {
+            this.moveList.push(new Move(this.getPosition(), new Point(this.getPosition().x - 1, this.getPosition().y - 2)));
         }
 
         return this.moveList;

@@ -1,5 +1,4 @@
 const Point = require('./Point');
-const Move = require('./Move');
 
 //Class plateau
 class Board {
