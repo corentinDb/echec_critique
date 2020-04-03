@@ -12,7 +12,7 @@
         window.location = 'http://localhost:4269/destroy';
     }
 
-    socket.on('test', (msg) => {
+    socket.on('startTheGame', (player) => {
         console.log(msg);
     });
 
@@ -64,6 +64,8 @@
 })();
 
 function addUserRow(pseudo, user, table) {      //Création d'une ligne pour un utilisateur connecté sur le serveur avec son nom et un bouton pour ouvrir un chat en direct avec lui
+    const socket = io.connect('http://localhost:4269');
+
     let newRow = document.createElement("tr");
     table.appendChild(newRow);
     newRow.id = user.toString();
@@ -75,15 +77,25 @@ function addUserRow(pseudo, user, table) {      //Création d'une ligne pour un 
     let linkCell = document.createElement("td");
     newRow.appendChild(linkCell);
 
-    let linkChat = document.createElement("input");
+    let linkChat = document.createElement("button");
     linkCell.appendChild(linkChat);
-    linkChat.type = 'button';
-    linkChat.value = 'discussion';
+    linkChat.innerHTML = 'discussion';
 
     let waitingMsg = document.createElement("td");
-    newRow.appendChild(waitingMsg);
+        newRow.appendChild(waitingMsg);
     waitingMsg.id = 'waitingMsg_' + user;
     waitingMsg.style.color = 'red';
+
+    let formPlay = document.createElement("form");
+    linkCell.appendChild(formPlay);
+    formPlay.action = "/menu";
+    formPlay.method = "post";
+
+    let connectionButton = document.createElement("input");
+    formPlay.appendChild(connectionButton);
+    connectionButton.type = 'button';
+    connectionButton.value = 'jouer';
+
 
     createTabChat(pseudo, user);
 
@@ -97,6 +109,10 @@ function addUserRow(pseudo, user, table) {      //Création d'une ligne pour un 
         }
         document.getElementById('chatBox_' + user).style.display = 'block';
         document.getElementById('waitingMsg_' + user).innerHTML = '';
+    });
+
+    connectionButton.addEventListener('click', () => {
+        socket.emit("play", pseudo);
     });
 }
 
