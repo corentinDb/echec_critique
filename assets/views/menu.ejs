@@ -1,0 +1,32 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+    <meta charset="UTF-8">
+    <title>Menu</title>
+    <link rel="stylesheet" type="text/css" href="../css/menu.css"/>
+    <link rel="stylesheet" type="text/css" href="../css/main.css"/>
+</head>
+<body>
+<p id="userList"><%= userList %></p>
+<p id="pseudo"><%= pseudo %></p>
+<div id="divUser">
+    <input type="button" value="déconnexion" id="deconnection">
+    <p id="pseudoGraphics">Votre pseudo : </p>
+    <table>
+        <thead>
+        <tr>
+            <th>Autre utilisateur :</th>
+        </tr>
+        </thead>
+        <tbody id="tablePlayer">
+        </tbody>
+    </table>
+</div>
+<div id="mainChatBox">
+</div>
+<script>
+</script>
+<script src="/socket.io/socket.io.js"></script>
+<script src="../js/menu.js"></script>
+</body>
+</html>
