@@ -16,7 +16,7 @@ class Rook extends Piece {
         let piece = new Piece;
         let point = new Point;
 
-        //On parcourt chaque ligne et colonne par rapport à la tour
+        //On parcourt chaque ligne et colonne autour de la tour
         for (let i = this.getPosition().x - 1; i >= 0; i--) {
             //On récupère les coordonnées de la case dans un point
             point.setPoint(i, this.getPosition().y);

@@ -10,18 +10,35 @@ class Queen extends Piece {
     }
 
     //Se déplace dans toutes les directions
-    getMoveList() {
+    getMoveList(board) {
         //Variable servant à arrêter l'ajout de case s'il y a une pièce sur le chemin
         let stop = false;
+        let point = new Point;
+        let piece = new Piece;
 
-        //Déplacement de la tour
+        //On utilise les mouvements de la tour
+        //On parcourt chaque ligne et colonne autour de la reine 
         for (let i = this.getPosition().x - 1; i >= 0; i--) {
+            //On récupère les coorodonnées de la case dans un point
+            point.setPoint(i, this.getPosition().y);
+            //On récupère la pièce sur la case
+            piece = board.getCase(point);
+
+            //Si la case est vide
             if (!stop && piece === undefined) {
-                this.moveList.push(new Move(this.getPosition(), new Point(i, this.getPosition().y)));
-            } else if (!stop && piece.color !== this.color && piece.name !== 'King') {
-                this.moveList.push(new Move(this.getPosition(), new Point(i, this.getPosition().y)));
+                //On ajoute le mouvement dans moveList et on continue
+                this.moveList.push(new Move(this.getPosition(), point));
+            } 
+            //Si c'est une pièce ennemie (sauf roi)
+            else if (!stop && piece.color !== this.color && piece.name !== 'King') {
+                //On ajoute le mouvement dans moveList
+                this.moveList.push(new Move(this.getPosition(), point));
+                //On arrête d'ajouter des mouvements sur cette ligne/colonne
                 stop = true;
-            } else {
+            } 
+            //Si c'est une pièce alliée ou un roi
+            else {
+                //On arrête d'ajouter des mouvements sur cette ligne/colonne
                 stop = true;
             }
         }
@@ -29,10 +46,13 @@ class Queen extends Piece {
         stop = false;
 
         for (let i = this.getPosition().x + 1; i <= 7; i++) {
+            point.setPoint(i, this.getPosition().y);
+            piece = board.getCase(point);
+
             if (!stop && piece === undefined) {
-                this.moveList.push(new Move(this.getPosition(), new Point(i, this.getPosition().y)));
+                this.moveList.push(new Move(this.getPosition(), point));
             } else if (!stop && piece.color !== this.color && piece.name !== 'King') {
-                this.moveList.push(new Move(this.getPosition(), new Point(i, this.getPosition().y)));
+                this.moveList.push(new Move(this.getPosition(), point));
                 stop = true;
             } else {
                 stop = true;
@@ -41,10 +61,13 @@ class Queen extends Piece {
         stop = false;
 
         for (let j = this.getPosition().y - 1; j >= 0; j--) {
+            point.setPoint(this.getPosition().x, j);
+            piece = board.getCase(point);
+
             if (!stop && piece === undefined) {
-                this.moveList.push(new Move(this.getPosition(), new Point(this.getPosition().x, j)));
+                this.moveList.push(new Move(this.getPosition(), point));
             } else if (!stop && piece.color !== this.color && piece.name !== 'King') {
-                this.moveList.push(new Move(this.getPosition(), new Point(this.getPosition().x, j)));
+                this.moveList.push(new Move(this.getPosition(), point));
                 stop = true;
             } else {
                 stop = true;
@@ -53,10 +76,13 @@ class Queen extends Piece {
         stop = false;
 
         for (let j = this.getPosition().y + 1; j <= 7; j++) {
+            point.setPoint(this.getPosition().x, j);
+            piece = board.getCase(point);
+
             if (!stop && piece === undefined) {
-                this.moveList.push(new Move(this.getPosition(), new Point(this.getPosition().x, j)));
+                this.moveList.push(new Move(this.getPosition(), point));
             } else if (!stop && piece.color !== this.color && piece.name !== 'King') {
-                this.moveList.push(new Move(this.getPosition(), new Point(this.getPosition().x, j)));
+                this.moveList.push(new Move(this.getPosition(), point));
                 stop = true;
             } else {
                 stop = true;
@@ -64,15 +90,28 @@ class Queen extends Piece {
         }
         stop = false;
 
-        //Déplacement du fou
+        //On utilise les mouvements du fou
+        //On parcrout chaque diagonale autour de la reine
         for (let i = this.getPosition().x + 1; i <= 7; i++) {
             for (let j = this.getPosition().y + 1; j <= 7; j++) {
+                point.setPoint(i, j);
+                piece = board.getCase(point);
+
+                //Si la case est vide
                 if (!stop && piece === undefined) {
-                    this.moveList.push(new Move(this.getPosition(), new Point(i, j)));
-                } else if (!stop && piece.color !== this.color && piece.name !== 'King') {
-                    this.moveList.push(new Move(this.getPosition(), new Point(i, j)));
+                    //On ajoute le mouvement à moveList et on continue
+                    this.moveList.push(new Move(this.getPosition(), point));
+                } 
+                //Si c'est une pièce ennemie (sauf roi)
+                else if (!stop && piece.color !== this.color && piece.name !== 'King') {
+                    //On ajoute le mouvement à moveList
+                    this.moveList.push(new Move(this.getPosition(), point));
+                    //On arrête d'ajouter des mouvements sur cette diagonale
                     stop = true;
-                } else {
+                } 
+                //Si c'est une pièce alliée ou un roi
+                else {
+                    //On arrête d'ajouter des mouvements sur cette diagonale
                     stop = true;
                 }
             }
@@ -81,10 +120,13 @@ class Queen extends Piece {
 
         for (let i = this.getPosition().x + 1; i >= 7; i++) {
             for (let j = this.getPosition().y - 1; j >= 0; j--) {
+                point.setPoint(i, j);
+                piece = board.getCase(point);
+
                 if (!stop && piece === undefined) {
-                    this.moveList.push(new Move(this.getPosition(), new Point(i, j)));
+                    this.moveList.push(new Move(this.getPosition(), point));
                 } else if (!stop && piece.color !== this.color && piece.name !== 'King') {
-                    this.moveList.push(new Move(this.getPosition(), new Point(i, j)));
+                    this.moveList.push(new Move(this.getPosition(), point));
                     stop = true;
                 } else {
                     stop = true;
@@ -95,10 +137,13 @@ class Queen extends Piece {
 
         for (let i = this.getPosition().x - 1; i >= 0; i--) {
             for (let j = this.getPosition().y - 1; j >= 0; j--) {
+                point.setPoint(i, j);
+                piece = board.getCase(point);
+
                 if (!stop && piece === undefined) {
-                    this.moveList.push(new Move(this.getPosition(), new Point(i, j)));
+                    this.moveList.push(new Move(this.getPosition(), point));
                 } else if (!stop && piece.color !== this.color && piece.name !== 'King') {
-                    this.moveList.push(new Move(this.getPosition(), new Point(i, j)));
+                    this.moveList.push(new Move(this.getPosition(), point));
                     stop = true;
                 } else {
                     stop = true;
@@ -109,10 +154,13 @@ class Queen extends Piece {
 
         for (let i = this.getPosition().x - 1; i >= 0; i--) {
             for (let j = this.getPosition().y + 1; j <= 7; j++) {
+                point.setPoint(i, j);
+                piece = board.getCase(point);
+                
                 if (!stop && piece === undefined) {
-                    this.moveList.push(new Move(this.getPosition(), new Point(i, j)));
+                    this.moveList.push(new Move(this.getPosition(), point));
                 } else if (!stop && piece.color !== this.color && piece.name !== 'King') {
-                    this.moveList.push(new Move(this.getPosition(), new Point(i, j)));
+                    this.moveList.push(new Move(this.getPosition(), point));
                     stop = true;
                 } else {
                     stop = true;

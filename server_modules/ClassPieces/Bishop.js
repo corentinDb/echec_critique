@@ -16,7 +16,7 @@ class Bishop extends Piece {
         let piece = new Piece;
         let point = new Point;
 
-        //On parcourt chaque diagonale par rapport au fou
+        //On parcourt chaque diagonale autour du fou
         for (let i = this.getPosition().x + 1; i <= 7; i++) {
             for (let j = this.getPosition().y + 1; j <= 7; j++) {
                 //On récupère les coordonnées de la case dans un point
