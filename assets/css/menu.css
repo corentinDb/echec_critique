@@ -1,0 +1,62 @@
+body {
+    display: flex;
+    justify-content: space-between;
+}
+
+#userList, #pseudo {
+    display: none;
+}
+
+#divUser {
+    flex: 1;
+}
+
+#mainChatBox {
+    flex: 1;
+}
+
+.chatBox {
+    display: flex;
+    flex-direction: column;
+}
+
+.pseudoBox, .messageBox {
+    border: 1px solid #e4e4e4;
+    padding: 15px;
+    margin-bottom: 15px;
+}
+
+.messageBox {
+    flex-shrink: 1;
+    overflow: auto;
+    height: 150px;
+}
+
+.message {
+    padding: 5px 0;
+}
+
+.message .author {
+    display: inline-block;
+}
+
+.author {
+    padding-right: 10px;
+    position: relative;
+}
+
+.chatForm {
+    display: flex;
+    flex-shrink: 0;
+}
+
+.newMessage {
+    flex-grow: 1;
+    border: 1px solid #dfdfdf;
+    padding: 10px 15px;
+    font-size: 16px;
+}
+
+.submitMessage {
+    margin: 10px;
+}
