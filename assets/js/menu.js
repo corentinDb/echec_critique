@@ -82,7 +82,7 @@ function addUserRow(pseudo, user, table) {      //Création d'une ligne pour un 
     linkChat.innerHTML = 'discussion';
 
     let waitingMsg = document.createElement("td");
-        newRow.appendChild(waitingMsg);
+    newRow.appendChild(waitingMsg);
     waitingMsg.id = 'waitingMsg_' + user;
     waitingMsg.style.color = 'red';
 
@@ -94,7 +94,7 @@ function addUserRow(pseudo, user, table) {      //Création d'une ligne pour un 
     let connectionButton = document.createElement("input");
     formPlay.appendChild(connectionButton);
     connectionButton.type = 'button';
-    connectionButton.value = 'jouer';
+    connectionButton.value = 'jouer avec ' + user;
 
 
     createTabChat(pseudo, user);
