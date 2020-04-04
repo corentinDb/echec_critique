@@ -18,4 +18,4 @@ roiBlanc.setPositionB(move);
 console.log('La pièce est en ', roiBlanc.getPosition());
 console.log('La pièce est en ' + roiBlanc.getPositionB());
 console.log('Déplacements possibles de la pièce en', roiBlanc.getPositionB(), ':');
-console.log(roiBlanc.getMoveList());
+console.log(roiBlanc.getMoveList(new Board));
