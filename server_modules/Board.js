@@ -117,7 +117,7 @@ class Board {
 
         for (let i = 0; i < 8; i++) {
             for (let j = 0; j < 8; j++) {
-                piece = this.getCase(new Point(i, j));
+                let piece = this.getCase(new Point(i, j));
                 if (piece !== undefined && piece.name === name && piece.color === color) {
                     tab += piece;
                 }
