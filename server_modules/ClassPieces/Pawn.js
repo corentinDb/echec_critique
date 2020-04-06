@@ -13,6 +13,13 @@ class Pawn extends Piece {
     getMoveList(board) {
         //Si le pion est blanc
         if (this.color === 'white') {
+
+            //variables
+            let piece;
+            let piece2;
+            let eat1;
+            let eat2;
+
             //On récupère les cases devant le pion
             if (this.getPosition().y < 7) {piece = board.getCase(new Point(this.getPosition().x, this.getPosition().y + 1));}
             if (this.getPosition().y < 6) {piece2 = board.getCase(new Point(this.getPosition().x, this.getPosition().y + 2));}
@@ -44,6 +51,13 @@ class Pawn extends Piece {
         } 
         //S'il est noir, on décrémente y au lieu de l'incrémenter
         else if (this.color === 'black') {
+
+            //variables
+            let piece;
+            let piece2;
+            let eat1;
+            let eat2;
+
             if (this.getPosition().y > 0) {piece = board.getCase(new Point(this.getPosition().x, this.getPosition().y - 1));}
             if (this.getPosition().y > 1) {piece2 = board.getCase(new Point(this.getPosition().x, this.getPosition().y - 2));}
             if (this.getPosition().x < 7 && this.getPosition().y > 0) {eat1 = board.getCase(new Point(this.getPosition().x + 1, this.getPosition().y - 1));}

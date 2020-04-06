@@ -21,7 +21,7 @@ class Rook extends Piece {
             //On récupère les coordonnées de la case dans un point
             point.setPoint(i, this.getPosition().y);
             //On récupère la 
-            piece = board.getCase()
+            piece = board.getCase();
 
             //Si la case est vide
             if (!stop && piece === undefined) {

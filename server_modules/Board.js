@@ -1,5 +1,4 @@
 const Point = require('./Point');
-const Piece = require('./ClassPieces/Piece');
 const Pawn = require('./ClassPieces/Pawn');
 const Rook = require('./ClassPieces/Rook');
 const Knight = require('./ClassPieces/Knight');
@@ -18,33 +17,39 @@ class Board {
         for (let i = 0; i < 8; i++) this.board[i] = new Array(8);
 
         //remplissage du plateau
+
         //pions
         for (let i = 0; i < 8; i++) {
-            this.board.insert(new Pawn('white', i, 1), new Point(i, 1));
-            this.board.insert(new Pawn('black', i, 6), new Point(i, 1));
+            this.insert(new Pawn('white', i, 1), new Point(i, 1));
+            this.insert(new Pawn('black', i, 6), new Point(i, 6));
         }
+
         //tours
-        this.board.insert(new Rook('white', 0, 0), new Point(0, 0));
-        this.board.insert(new Rook('white', 7, 0), new Point(7, 0));
-        this.board.insert(new Rook('black', 0, 7), new Point(0, 7));
-        this.board.insert(new Rook('black', 7, 7), new Point(7, 7));
+        this.insert(new Rook('white', 0, 0), new Point(0, 0));
+        this.insert(new Rook('white', 7, 0), new Point(7, 0));
+        this.insert(new Rook('black', 0, 7), new Point(0, 7));
+        this.insert(new Rook('black', 7, 7), new Point(7, 7));
+
         //cavaliers
-        this.board.insert(new Knight('white', 1, 0), new Point(1, 0));
-        this.board.insert(new Knight('white', 6, 0), new Point(6, 0));
-        this.board.insert(new Knight('black', 1, 7), new Point(1, 7));
-        this.board.insert(new Knight('black', 6, 7), new Point(6, 7));
+        this.insert(new Knight('white', 1, 0), new Point(1, 0));
+        this.insert(new Knight('white', 6, 0), new Point(6, 0));
+        this.insert(new Knight('black', 1, 7), new Point(1, 7));
+        this.insert(new Knight('black', 6, 7), new Point(6, 7));
+
         //fous
-        this.board.insert(new Bishop('white', 2, 0), new Point(2, 0));
-        this.board.insert(new Bishop('white', 5, 0), new Point(5, 0));
-        this.board.insert(new Bishop('black', 2, 7), new Point(2, 7));
-        this.board.insert(new Bishop('black', 5, 7), new Point(5, 7));
+        this.insert(new Bishop('white', 2, 0), new Point(2, 0));
+        this.insert(new Bishop('white', 5, 0), new Point(5, 0));
+        this.insert(new Bishop('black', 2, 7), new Point(2, 7));
+        this.insert(new Bishop('black', 5, 7), new Point(5, 7));
+
         //reines
-        this.board.insert(new Queen('white', 3, 0), new Point(3, 0));
-        this.board.insert(new Queen('black', 3, 7), new Point(3, 7));
+        this.insert(new Queen('white', 3, 0), new Point(3, 0));
+        this.insert(new Queen('black', 3, 7), new Point(3, 7));
+
         //rois
-        this.board.insert(new King('white', 4, 0), new Point(4, 0));
-        this.board.insert(new King('black', 4, 7), new Point(4, 7));
-        
+        this.insert(new King('white', 4, 0), new Point(4, 0));
+        this.insert(new King('black', 4, 7), new Point(4, 7));
+
         //initialisation du nombre de tour à 0
         this.turn = 0;
 
@@ -85,7 +90,7 @@ class Board {
     }
 
     //reset le plateau
-    reset(){
+    reset() {
 
         let newBoard = new Board();
         this.board = newBoard.board;
@@ -99,7 +104,7 @@ class Board {
 
         let moves = this.replay;
 
-        for (let i = 0; i < turn; i++){
+        for (let i = 0; i < turn; i++) {
             moves.pop();
         }
 
@@ -114,12 +119,12 @@ class Board {
     //permet de trouver une pièce sur l'échiquier
     searchPiece(name, color) {
         let tab = [];
-
         for (let i = 0; i < 8; i++) {
             for (let j = 0; j < 8; j++) {
+
                 let piece = this.getCase(new Point(i, j));
-                if (piece !== undefined && piece.name === name && piece.color === color) {
-                    tab += piece;
+                if (piece !== undefined && piece.getName() === name && piece.getColor() === color) {
+                    tab.push(piece);
                 }
             }
         }
