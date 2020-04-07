@@ -21,70 +21,83 @@ class King extends Piece {
 
     //Se déplace d'une case dans toute les directions s'il n'est pas en échec
     getMoveList(board) {
+        //Déclaration du point dans lequel on stockera les cordonnée d'une case
+        let point = point;
+
         //Si la case ne sort pas de l'échiquier
         if (this.getPosition().x < 7 && this.getPosition().y < 7) {
+            //On récupère les coordonnées de la case sélectionnée dans le point
+            point.setPoint(this.getPosition().x + 1, this.getPosition().y + 1);
             //On récupère la pièce sur la case
-            let piece = board.getCase(new Point(this.getPosition().x + 1, this.getPosition().y + 1));
+            let piece = board.getCase(point);
             //Si la case est vide ou si la pièce est ennemie (sauf roi)
-            if ((piece === undefined || (piece.color !== this.color && piece.name !== 'King')) /*&& pas en échec*/) {
+            if ((!piece || (piece.color !== this.color && piece.name !== 'King')) /*&& pas en échec*/) {
                 //On ajoute le mouvement à moveList
-                this.moveList.push(new Move(this.getPosition(), piece.getPosition()));
+                this.moveList.push(new Move(this.getPosition(), point));
             }
         }
 
+        //On recommence pour chacune des 7 autres possibilités
         if (this.getPosition().y < 7) {
-            let piece = board.getCase(new Point(this.getPosition().x, this.getPosition().y + 1));
+            point.setPoint(this.getPosition().x, this.getPosition().y + 1);
+            let piece = board.getCase(point);
 
-            if ((piece === undefined || (piece.color !== this.color && piece.name !== 'King')) /*&& pas en échec*/) {
-                this.moveList.push(new Move(this.getPosition(), piece.getPosition()));
+            if ((!piece || (piece.color !== this.color && piece.name !== 'King')) /*&& pas en échec*/) {
+                this.moveList.push(new Move(this.getPosition(), point));
             }
         }
 
         if (this.getPosition().x > 0 && this.getPosition().y < 7) {
-            let piece = board.getCase(new Point(this.getPosition().x - 1, this.getPosition().y + 1));
+            point.setPoint(this.getPosition().x - 1, this.getPosition().y + 1);
+            let piece = board.getCase(point);
 
-            if ((piece === undefined || (piece.color !== this.color && piece.name !== 'King')) /*&& pas en échec*/) {
-                this.moveList.push(new Move(this.getPosition(), piece.getPosition()));
+            if ((!piece || (piece.color !== this.color && piece.name !== 'King')) /*&& pas en échec*/) {
+                this.moveList.push(new Move(this.getPosition(), point));
             }
         }
 
         if (this.getPosition().x > 0) {
-            let piece = board.getCase(new Point(this.getPosition().x - 1, this.getPosition().y));
+            point.setPoint(this.getPosition().x - 1, this.getPosition().y);
+            let piece = board.getCase(point);
 
-            if ((piece === undefined || (piece.color !== this.color && piece.name !== 'King')) /*&& pas en échec*/) {
-                this.moveList.push(new Move(this.getPosition(), piece.getPosition()));
+            if ((!piece || (piece.color !== this.color && piece.name !== 'King')) /*&& pas en échec*/) {
+                this.moveList.push(new Move(this.getPosition(), point));
             }
         }
 
         if (this.getPosition().x > 0 && this.getPosition().y > 0) {
-            let piece = board.getCase(new Point(this.getPosition().x - 1, this.getPosition().y - 1));
+            point.setPoint(this.getPosition().x - 1, this.getPosition().y - 1);
+            let piece = board.getCase(point);
 
-            if ((piece === undefined || (piece.color !== this.color && piece.name !== 'King')) /*&& pas en échec*/) {
+            if ((!piece || (piece.color !== this.color && piece.name !== 'King')) /*&& pas en échec*/) {
                 this.moveList.push(new Move(this.getPosition(), ));
             }        
         }
 
         if (this.getPosition().y > 0) {
-            let piece = board.getCase(new Point(this.getPosition().x, this.getPosition().y - 1));
+            point.setPoint(this.getPosition().x, this.getPosition().y - 1);
+            let piece = board.getCase(point);
 
-            if ((piece === undefined || (piece.color !== this.color && piece.name !== 'King')) /*&& pas en échec*/) {
-                this.moveList.push(new Move(this.getPosition(), piece.getPosition()));
+            if ((!piece || (piece.color !== this.color && piece.name !== 'King')) /*&& pas en échec*/) {
+                this.moveList.push(new Move(this.getPosition(), point));
             }
         }
 
         if (this.getPosition().x < 7 && this.getPosition().y > 0) {
-            let piece = board.getCase(new Point(this.getPosition().x + 1, this.getPosition().y - 1));
+            point.setPoint(this.getPosition().x + 1, this.getPosition().y - 1);
+            let piece = board.getCase(point);
 
-            if ((piece === undefined || (piece.color !== this.color && piece.name !== 'King')) /*&& pas en échec*/) {
-                this.moveList.push(new Move(this.getPosition(), piece.getPosition()));
+            if ((!piece || (piece.color !== this.color && piece.name !== 'King')) /*&& pas en échec*/) {
+                this.moveList.push(new Move(this.getPosition(), point));
             }
         }
 
         if (this.getPosition().x < 7) {
-            let piece = board.getCase(new Point(this.getPosition().x + 1, this.getPosition().y));
+            point.setPoint(this.getPosition().x + 1, this.getPosition().y)
+            let piece = board.getCase(point);
 
-            if ((piece === undefined || (piece.color !== this.color && piece.name !== 'King')) /*&& pas en échec*/) {
-                this.moveList.push(new Move(this.getPosition(), piece.getPosition()));
+            if ((!piece || (piece.color !== this.color && piece.name !== 'King')) /*&& pas en échec*/) {
+                this.moveList.push(new Move(this.getPosition(), point));
             }
         }
 
