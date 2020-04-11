@@ -21,8 +21,9 @@ class King extends Piece {
 
     //Se déplace d'une case dans toute les directions s'il n'est pas en échec
     getMoveList(board) {
+        super.getMoveList();
         //Déclaration du point dans lequel on stockera les cordonnée d'une case
-        let point = point;
+        let point = new Point;
 
         //Si la case ne sort pas de l'échiquier
         if (this.getPosition().x < 7 && this.getPosition().y < 7) {

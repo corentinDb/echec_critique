@@ -11,7 +11,6 @@ class Board {
 
     //construit un plateau
     constructor() {
-
         //creation du plateau de 8 par 8
         this.board = new Array(8);
         for (let i = 0; i < 8; i++) this.board[i] = new Array(8);
