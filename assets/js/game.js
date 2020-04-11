@@ -8,31 +8,9 @@
         boardCache = board;
     });
 
-    let moveList = [
-        {
-            origin: {
-                x: 5,
-                y: 1
-            },
-            destination: {
-                x: 5,
-                y: 2
-            }
-        },
-        {
-            origin: {
-                x: 5,
-                y: 1
-            },
-            destination: {
-                x: 5,
-                y: 3
-            }
-        }
-    ];
+    let moveList = [];
 
     let color = 'white';
-    //let color = 'black';
 
 
     let game = new Phaser.Game(window.innerWidth - 200, window.innerHeight - 240, Phaser.AUTO, 'phaser-example', {
@@ -256,8 +234,6 @@
             //si click alors on selectionne la texture
             if (game.input.activePointer.leftButton.isDown && selectorClick) {
 
-
-
                 //on recupère la pièce et on demande les deplacement
                 let hoverPiece = boardCache.board[hoverTile.coord.x][hoverTile.coord.y];
                 if (hoverPiece !== null && hoverPiece.color === color) {
@@ -281,13 +257,14 @@
             //on affiche les déplacement possible
             showMoveList(spriteMoveList);
 
+            //envoie du move si l'on click sur un move
             if(game.input.activePointer.leftButton.isDown && moveClick) {
-
                 let moveTile = hoverTile;
                 if  (moveTile !== undefined) if(moveTile.move) console.log('envoie du move pour la position', moveTile.coord);
 
             }
 
+            //reset si l'on clique autre part
             if(game.input.activePointer.leftButton.isDown && resetClick) {
 
                 let resetTile = hoverTile;
@@ -299,10 +276,8 @@
                 }
                 else selectedTile = undefined;
 
-
                 resetClick = false;
             }
-
 
         }
 
