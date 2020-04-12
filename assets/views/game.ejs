@@ -8,6 +8,16 @@
         #opponent, #localPlayer, #color, #gameID {
             /*display: none;*/
         }
+        body {
+            background-color: #eee7bc;
+            margin: 0;
+            padding: 0;
+        }
+
+        canvas {
+            margin: 40px auto auto;
+            overflow: hidden;
+        }
     </style>
 </head>
 <body>
@@ -16,8 +26,9 @@
 <div id="color"><%= color %></div>
 <div id="gameID"><%= gameID %></div>
 <input type="button" value="Retour au menu" id="back">
+<script type="text/javascript" src="../js/phaser.min.js"></script>
 <script src="/socket.io/socket.io.js"></script>
 <script src="../js/gameModule.js"></script>
-<script src="../js/gameEngine.js"></script>
+<script src="../js/game.js"></script>n
 </body>
 </html>

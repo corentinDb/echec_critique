@@ -17,7 +17,7 @@ class Knight extends Piece {
         //Si la case ne sort pas de l'échiquier
         if (this.getPosition().x < 7 && this.getPosition().y < 6) {
             //On récupère les coordonnées de la case sélectionnée dans le point
-            point.set(this.getPosition().x + 1, this.getPosition().y + 2);
+            point.setPoint(this.getPosition().x + 1, this.getPosition().y + 2);
             //On récupère la pièce sur la case
             let piece = board.getCase(point);
             //Si la case est vide ou la pièce ennemie (sauf roi)

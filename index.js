@@ -270,10 +270,17 @@ io.sockets.on('connection', (socket) => {
         io.to(id).emit('playTurn', listGameInstance[id]);
     });
 
+    socket.on('getBoard', (id) => {
+        socket.emit('giveBoard', listGameInstance[id]);
+    });
+
     socket.on('getMoveList', (id, xOrigin, yOrigin) => {
+        console.log('getMoveList');
         let pointOrigin = listGameInstance[id].getCase(new Point(xOrigin, yOrigin));
+        console.log(pointOrigin);
         if (pointOrigin !== undefined) {
             let moveList = pointOrigin.getMoveList(listGameInstance[id]);
+            console.log(moveList);
             socket.emit('giveMoveList', listGameInstance[id], moveList);
         }
     });

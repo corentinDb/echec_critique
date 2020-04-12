@@ -2,15 +2,47 @@
 
     const socket = io.connect('http://localhost:4269');
 
+    //Récupère les infos du joueur
+    const localPlayer = document.getElementById('localPlayer').innerHTML;
+    const opponent = document.getElementById('opponent').innerHTML;
+    const color = document.getElementById('color').innerHTML;
+    const gameID = document.getElementById('gameID').innerHTML;
     let boardCache;
-    socket.emit('board');
-    socket.on('board', (board) => {
-        boardCache = board;
+
+
+    //Initialise la game
+    socket.emit('joinGame', gameID);
+
+    //Si le joueur est blanc, il lance la partie après 2 secondes (pour être sur que les 2 joueurs sont connectées)
+    if (color === 'white') {
+        socket.emit('startGame', gameID);
+    } else {
+        setTimeout(function () {
+            socket.emit('getBoard', gameID);
+        }, 500);
+    }
+
+    socket.on('giveBoard', (gameInstance) => {
+        console.table(gameInstance.board);
+        boardCache = gameInstance;
     });
 
-    let moveList = [];
+    socket.on('playTurn', (gameInstance) => {   //Début du tour
+        boardCache = gameInstance;      //Update du board
+        console.table(gameInstance.board);
+    });
 
-    let color = 'white';
+    socket.on('giveMoveList', (gameInstance, serverMoveList) => {     //Réception de la moveList
+        console.log('most list reçu');
+        console.log(gameInstance);
+        console.log(serverMoveList);
+        moveList = serverMoveList;
+        //vérifier qu'une moveList a précédement été demandé
+        //Activer selection move
+    });
+
+
+    let moveList = [];
 
 
     let game = new Phaser.Game(window.innerWidth - 200, window.innerHeight - 240, Phaser.AUTO, 'phaser-example', {
@@ -152,6 +184,7 @@
         if (color === 'black') return Number(position.y * 8 + 7 - position.x);
     }
 
+
     function loadBoard(board) {
 
         for (let sprite of tile.children) {
@@ -165,14 +198,14 @@
 
         for (let i = 0; i < 8; i++) {
             for (let j = 0; j < 8; j++) {
-                if (board.board[j][i] !== null)
-                    if (color === 'white') changeTexture(tile.children[whiteTileId], board.board[j][i].color + board.board[j][i].name);
-                    else if (color === 'black') changeTexture(tile.children[blackTileId], board.board[j][i].color + board.board[j][i].name);
-                blackTileId++;
-                whiteTileId--;
+                if (board !== undefined) {
+                    if (board.board[j][i] !== null) {
+                        let id = positionToBoardId({x: j, y: i}, color);
+                        changeTexture(tile.children[id], board.board[j][i].color + board.board[j][i].name);
+                    }
+                }
             }
         }
-
     }
 
     function tilePosition(mouse) {
@@ -195,15 +228,17 @@
 
     function getSpriteMoveList(sprite) {
         let spriteMoveList = [];
-        if (moveList[0].origin.x === sprite.coord.x && moveList[0].origin.y === sprite.coord.y) {
-            for (let move of moveList) {
-                spriteMoveList.push(tile.children[positionToBoardId(move.destination, color)]);
+        if (moveList === []) {
+            if (moveList[0].origin.x === sprite.coord.x && moveList[0].origin.y === sprite.coord.y) {
+                for (let move of moveList) {
+                    spriteMoveList.push(tile.children[positionToBoardId(move.destination, color)]);
+                }
             }
         }
         return spriteMoveList;
     }
 
-    function showMoveList(spriteMoveList){
+    function showMoveList(spriteMoveList) {
         for (let spriteMove of spriteMoveList) {
             spriteMove.key.circle(getTileSize() / 2, getTileSize() / 2, getTileSize() / 8)
             spriteMove.move = true;
@@ -213,6 +248,9 @@
     let selectorClick = true;
     let resetClick = true;
     let moveClick = true;
+
+    let canSelect;
+    color === 'white' ? canSelect = 0 : canSelect = 1;
 
     function update() {
 
@@ -232,13 +270,14 @@
             changeTexture(hoverTile, 'selectedTile');
 
             //si click alors on selectionne la texture
-            if (game.input.activePointer.leftButton.isDown && selectorClick) {
+            if (game.input.activePointer.leftButton.isDown && selectorClick && boardCache.turn % 2 === canSelect) {
 
                 //on recupère la pièce et on demande les deplacement
                 let hoverPiece = boardCache.board[hoverTile.coord.x][hoverTile.coord.y];
                 if (hoverPiece !== null && hoverPiece.color === color) {
                     selectedTile = hoverTile;
                     console.log('demande de moveList pour', selectedTile.coord);
+                    gameMod.getMoveList(boardCache, gameID, color, selectedTile.coord.x, selectedTile.coord.y);
                 }
                 selectorClick = false;
             }
@@ -258,23 +297,22 @@
             showMoveList(spriteMoveList);
 
             //envoie du move si l'on click sur un move
-            if(game.input.activePointer.leftButton.isDown && moveClick) {
+            if (game.input.activePointer.leftButton.isDown && moveClick) {
                 let moveTile = hoverTile;
-                if  (moveTile !== undefined) if(moveTile.move) console.log('envoie du move pour la position', moveTile.coord);
+                if (moveTile !== undefined) if (moveTile.move) console.log('envoie du move pour la position', moveTile.coord);
 
             }
 
             //reset si l'on clique autre part
-            if(game.input.activePointer.leftButton.isDown && resetClick) {
+            if (game.input.activePointer.leftButton.isDown && resetClick) {
 
                 let resetTile = hoverTile;
 
-                if  (resetTile !== undefined) {
+                if (resetTile !== undefined) {
 
                     let resetPiece = boardCache.board[resetTile.coord.x][resetTile.coord.y];
                     if (resetPiece === null || resetPiece.color !== color) selectedTile = undefined;
-                }
-                else selectedTile = undefined;
+                } else selectedTile = undefined;
 
                 resetClick = false;
             }

@@ -1,4 +1,4 @@
-let game = (function () {
+let gameMod = (function () {
     const socket = io.connect('http://localhost:4269');
     return {
         getMoveList(gameInstance, gameID, color, xOrigin, yOrigin) {    //Demande la moveList au serveur
