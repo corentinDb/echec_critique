@@ -11,7 +11,6 @@ class Board {
 
     //construit un plateau
     constructor() {
-
         //creation du plateau de 8 par 8
         this.board = new Array(8);
         for (let i = 0; i < 8; i++) this.board[i] = new Array(8);
@@ -43,12 +42,12 @@ class Board {
         this.insert(new Bishop('black', 5, 7), new Point(5, 7));
 
         //reines
-        this.insert(new Queen('white', 3, 0), new Point(3, 0));
-        this.insert(new Queen('black', 3, 7), new Point(3, 7));
+        this.insert(new Queen('white', 4, 0), new Point(4, 0));
+        this.insert(new Queen('black', 4, 7), new Point(4, 7));
 
         //rois
-        this.insert(new King('white', 4, 0), new Point(4, 0));
-        this.insert(new King('black', 4, 7), new Point(4, 7));
+        this.insert(new King('white', 3, 0), new Point(3, 0));
+        this.insert(new King('black', 3, 7), new Point(3, 7));
 
         //initialisation du nombre de tour à 0
         this.turn = 0;
@@ -59,7 +58,7 @@ class Board {
 
     //renvoie le pion d'une case donnée
     getCase(point) {
-        return (this.board[point.x][point.y]);
+        if (point !== undefined) return this.board[point.x][point.y];
     }
 
     //permet d'inserer un pion pour une case donnée

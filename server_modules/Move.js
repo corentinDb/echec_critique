@@ -19,6 +19,9 @@ class Move {
         return (this.destination);
     }
 
+    isEqual(move) {
+        return this.getOrigin().x === move.getOrigin().x && this.getOrigin().y === move.getOrigin().y && this.getDestination().x === move.getDestination().x && this.getDestination().y === move.getDestination().y;
+    }
 }
 
 module.exports = Move;
