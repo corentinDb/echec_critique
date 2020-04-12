@@ -10,6 +10,7 @@ class Knight extends Piece {
     }
 
     getMoveList(board) {
+        super.getMoveList();
         //Déclaration du point dans lequel on stockera les cordonnée d'une case
         let point = new Point;
 

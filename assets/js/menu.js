@@ -1,20 +1,9 @@
 (function () {
     const socket = io.connect('http://localhost:4269');
 
-    let userList = document.getElementById('userList').innerHTML;   //Liste des utilisateurs connectées sous forme d'une chaine de caractère
-    let pseudo = document.getElementById('pseudo').innerHTML;  //Pseudo de l'utilisateur
+    const userList = document.getElementById('userList').innerHTML;   //Liste des utilisateurs connectées sous forme d'une chaine de caractère
+    const pseudo = document.getElementById('pseudo').innerHTML;  //Pseudo de l'utilisateur
     const tempTab = userList.split(',');    //Conversion de la chaine de caractère des utilisateurs en tableau
-
-    let href = document.referrer;
-    let tabHref = href.split('/');
-    if (tabHref[2] !== 'localhost:4269'){
-        socket.emit('removeUserRequest', pseudo);
-        window.location = 'http://localhost:4269/destroy';
-    }
-
-    socket.on('startTheGame', (player) => {
-        console.log(msg);
-    });
 
     document.getElementById('pseudoGraphics').innerHTML += pseudo;
 
@@ -57,6 +46,42 @@
         }
     });
 
+    socket.on('playRequestToClient', (sender, receiver) => {
+        if (receiver === pseudo) {
+            let response = confirm(sender + ' veut jouer avec vous !');
+            let colorTab = ['black', 'white'];
+            let color1 = colorTab[Math.floor(Math.random() * 2)];
+            let color2;
+            color1 === 'black' ? color2 = 'white' : color2 = 'black';
+
+            let id = 'game' + sender + receiver;
+            console.log(id);
+            socket.emit('playResponseToServer', pseudo, sender, response, color2, id);
+            if (response) {
+                startGame(sender, color1, id);
+            }
+        }
+    });
+
+    socket.on('playResponseToClient', (sender, receiver, response, color, id) => {
+        if (receiver === pseudo) {
+            if (response) {
+                startGame(sender, color, id);
+            } else {
+                alert(sender + ' a refusé de jouer avec vous :\'(\nC\'est vraiment pas un(e) ami(e) !');
+            }
+        } else if (response && sender !== pseudo) {
+            document.getElementById("play_with_" + sender).disabled = true;
+            document.getElementById("play_with_" + receiver).disabled = true;
+        }
+    });
+
+    socket.on('backInfo', (user1, user2) => {
+        document.getElementById("play_with_" + user1).disabled = false;
+        document.getElementById("play_with_" + user2).disabled = false;
+    });
+
+
     document.getElementById("deconnection").addEventListener('click', () => {   //Bouton déconnexion
         socket.emit('removeUserRequest', pseudo);
         window.location = "http://localhost:4269/destroy";
@@ -95,6 +120,7 @@ function addUserRow(pseudo, user, table) {      //Création d'une ligne pour un 
     formPlay.appendChild(connectionButton);
     connectionButton.type = 'button';
     connectionButton.value = 'jouer avec ' + user;
+    connectionButton.id = 'play_with_' + user;
 
 
     createTabChat(pseudo, user);
@@ -111,8 +137,8 @@ function addUserRow(pseudo, user, table) {      //Création d'une ligne pour un 
         document.getElementById('waitingMsg_' + user).innerHTML = '';
     });
 
-    connectionButton.addEventListener('click', () => {
-        socket.emit("play", pseudo);
+    connectionButton.addEventListener('click', () => {  //Bouton play
+        socket.emit("playRequestToServer", pseudo, user);
     });
 }
 
@@ -193,4 +219,32 @@ function addMessage(msg, sender, corresponding) {    //Ajout d'un message dans l
 
     divNewMessage.appendChild(spanAuthor);
     divNewMessage.appendChild(document.createTextNode(msg));
+}
+
+function startGame(player, color, id) {     //Redirige vers la page de jeu avec les informations nécessaire
+    let form = document.createElement("form");
+    form.method = 'post';
+    form.action = '/game';
+
+    let opponent = document.createElement("input");
+    opponent.type = 'hidden';
+    opponent.value = player;
+    opponent.name = 'opponent';
+
+    let colorInput = document.createElement("input");
+    colorInput.type = 'hidden';
+    colorInput.value = color;
+    colorInput.name = 'color';
+
+    let idInput = document.createElement("input");
+    idInput.type = 'hidden';
+    idInput.value = id;
+    idInput.name = 'gameID';
+
+    form.appendChild(opponent);
+    form.appendChild(colorInput);
+    form.appendChild(idInput);
+
+    document.body.appendChild(form);
+    form.submit();
 }

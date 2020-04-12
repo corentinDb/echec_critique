@@ -1,0 +1,23 @@
+<!DOCTYPE html>
+<html lang="fr">
+<head>
+    <meta charset="UTF-8">
+    <title>Echec critique</title>
+    <link rel="stylesheet" type="text/css" href="../css/main.css"/>
+    <style>
+        #opponent, #localPlayer, #color, #gameID {
+            /*display: none;*/
+        }
+    </style>
+</head>
+<body>
+<div id="localPlayer"><%= localPlayer %></div>
+<div id="opponent"><%= opponent %></div>
+<div id="color"><%= color %></div>
+<div id="gameID"><%= gameID %></div>
+<input type="button" value="Retour au menu" id="back">
+<script src="/socket.io/socket.io.js"></script>
+<script src="../js/gameModule.js"></script>
+<script src="../js/gameEngine.js"></script>
+</body>
+</html>
