@@ -11,81 +11,77 @@ class Rook extends Piece {
 
     //Se déplace à l'horizontale et la verticale
     getMoveList(board) {
+        //On reset la moveList de la pièce
         super.getMoveList();
-        //Variable servant à arrêter l'ajout de case s'il y a une pièce sur le chemin
-        let stop = false;
+        
         let piece = new Piece;
         let point = new Point;
 
         //On parcourt chaque ligne et colonne autour de la tour
         for (let i = this.getPosition().x - 1; i >= 0; i--) {
             //On récupère les coordonnées de la case dans un point
-            point.setPoint(i, this.getPosition().y);
-            //On récupère la 
-            piece = board.getCase();
+            point = new Point(i, this.getPosition().y);
+            //On récupère la pièce sur la case
+            piece = board.getCase(point);
 
             //Si la case est vide
-            if (!stop && piece === undefined) {
+            if (!piece) {
                 //On ajoute le mouvement à moveList
                 this.moveList.push(new Move(this.getPosition(), point));
             } 
-            //Si c'est une pièce ennemie (sauf roi)
-            else if (!stop && piece.color !== this.color && piece.name !== 'King') {
+            //Si c'est une pièce ennemie
+            else if (piece.getColor() !== this.getColor()) {
                 //On ajoute le mouvement à moveList
                 this.moveList.push(new Move(this.getPosition(), point));
-                //On arrête d'ajouter des mouvements sur cette ligne/colonne
-                stop = true;
+                //On sort de la boucle for
+                break;
             } 
-            //Si c'est une pièce alliée ou un roi
+            //Si c'est une pièce alliée
             else {
-                //On arrête d'ajouter des mouvements sur cette ligne/colonne
-                stop = true;
+                //On sort de la boucle for
+                break;
             }
         }
-        //Réinitialisation de la variable
-        stop = false;
 
         for (let i = this.getPosition().x + 1; i <= 7; i++) {
-            point.setPoint(i, this.getPosition().y);
+            point = new Point(i, this.getPosition().y);
             piece = board.getCase(point);
 
-            if (!stop && piece === undefined) {
+            if (!piece) {
                 this.moveList.push(new Move(this.getPosition(), point));
-            } else if (!stop && piece.color !== this.color && piece.name !== 'King') {
+            } else if (piece.getColor() !== this.getColor()) {
                 this.moveList.push(new Move(this.getPosition(), point));
-                stop = true;
+                break;
             } else {
-                stop= true;
+                break;
             }
         }
-        stop = false;
 
         for (let j = this.getPosition().y - 1; j >= 0; j--) {
-            point.setPoint(this.getPosition().x, j);
+            point = new Point(this.getPosition().x, j);
             piece = board.getCase(point);
 
-            if (!stop && piece === undefined) {
+            if (!piece) {
                 this.moveList.push(new Move(this.getPosition(), point));
-            } else if (!stop && piece.color !== this.color && piece.name !== 'King') {
+            } else if (piece.getColor() !== this.getColor()) {
                 this.moveList.push(new Move(this.getPosition(), point));
-                stop = true;
+                break;
             } else {
-                stop = true;
+                break;
             }
         }
-        stop = false;
 
         for (let j = this.getPosition().y + 1; j <= 7; j++) {
-            point.setPoint(this.getPosition().x, j);
+            point = new Point(this.getPosition().x, j);
             piece = board.getCase(point);
             
-            if (!stop && piece === undefined) {
+            if (!piece) {
                 this.moveList.push(new Move(this.getPosition(), point));
-            } else if (!stop && piece.color !== this.color && piece.name !== 'King') {
+            } else if (piece.getColor() !== this.getColor()) {
                 this.moveList.push(new Move(this.getPosition(), point));
-                stop = true;
+                break;
             } else {
-                stop = true;
+                break;
             }
         }
 

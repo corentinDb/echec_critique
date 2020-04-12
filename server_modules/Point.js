@@ -6,11 +6,6 @@ class Point {
         this.y = y;
     }
 
-    setPoint(x, y) {
-        this.x = x;
-        this.y = y;
-    }
-
     reverse(){
         let tmp = this.x;
         this.x = this.y;
