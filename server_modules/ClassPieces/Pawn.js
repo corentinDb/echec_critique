@@ -11,14 +11,16 @@ class Pawn extends Piece {
 
     //Se déplace case par case en avant
     getMoveList(board) {
+        //On reset la moveList de la pièce
         super.getMoveList();
+        
         let piece = new Piece;
         let piece2 = new Piece;
         let eat1 = new Piece;
         let eat2 = new Piece;
 
         //Si le pion est blanc
-        if (this.color === 'white') {
+        if (this.getColor() === 'white') {
             //variables dans lesquelles on récupère les pièces aux position demandées
 
             //On récupère les cases devant le pion en vérifiant si chaque case est bien sur l'échiquier
@@ -30,9 +32,13 @@ class Pawn extends Piece {
             }
             if (this.getPosition().x < 7 && this.getPosition().y < 7) {
                 eat1 = board.getCase(new Point(this.getPosition().x + 1, this.getPosition().y + 1));
+            } else {
+                eat1 = undefined;
             }
             if (this.getPosition().x > 0 && this.getPosition().y < 7) {
                 eat2 = board.getCase(new Point(this.getPosition().x - 1, this.getPosition().y + 1));
+            } else {
+                eat2 = undefined;
             }
 
             //Déplacement classique
@@ -50,16 +56,16 @@ class Pawn extends Piece {
             }
 
             //Déplacements pour manger
-            //S'il y a une pièce ennemie (sauf roi) devant le pion en diagonale, on ajoute le mouvement à moveList
-            if (eat1 && eat1.color !== this.color && eat1.name !== 'King') {
+            //S'il y a une pièce ennemie devant le pion en diagonale, on ajoute le mouvement à moveList
+            if (eat1 && eat1.getColor() !== this.getColor()) {
                 this.moveList.push(new Move(this.getPosition(), eat1.getPosition()));
             }
-            if (eat2 && eat2.color !== this.color && eat2.name !== 'King') {
+            if (eat2 && eat2.getColor() !== this.getColor()) {
                 this.moveList.push(new Move(this.getPosition(), eat2.getPosition()));
             }
         }
         //S'il est noir, on décrémente y au lieu de l'incrémenter
-        else if (this.color === 'black') {
+        else if (this.getColor() === 'black') {
             if (this.getPosition().y > 0) {
                 piece = board.getCase(new Point(this.getPosition().x, this.getPosition().y - 1));
             }
@@ -68,9 +74,13 @@ class Pawn extends Piece {
             }
             if (this.getPosition().x < 7 && this.getPosition().y > 0) {
                 eat1 = board.getCase(new Point(this.getPosition().x + 1, this.getPosition().y - 1));
+            } else {
+                eat1 = undefined;
             }
             if (this.getPosition().x > 0 && this.getPosition().y > 0) {
                 eat2 = board.getCase(new Point(this.getPosition().x - 1, this.getPosition().y - 1));
+            } else {
+                eat2 = undefined;
             }
 
             if (!piece && this.getPosition().y > 0) {
@@ -81,17 +91,17 @@ class Pawn extends Piece {
                 this.moveList.push(new Move(this.getPosition(), new Point(this.getPosition().x, this.getPosition().y - 2)));
             }
 
-            if (eat1 && eat1.color !== this.color && eat1.name !== 'King') {
+            if (eat1 && eat1.getColor() !== this.getColor()) {
                 this.moveList.push(new Move(this.getPosition(), eat1.getPosition()));
             }
-            if (eat2 && eat2.color !== this.color && eat2.name !== 'King') {
+            if (eat2 && eat2.getColor() !== this.getColor()) {
                 this.moveList.push(new Move(this.getPosition(), eat2.getPosition()));
             }
 
         }
         //Sinon on renvoie une erreur
         else {
-            console.error('Bad color : expected black or white, got ', this.color);
+            console.error('Bad color : expected black or white, got ', this.getColor());
         }
 
         return this.moveList;
