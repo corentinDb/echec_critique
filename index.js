@@ -24,7 +24,6 @@ function resetMessage(user) {   //Fonction qui peut ajouter un utilisateur au fi
                 console.log("An error occured while writing JSON Object to File.");
                 return console.log(err);
             }
-            console.log("JSON file has been saved.");
         });
     });
 }
@@ -40,6 +39,10 @@ const mysql = require('mysql');
 const sha512 = require('js-sha512');
 const fs = require('fs');
 
+const Board = require('./server_modules/Board');
+const Point = require('./server_modules/Point');
+const Move = require('./server_modules/Move');
+
 app.set('views', __dirname + '/assets/views');
 app.set('view engine', 'ejs');
 
@@ -50,6 +53,7 @@ app.use(express.urlencoded({extended: true}));
 app.use(session({secret: 'Error 418 I\'m a teapot !', cookie: {maxAge: 60 * 60 * 1000}}));
 
 let connectedUserList = [];
+let listGameInstance = [];
 
 const con = mysql.createConnection({    //Création de la base de donnée
     host: 'localhost',
@@ -191,14 +195,28 @@ app.get('/destroy', (req, res, next) => {       //Page de déconnexion
     }
 });
 
+app.get('/game', (req, res, next) => {
+    res.redirect('/menu');
+});
+
+app.post('/game', (req, res, next) => {
+    if (req.session.connectionID) {         //Si l'utilisateur est bien connecté
+        res.render('game', {localPlayer: req.session.pseudo, opponent: req.body.opponent, color: req.body.color, gameID: req.body.gameID});
+    } else {
+        res.redirect('/');
+    }
+});
+
 
 io.sockets.on('connection', (socket) => {
+
     socket.on('newUserRequest', (user) => {     //Quand un utilisateur se connecte, on prévient les autres
-        io.emit('newUserResponse', user);
+        socket.join(user);
+        socket.broadcast.emit('newUserResponse', user);
     });
 
     socket.on('removeUserRequest', (user) => {  //Quand un utilisateur se déconnecte, on prévient les autres
-        io.emit('removeUserResponse', user);
+        socket.broadcast.emit('removeUserResponse', user);
     });
 
     socket.on('sendMessage', (msg, sender, receiver) => {    //Quand un utilisateur envoie un message, on prévient les autres
@@ -219,10 +237,9 @@ io.sockets.on('connection', (socket) => {
                     console.log("An error occured while writing JSON Object to File.");
                     return console.log(err);
                 }
-                console.log("JSON file has been saved.");
             });
         });
-        io.emit('receiveMessage', msg, sender, receiver);
+        socket.broadcast.emit('receiveMessage', msg, sender, receiver);
     });
 
     socket.on('loadMessageRequest', (user) => {
@@ -231,6 +248,71 @@ io.sockets.on('connection', (socket) => {
             let dataToSend = jsonParsed[user];
             socket.emit('loadMessageResponse', dataToSend);     //Envoie des messages enregistrés pour l'utilisateur 'user'
         });
+    });
+
+
+    socket.on('playRequestToServer', (sender, receiver) => {
+        socket.broadcast.emit('playRequestToClient', sender, receiver);
+    });
+
+    socket.on('playResponseToServer', (sender, receiver, response, color, id) => {
+        socket.broadcast.emit('playResponseToClient', sender, receiver, response, color, id);
+    });
+
+
+    socket.on('joinGame', (id) => {
+        socket.join(id);
+    });
+
+    socket.on('startGame', (id) => {
+        listGameInstance[id] = new Board();
+        listGameInstance[id].color = 'white';
+        io.to(id).emit('playTurn', listGameInstance[id]);
+    });
+
+    socket.on('getBoard', (id) => {
+        socket.emit('giveBoard', listGameInstance[id]);
+    });
+
+    socket.on('getMoveList', (id, xOrigin, yOrigin) => {
+        console.log('getMoveList');
+        let pointOrigin = listGameInstance[id].getCase(new Point(xOrigin, yOrigin));
+        console.log(pointOrigin);
+        if (pointOrigin !== undefined) {
+            let moveList = pointOrigin.getMoveList(listGameInstance[id]);
+            console.log(moveList);
+            socket.emit('giveMoveList', listGameInstance[id], moveList);
+        }
+    });
+
+    socket.on('moveRequest', (id, xOrigin, yOrigin, xDestination, yDestination) => {
+        let origin = new Point(xOrigin, yOrigin);
+        let destination = new Point(xDestination, yDestination);
+        let newMove = new Move(origin, destination);
+        let pointOrigin = listGameInstance[id].getCase(origin);
+        let moveList = pointOrigin.getMoveList(listGameInstance[id]);
+        let inTheList = false;
+
+        if (pointOrigin !== undefined) {
+            for (let i = 0; i < moveList.length; i++) {
+                console.log(moveList[i]);
+                if (moveList[i].isEqual(newMove)) {
+                    inTheList = true;
+                }
+            }
+
+            if (inTheList) {
+                listGameInstance[id].move(newMove);
+                listGameInstance[id].color === 'white' ? listGameInstance[id].color = 'black' : listGameInstance[id].color = 'white';
+                listGameInstance[id].turn++;
+                io.to(id).emit('playTurn', listGameInstance[id]);
+            }
+        }
+    });
+
+    socket.on('backMenu', (id, localPlayer, opponent) => {
+        socket.to(id).emit('backMenu', opponent);
+        io.emit('backInfo', localPlayer, opponent);
     });
 });
 
