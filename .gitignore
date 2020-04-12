@@ -1,0 +1,4 @@
+# Do not commit files & folders that can ba generated (e.g. node_modules)
+# Do not commit user specific files (e.g. .vscode/settings.json)
+
+node_modules/*
