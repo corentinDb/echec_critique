@@ -36,7 +36,9 @@ class Piece {
     }
 
     //On déclare la fonction qui sera utilisée pour retourner la liste des mouvements possibles d'une pièce
-    getMoveList(board) {};
+    getMoveList(board) {
+        this.moveList = [];
+    };
 }
 
 module.exports = Piece;

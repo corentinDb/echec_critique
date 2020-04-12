@@ -11,6 +11,7 @@ class Bishop extends Piece {
 
     //Se déplace en diagonale
     getMoveList(board) {
+        super.getMoveList();
         //Variable servant à arrêter l'ajout de case s'il y a une pièce sur le chemin
         let stop = false;
         let piece = new Piece;
