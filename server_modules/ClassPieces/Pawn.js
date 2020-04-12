@@ -13,7 +13,7 @@ class Pawn extends Piece {
     getMoveList(board) {
         //On reset la moveList de la pièce
         super.getMoveList();
-        
+
         let piece = new Piece;
         let piece2 = new Piece;
         let eat1 = new Piece;

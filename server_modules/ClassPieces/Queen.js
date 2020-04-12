@@ -19,7 +19,9 @@ class Queen extends Piece {
 
         //On utilise les mouvements de la tour
         //On parcourt chaque ligne et colonne autour de la reine 
-        for (let i = this.getPosition().x - 1; i >= 0; i--) {
+        let isEnd = false;
+        let i = this.getPosition().x - 1;
+        while (!isEnd && i >= 0) {
             //On récupère les coorodonnées de la case dans un point
             point = new Point(i, this.getPosition().y);
             //On récupère la pièce sur la case
@@ -29,22 +31,26 @@ class Queen extends Piece {
             if (!piece) {
                 //On ajoute le mouvement dans moveList et on continue
                 this.moveList.push(new Move(this.getPosition(), point));
-            } 
+            }
             //Si c'est une pièce ennemie
             else if (piece.getColor() !== this.getColor()) {
                 //On ajoute le mouvement dans moveList
                 this.moveList.push(new Move(this.getPosition(), point));
-                //On sort de la boucle for
-                break;
-            } 
+                //On sort de la boucle
+                isEnd = true;
+            }
             //Si c'est une pièce alliée
             else {
-                //On sort de la boucle for
-                break;
+                //On sort de la boucle
+                isEnd = true;
             }
-        }        
+            i--;
+        }
 
-        for (let i = this.getPosition().x + 1; i <= 7; i++) {
+        isEnd = false;
+        i = this.getPosition().x + 1;
+        while (!isEnd && i < 8) {
+
             point = new Point(i, this.getPosition().y);
             piece = board.getCase(point);
 
@@ -52,13 +58,16 @@ class Queen extends Piece {
                 this.moveList.push(new Move(this.getPosition(), point));
             } else if (piece.getColor() !== this.getColor()) {
                 this.moveList.push(new Move(this.getPosition(), point));
-                break;
+                isEnd = true;
             } else {
-                break;
+                isEnd = true;
             }
+            i++;
         }
-        
-        for (let j = this.getPosition().y - 1; j >= 0; j--) {
+
+        isEnd = false;
+        i = this.getPosition().y - 1;
+        while (!isEnd && i >= 0) {
             point = new Point(this.getPosition().x, j);
             piece = board.getCase(point);
 
@@ -66,13 +75,16 @@ class Queen extends Piece {
                 this.moveList.push(new Move(this.getPosition(), point));
             } else if (piece.getColor() !== this.getColor()) {
                 this.moveList.push(new Move(this.getPosition(), point));
-                break;
+                isEnd = true;
             } else {
-                break;
+                isEnd = true;
             }
+            i--;
         }
 
-        for (let j = this.getPosition().y + 1; j <= 7; j++) {
+        isEnd = false;
+        i = this.getPosition().y + 1;
+        while (!isEnd && i < 8) {
             point = new Point(this.getPosition().x, j);
             piece = board.getCase(point);
 
@@ -80,16 +92,19 @@ class Queen extends Piece {
                 this.moveList.push(new Move(this.getPosition(), point));
             } else if (piece.getColor() !== this.getColor()) {
                 this.moveList.push(new Move(this.getPosition(), point));
-                break;
+                isEnd = true;
             } else {
-                break;
+                isEnd = true;
             }
+            i++;
         }
 
         //On utilise les mouvements du fou
         //On parcourt chaque diagonale autour de la reine
+        isEnd = false;
+        i = this.getPosition().x + 1;
         let j = this.getPosition().y + 1;
-        for (let i = this.getPosition().x + 1; i <= 7; i++) {
+        while (!isEnd && i < 8 && j < 8) {
             //On récupère les coordonnées de la case sélectionnée dans le point
             point = new Point(i, j);
             //On récupère la pièce sur la case
@@ -99,31 +114,27 @@ class Queen extends Piece {
             if (!piece) {
                 //On ajoute le mouvement à moveList et on continue
                 this.moveList.push(new Move(this.getPosition(), point));
-            } 
+            }
             //Si c'est un pièce ennemie 
             else if (piece.getColor() !== this.getColor()) {
                 //On ajoute le mouvement
                 this.moveList.push(new Move(this.getPosition(), point));
-                //On sort de la boucle for
-                break;
-            } 
+                //On sort de la boucle
+                isEnd = true;
+            }
             //Si c'est une pièce alliée
             else {
-                //On sort de la boucle for
-                break;
+                //On sort de la boucle
+                isEnd = true;
             }
 
-            //On incrémente j
             j++;
-            //Si on sort de l'échiquier
-            if(j > 7) {
-                //On sort de la boucle for
-                break;
-            }
+            i++;
         }
 
+        i = this.getPosition().x - 1;
         j = this.getPosition().y + 1;
-        for (let i = this.getPosition().x - 1; i >= 0; i--) {
+        while (!isEnd && i >= 0 && j < 8) {
             point = new Point(i, j);
             piece = board.getCase(point);
 
@@ -131,19 +142,18 @@ class Queen extends Piece {
                 this.moveList.push(new Move(this.getPosition(), point));
             } else if (piece.getColor() !== this.getColor()) {
                 this.moveList.push(new Move(this.getPosition(), point));
-                break;
+                isEnd = true;
             } else {
-                break;
+                isEnd = true;
             }
 
             j++;
-            if (j > 7) {
-                break;
-            }
+            i--;
         }
 
+        i = this.getPosition().x + 1;
         j = this.getPosition().y - 1;
-        for (let i = this.getPosition().x + 1; i <= 7; i++) {
+        while (!isEnd && i < 8 && j >= 0) {
             point = new Point(i, j);
             piece = board.getCase(point);
 
@@ -151,19 +161,18 @@ class Queen extends Piece {
                 this.moveList.push(new Move(this.getPosition(), point));
             } else if (piece.getColor() !== this.getColor()) {
                 this.moveList.push(new Move(this.getPosition(), point));
-                break;
+                isEnd = true;
             } else {
-                break;
+                isEnd = true;
             }
 
             j--;
-            if (j < 0) {
-                break;
-            }
+            i++;
         }
 
+        i = this.getPosition().x - 1;
         j = this.getPosition().y - 1;
-        for (let i = this.getPosition().x - 1; i >= 0; i--) {
+        while (!isEnd && i >= 0 && j >= 0) {
             point = new Point(i, j);
             piece = board.getCase(point);
 
@@ -171,15 +180,13 @@ class Queen extends Piece {
                 this.moveList.push(new Move(this.getPosition(), point));
             } else if (piece.getColor() !== this.getColor()) {
                 this.moveList.push(new Move(this.getPosition(), point));
-                break;
+                isEnd = true;
             } else {
-                break;
+                isEnd = true;
             }
 
             j--;
-            if (j < 0) {
-                break;
-            }
+            i--;
         }
 
         return this.moveList;

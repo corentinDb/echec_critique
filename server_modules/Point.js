@@ -6,7 +6,7 @@ class Point {
         this.y = y;
     }
 
-    reverse(){
+    reverse() {
         let tmp = this.x;
         this.x = this.y;
         this.y = tmp;

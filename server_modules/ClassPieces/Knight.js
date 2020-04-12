@@ -31,7 +31,7 @@ class Knight extends Piece {
         if (this.getPosition().x > 0 && this.getPosition().y < 6) {
             point = new Point(this.getPosition().x - 1, this.getPosition().y + 2);
             let piece = board.getCase(point);
-            
+
             if (!piece || (piece.color !== this.color)) {
                 this.moveList.push(new Move(this.getPosition(), point));
             }
@@ -40,7 +40,7 @@ class Knight extends Piece {
         if (this.getPosition().x > 1 && this.getPosition().y < 7) {
             point = new Point(this.getPosition().x - 2, this.getPosition().y + 1);
             let piece = board.getCase(point);
-            
+
             if (!piece || (piece.color !== this.color)) {
                 this.moveList.push(new Move(this.getPosition(), point));
             }
@@ -49,7 +49,7 @@ class Knight extends Piece {
         if (this.getPosition().x > 1 && this.getPosition().y > 0) {
             point = new Point(this.getPosition().x - 2, this.getPosition().y - 1);
             let piece = board.getCase(point);
-            
+
             if (!piece || (piece.color !== this.color)) {
                 this.moveList.push(new Move(this.getPosition(), point));
             }
@@ -89,7 +89,7 @@ class Knight extends Piece {
             if (!piece || (piece.color !== this.color)) {
                 this.moveList.push(new Move(this.getPosition(), point));
             }
-        }   
+        }
 
         return this.moveList;
     }

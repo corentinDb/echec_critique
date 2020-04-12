@@ -18,8 +18,10 @@ class Bishop extends Piece {
         let point = new Point;
 
         //On parcourt chaque diagonale autour du fou
+        let isEnd = false;
+        let i = this.getPosition().x + 1;
         let j = this.getPosition().y + 1;
-        for (let i = this.getPosition().x + 1; i <= 7; i++) {
+        while (!isEnd && j < 8 && i < 8) {
             //On récupère les coordonnées de la case sélectionnée dans le point
             point = new Point(i, j);
             //On récupère la pièce sur la case
@@ -29,31 +31,28 @@ class Bishop extends Piece {
             if (!piece) {
                 //On ajoute le mouvement dans moveList et on continue
                 this.moveList.push(new Move(this.getPosition(), point));
-            } 
-            //Si c'est un pièce ennemie 
+            }
+            //Si c'est un pièce ennemie
             else if (piece.getColor() !== this.getColor()) {
                 //On ajoute le mouvement dans moveList
                 this.moveList.push(new Move(this.getPosition(), point));
-                //On sort de la boucle for
-                break;
-            } 
+                //On sort de la boucle
+                isEnd = true;
+            }
             //Si c'est une pièce alliée
             else {
-                //On sort de la boucle for
-                break;
+                //On sort de la boucle
+                isEnd = true;
             }
 
-            //On incrémente j
             j++;
-            //Si on sort de l'échiquier
-            if(j > 7) {
-                //On sort de la boucle for
-                break;
-            }
+            i++;
         }
 
+        isEnd = false;
+        i = this.getPosition().x - 1;
         j = this.getPosition().y + 1;
-        for (let i = this.getPosition().x - 1; i >= 0; i--) {
+        while (!isEnd && j < 8 && i >= 0) {
             point = new Point(i, j);
             piece = board.getCase(point);
 
@@ -65,15 +64,16 @@ class Bishop extends Piece {
             } else {
                 break;
             }
+
 
             j++;
-            if (j > 7) {
-                break;
-            }
+            i--;
         }
 
+        isEnd = false;
+        i = this.getPosition().x + 1;
         j = this.getPosition().y - 1;
-        for (let i = this.getPosition().x + 1; i <= 7; i++) {
+        while (!isEnd && j >= 0 && i < 8) {
             point = new Point(i, j);
             piece = board.getCase(point);
 
@@ -86,14 +86,15 @@ class Bishop extends Piece {
                 break;
             }
 
+
             j--;
-            if (j < 0) {
-                break;
-            }
+            i++;
         }
 
+        isEnd = false;
+        i = this.getPosition().x - 1;
         j = this.getPosition().y - 1;
-        for (let i = this.getPosition().x - 1; i >= 0; i--) {
+        while (!isEnd && j >= 0 && i >= 0) {
             point = new Point(i, j);
             piece = board.getCase(point);
 
@@ -106,10 +107,9 @@ class Bishop extends Piece {
                 break;
             }
 
+
             j--;
-            if (j < 0) {
-                break;
-            }
+            i--;
         }
 
         return this.moveList;

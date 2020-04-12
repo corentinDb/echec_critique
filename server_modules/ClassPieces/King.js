@@ -73,7 +73,7 @@ class King extends Piece {
 
             if ((!piece || (piece.color !== this.color)) /*&& pas en échec*/) {
                 this.moveList.push(new Move(this.getPosition(), point));
-            }        
+            }
         }
 
         if (this.getPosition().y > 0) {

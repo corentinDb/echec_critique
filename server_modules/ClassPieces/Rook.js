@@ -13,37 +13,43 @@ class Rook extends Piece {
     getMoveList(board) {
         //On reset la moveList de la pièce
         super.getMoveList();
-        
-        let piece = new Piece;
+
         let point = new Point;
+        let piece = new Piece;
 
         //On parcourt chaque ligne et colonne autour de la tour
-        for (let i = this.getPosition().x - 1; i >= 0; i--) {
-            //On récupère les coordonnées de la case dans un point
+        let isEnd = false;
+        let i = this.getPosition().x - 1;
+        while (!isEnd && i >= 0) {
+            //On récupère les coorodonnées de la case dans un point
             point = new Point(i, this.getPosition().y);
             //On récupère la pièce sur la case
             piece = board.getCase(point);
 
             //Si la case est vide
             if (!piece) {
-                //On ajoute le mouvement à moveList
+                //On ajoute le mouvement dans moveList et on continue
                 this.moveList.push(new Move(this.getPosition(), point));
-            } 
+            }
             //Si c'est une pièce ennemie
             else if (piece.getColor() !== this.getColor()) {
-                //On ajoute le mouvement à moveList
+                //On ajoute le mouvement dans moveList
                 this.moveList.push(new Move(this.getPosition(), point));
-                //On sort de la boucle for
-                break;
-            } 
+                //On sort de la boucle
+                isEnd = true;
+            }
             //Si c'est une pièce alliée
             else {
-                //On sort de la boucle for
-                break;
+                //On sort de la boucle
+                isEnd = true;
             }
+            i--;
         }
 
-        for (let i = this.getPosition().x + 1; i <= 7; i++) {
+        isEnd = false;
+        i = this.getPosition().x + 1;
+        while (!isEnd && i < 8) {
+
             point = new Point(i, this.getPosition().y);
             piece = board.getCase(point);
 
@@ -51,13 +57,16 @@ class Rook extends Piece {
                 this.moveList.push(new Move(this.getPosition(), point));
             } else if (piece.getColor() !== this.getColor()) {
                 this.moveList.push(new Move(this.getPosition(), point));
-                break;
+                isEnd = true;
             } else {
-                break;
+                isEnd = true;
             }
+            i++;
         }
 
-        for (let j = this.getPosition().y - 1; j >= 0; j--) {
+        isEnd = false;
+        i = this.getPosition().y - 1;
+        while (!isEnd && i >= 0) {
             point = new Point(this.getPosition().x, j);
             piece = board.getCase(point);
 
@@ -65,26 +74,29 @@ class Rook extends Piece {
                 this.moveList.push(new Move(this.getPosition(), point));
             } else if (piece.getColor() !== this.getColor()) {
                 this.moveList.push(new Move(this.getPosition(), point));
-                break;
+                isEnd = true;
             } else {
-                break;
+                isEnd = true;
             }
+            i--;
         }
 
-        for (let j = this.getPosition().y + 1; j <= 7; j++) {
+        isEnd = false;
+        i = this.getPosition().y + 1;
+        while (!isEnd && i < 8) {
             point = new Point(this.getPosition().x, j);
             piece = board.getCase(point);
-            
+
             if (!piece) {
                 this.moveList.push(new Move(this.getPosition(), point));
             } else if (piece.getColor() !== this.getColor()) {
                 this.moveList.push(new Move(this.getPosition(), point));
-                break;
+                isEnd = true;
             } else {
-                break;
+                isEnd = true;
             }
+            i++;
         }
-
         return this.moveList;
     }
 }
