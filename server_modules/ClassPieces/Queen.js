@@ -68,7 +68,7 @@ class Queen extends Piece {
         isEnd = false;
         i = this.getPosition().y - 1;
         while (!isEnd && i >= 0) {
-            point = new Point(this.getPosition().x, j);
+            point = new Point(this.getPosition().x, i);
             piece = board.getCase(point);
 
             if (!piece) {
@@ -85,7 +85,7 @@ class Queen extends Piece {
         isEnd = false;
         i = this.getPosition().y + 1;
         while (!isEnd && i < 8) {
-            point = new Point(this.getPosition().x, j);
+            point = new Point(this.getPosition().x, i);
             piece = board.getCase(point);
 
             if (!piece) {
@@ -132,6 +132,7 @@ class Queen extends Piece {
             i++;
         }
 
+        isEnd = false;
         i = this.getPosition().x - 1;
         j = this.getPosition().y + 1;
         while (!isEnd && i >= 0 && j < 8) {
@@ -151,6 +152,7 @@ class Queen extends Piece {
             i--;
         }
 
+        isEnd = false;
         i = this.getPosition().x + 1;
         j = this.getPosition().y - 1;
         while (!isEnd && i < 8 && j >= 0) {
@@ -170,6 +172,7 @@ class Queen extends Piece {
             i++;
         }
 
+        isEnd = false;
         i = this.getPosition().x - 1;
         j = this.getPosition().y - 1;
         while (!isEnd && i >= 0 && j >= 0) {

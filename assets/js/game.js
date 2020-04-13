@@ -1,5 +1,4 @@
 (function () {
-
     const socket = io.connect('http://localhost:4269');
 
     //Récupère les infos du joueur
@@ -7,13 +6,50 @@
     const opponent = document.getElementById('opponent').innerHTML;
     const color = document.getElementById('color').innerHTML;
     const gameID = document.getElementById('gameID').innerHTML;
+
+    const id = Math.floor(Math.random() * Math.pow(10, 42));
+    let pong = false;
     let boardCache;
+    let moveList = [];
+
+    //Initialise les paramètres de socket io
+    socket.emit('joinGame', gameID, localPlayer);
+
+    socket.on('newUserResponse', (user) => {    //Si un nouveau utilisateur se connecte au serveur, s'il a le même nom, on lui demande de se déconnecter, sinon on le prévient qu'on est connecté
+        if (user === localPlayer) {
+            socket.emit('close', localPlayer, id);
+        } else {
+            socket.emit('giveConnectionInfo', localPlayer, user);
+        }
+    });
+
+    socket.on('pingRequest', (user) => {    //Réponse à une demande de ping
+        socket.emit('pongUser', localPlayer, user, true);   //On ajoute un booléen à true dans la réponse pour préciser que l'utilisateur est en jeux
+    });
+
+    socket.on('pongResponse', (user, inGame) => {   //Réception de la réponse du ping
+        if (inGame) {
+            pong = true;
+        }
+    });
+
+    let pingPong = setInterval(() => {     //Ping de l'utilisateur toutes les 5 secondes pour vérifier qu'il est toujours connecté à la partie, sinon on retourne au menu et on arrête le ping régulier
+        socket.emit('pingUser', localPlayer, opponent);
+        setTimeout(() => {
+            if (pong === false) {
+                alert('L\'adversaire est parti, vous allez être redirigé vers le menu');
+                setTimeout(() => {
+                    window.location = 'http://game.delhon-bugard.fr:4269/menu';
+                }, 1000);
+                clearInterval(pingPong);
+            } else {
+                pong = false;
+            }
+        }, 1000);
+    }, 5000);
 
 
-    //Initialise la game
-    socket.emit('joinGame', gameID);
-
-    //Si le joueur est blanc, il lance la partie après 2 secondes (pour être sur que les 2 joueurs sont connectées)
+    //Si le joueur est blanc, il lance la partie, s'il est noir, on demande le board après 500ms (pour être sur que la partie est bien commencé
     if (color === 'white') {
         socket.emit('startGame', gameID);
     } else {
@@ -23,7 +59,6 @@
     }
 
     socket.on('giveBoard', (gameInstance) => {
-        console.table(gameInstance.board);
         boardCache = gameInstance;
     });
 
@@ -33,16 +68,8 @@
     });
 
     socket.on('giveMoveList', (gameInstance, serverMoveList) => {     //Réception de la moveList
-        console.log('most list reçu');
-        console.log(gameInstance);
-        console.log(serverMoveList);
         moveList = serverMoveList;
-        //vérifier qu'une moveList a précédement été demandé
-        //Activer selection move
     });
-
-
-    let moveList = [];
 
 
     let game = new Phaser.Game(window.innerWidth - 200, window.innerHeight - 240, Phaser.AUTO, 'phaser-example', {
@@ -192,9 +219,6 @@
             sprite.move = false;
         }
 
-        let blackTileId = 0;
-        let whiteTileId = 63;
-
 
         for (let i = 0; i < 8; i++) {
             for (let j = 0; j < 8; j++) {
@@ -228,7 +252,7 @@
 
     function getSpriteMoveList(sprite) {
         let spriteMoveList = [];
-        if (moveList === []) {
+        if (moveList[0] !== undefined) {
             if (moveList[0].origin.x === sprite.coord.x && moveList[0].origin.y === sprite.coord.y) {
                 for (let move of moveList) {
                     spriteMoveList.push(tile.children[positionToBoardId(move.destination, color)]);
@@ -240,7 +264,7 @@
 
     function showMoveList(spriteMoveList) {
         for (let spriteMove of spriteMoveList) {
-            spriteMove.key.circle(getTileSize() / 2, getTileSize() / 2, getTileSize() / 8)
+            spriteMove.key.circle(getTileSize() / 2, getTileSize() / 2, getTileSize() / 8);
             spriteMove.move = true;
         }
     }
@@ -277,7 +301,9 @@
                 if (hoverPiece !== null && hoverPiece.color === color) {
                     selectedTile = hoverTile;
                     console.log('demande de moveList pour', selectedTile.coord);
-                    gameMod.getMoveList(boardCache, gameID, color, selectedTile.coord.x, selectedTile.coord.y);
+                    if (boardCache.color === color) {
+                        socket.emit('getMoveList', gameID, selectedTile.coord.x, selectedTile.coord.y);
+                    }
                 }
                 selectorClick = false;
             }
@@ -299,7 +325,10 @@
             //envoie du move si l'on click sur un move
             if (game.input.activePointer.leftButton.isDown && moveClick) {
                 let moveTile = hoverTile;
-                if (moveTile !== undefined) if (moveTile.move) console.log('envoie du move pour la position', moveTile.coord);
+                if (moveTile !== undefined && moveTile.move) {
+                    socket.emit('moveRequest', gameID, selectedTile.coord.x, selectedTile.coord.y, moveTile.coord.x, moveTile.coord.y);
+                    console.log('envoie du move pour la position', moveTile.coord);
+                }
 
             }
 

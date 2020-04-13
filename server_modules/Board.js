@@ -42,12 +42,12 @@ class Board {
         this.insert(new Bishop('black', 5, 7), new Point(5, 7));
 
         //reines
-        this.insert(new Queen('white', 4, 0), new Point(4, 0));
-        this.insert(new Queen('black', 4, 7), new Point(4, 7));
+        this.insert(new Queen('white', 3, 0), new Point(3, 0));
+        this.insert(new Queen('black', 3, 7), new Point(3, 7));
 
         //rois
-        this.insert(new King('white', 3, 0), new Point(3, 0));
-        this.insert(new King('black', 3, 7), new Point(3, 7));
+        this.insert(new King('white', 4, 0), new Point(4, 0));
+        this.insert(new King('black', 4, 7), new Point(4, 7));
 
         //initialisation du nombre de tour à 0
         this.turn = 0;
@@ -73,9 +73,9 @@ class Board {
 
     //permet de déplacer un pion d'une case à une autre (augmente le nombre de tour et ajoute le mouvement dans replay)
     move(move) {
-
         let origin = move.getOrigin();
         let destination = move.getDestination();
+
 
         this.insert(this.getCase(origin), destination);
         this.destruct(origin);
@@ -83,9 +83,9 @@ class Board {
         //change les coordonnées contenues dans la pièce
         this.getCase(destination).setPosition(destination);
 
-        this.replay[this.turn] = move;
-        this.turn++;
+        this.getCase(destination).moved();
 
+        this.replay[this.turn] = move;
     }
 
     //reset le plateau

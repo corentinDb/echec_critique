@@ -52,7 +52,6 @@ app.use(express.urlencoded({extended: true}));
 
 app.use(session({secret: 'Error 418 I\'m a teapot !', cookie: {maxAge: 60 * 60 * 1000}}));
 
-let connectedUserList = [];
 let listGameInstance = [];
 
 const con = mysql.createConnection({    //Création de la base de donnée
@@ -77,7 +76,11 @@ app.get('/error', (req, res, next) => {
 
 
 app.get('/', (req, res, next) => {      //Page principale du serveur = page de connexion
-    if (req.session.connectionID) {
+    if (req.query.error === 'existing') {
+        // cookies.set('connect.sid', {expires: Date.now()});
+        res.clearCookie("connect.sid");
+        res.sendFile(__dirname + '/assets/views/connection.html');
+    } else if (req.session.connectionID) {
         res.redirect('/menu');
     } else {
         res.sendFile(__dirname + '/assets/views/connection.html');
@@ -91,25 +94,17 @@ app.post('/', (req, res, next) => {     //Traitement des informations de connexi
         if (req.body.login !== undefined && req.body.password !== undefined) {  //On vérifie si les informations de connexion existe bien (condition normalement toujours vrai car vérifié avant l'envoie du formulaire mais au cas où on revérifie)
             con.query('SELECT * FROM connection', (error, responseSelect) => {
                 let connectionSuccessful = false;
-                let existingConenction = false;
                 responseSelect.forEach((row) => {
                     if (hashPassword(req.body.password) === row['password'] && req.body.login === row['pseudo']) {  //On vérifie chaque couple pseudo/password enregistré en BDD par rapport à celui entré par l'utilisateur
-                        if (!connectedUserList.some((user) => user === row['pseudo'])) {    //On vérifie que l'utilisateur est pas déjà connecté sur un autre ordinateur / navigateur
-                            req.session.connectionID = row['userID'];
-                            req.session.pseudo = row['pseudo'];
-                            connectedUserList.push(row['pseudo']);
-                            connectionSuccessful = true;
-                        } else {
-                            existingConenction = true;
-                        }
+                        req.session.connectionID = row['userID'];
+                        req.session.pseudo = row['pseudo'];
+                        connectionSuccessful = true;
                     }
                 });
                 //Redirection en fonction des résultats de la tentative de connexion
                 if (connectionSuccessful) {
                     resetMessage(req.session.pseudo);   //Par précaution, on reset les messages
                     res.redirect('/menu');
-                } else if (existingConenction) {
-                    res.redirect('/?error=existing');
                 } else {
                     res.redirect('/?error=wrongLogin');
                 }
@@ -130,53 +125,48 @@ app.get('/registration', (req, res, next) => {      //Page de création de compt
 });
 
 app.post('/registration', (req, res, next) => {     //Traitement des informations de création de compte
-    if (req.session.connectionID) {     //Si l'utilisateur est déjà connecté on l'envoie directement sur le menu
-        res.redirect('/menu');
-    } else {
-        if (req.body.pseudo !== undefined && req.body.password !== undefined && req.body.email !== undefined) {     //On vérifie si les informations de connexion existe bien (condition normalement toujours vrai car vérifié avant l'envoie du formulaire mais au cas où on revérifie)
-            con.query('SELECT * FROM connection', (error, responseSelect) => {
-                if (error) throw error;
-                let validUser = true;
-                let validMail = true;
-                let errorMsg = '';
+    if (req.body.pseudo !== undefined && req.body.password !== undefined && req.body.email !== undefined) {     //On vérifie si les informations de connexion existe bien (condition normalement toujours vrai car vérifié avant l'envoie du formulaire mais au cas où on revérifie)
+        con.query('SELECT * FROM connection', (error, responseSelect) => {
+            if (error) throw error;
+            let validUser = true;
+            let validMail = true;
+            let errorMsg = '';
 
-                responseSelect.forEach((row) => {       //On vérifie qu'un utilistateur avec ce pseudo ou cet email n'existe pas déjà
-                    if (row['pseudo'] === req.body.pseudo) {
-                        validUser = false;
-                        errorMsg = 'wrongPseudo';
-                    } else if (row['email'] === req.body.email) {
-                        validMail = false;
-                        errorMsg = 'wrongEmail';
-                    }
-                });
-
-                if (validUser && validMail) {
-                    let data = [req.body.pseudo, hashPassword(req.body.password), req.body.email];
-                    con.query('INSERT INTO connection (`pseudo`, `password`, `email`) VALUES (?)', [data], (error, resp) => {   //On ajoute l'utilisteur en base de donnée
-                        if (error) throw error;
-                        let pseudo = req.body.pseudo;
-                        req.session.connectionID = resp.insertId;
-                        req.session.pseudo = pseudo;
-                        connectedUserList.push(req.body.pseudo);
-
-                        resetMessage(pseudo);   //Ajout de l'utilisateur dans le fichier message.json
-
-                        res.redirect('/menu');
-                    });
-                } else {
-                    res.redirect('/registration?error=' + errorMsg);
+            responseSelect.forEach((row) => {       //On vérifie qu'un utilistateur avec ce pseudo ou cet email n'existe pas déjà
+                if (row['pseudo'] === req.body.pseudo) {
+                    validUser = false;
+                    errorMsg = 'wrongPseudo';
+                } else if (row['email'] === req.body.email) {
+                    validMail = false;
+                    errorMsg = 'wrongEmail';
                 }
             });
-        } else {
-            res.redirect('/redirection?error=undefined');
-        }
+
+            if (validUser && validMail) {
+                let data = [req.body.pseudo, hashPassword(req.body.password), req.body.email];
+                con.query('INSERT INTO connection (`pseudo`, `password`, `email`) VALUES (?)', [data], (error, resp) => {   //On ajoute l'utilisteur en base de donnée
+                    if (error) throw error;
+                    let pseudo = req.body.pseudo;
+                    req.session.connectionID = resp.insertId;
+                    req.session.pseudo = pseudo;
+
+                    resetMessage(pseudo);   //Ajout de l'utilisateur dans le fichier message.json
+
+                    res.redirect('/menu');
+                });
+            } else {
+                res.redirect('/registration?error=' + errorMsg);
+            }
+        });
+    } else {
+        res.redirect('/redirection?error=undefined');
     }
 });
 
 
 app.get('/menu', (req, res, next) => {      //Page du menu principal
     if (req.session.connectionID) {         //Si l'utilisateur est bien connecté
-        res.render('menu', {pseudo: req.session.pseudo, userList: connectedUserList});
+        res.render('menu', {pseudo: req.session.pseudo});
     } else {
         res.redirect('/');
     }
@@ -186,16 +176,16 @@ app.get('/menu', (req, res, next) => {      //Page du menu principal
 app.get('/destroy', (req, res, next) => {       //Page de déconnexion
     let user = req.session.pseudo;
     if (user !== undefined && user !== null) {  //Si le pseudo n'est pas undefined ou null, pour éviter les bugs si l'utilisateur charge cette page sans être connecté
-        let index = connectedUserList.indexOf(user);
-        connectedUserList.splice(index, 1);     //On retire le pseudo de la liste des utilisateurs
         req.session.destroy(function (err) {    //Suppression de la session
-            resetMessage(user);     //Suppression des messages de l'utilisateur 'user'
+            if (req.query.doubleConnection !== true) {
+                resetMessage(user);     //Suppression des messages de l'utilisateur 'user'
+            }
             res.redirect('/');
         })
     }
 });
 
-app.get('/game', (req, res, next) => {
+app.get('/game', (req, res, next) => {      //Si l'utilisateur charge la page /game directement dans l'url, on le revoit au menu
     res.redirect('/menu');
 });
 
@@ -215,31 +205,42 @@ io.sockets.on('connection', (socket) => {
         socket.broadcast.emit('newUserResponse', user);
     });
 
+    socket.on('giveConnectionInfo', (pseudo, user) => {     //On informe l'utilisateur 'user' que l'utilisateur 'pseudo' est déjà connecté au serveur
+        io.to(user).emit('giveConnectionInfo', pseudo);
+    });
+
     socket.on('removeUserRequest', (user) => {  //Quand un utilisateur se déconnecte, on prévient les autres
         socket.broadcast.emit('removeUserResponse', user);
     });
 
+    socket.on('close', (user, id) => {          //On demande aux l'utilisateurs 'user' ayant un ID différent de 'id' de se déconnecter
+        socket.broadcast.emit('close', user, id);
+    });
+
+
     socket.on('sendMessage', (msg, sender, receiver) => {    //Quand un utilisateur envoie un message, on prévient les autres
-        fs.readFile('message.json', (err, data) => {    //Enregistrement du message dans le fichier message.json
-            if (err) {
-                console.log("An error occured while reading JSON File.");
-                return console.log(err);
-            }
-            let jsonParsed = JSON.parse(data);
-            let msgJson = {};
-            msgJson['sender'] = sender;
-            msgJson['msg'] = msg;
-            jsonParsed[sender][receiver].push(msgJson);
-            jsonParsed[receiver][sender].push(msgJson);
-            let jsonContent = JSON.stringify(jsonParsed);
-            fs.writeFile('message.json', jsonContent, 'utf8', (err) => {
+        if (sender !== receiver) {
+            fs.readFile('message.json', (err, data) => {    //Enregistrement du message dans le fichier message.json
                 if (err) {
-                    console.log("An error occured while writing JSON Object to File.");
+                    console.log("An error occured while reading JSON File.");
                     return console.log(err);
                 }
+                let jsonParsed = JSON.parse(data);
+                let msgJson = {};
+                msgJson['sender'] = sender;
+                msgJson['msg'] = msg;
+                jsonParsed[sender][receiver].push(msgJson);
+                jsonParsed[receiver][sender].push(msgJson);
+                let jsonContent = JSON.stringify(jsonParsed);
+                fs.writeFile('message.json', jsonContent, 'utf8', (err) => {
+                    if (err) {
+                        console.log("An error occured while writing JSON Object to File.");
+                        return console.log(err);
+                    }
+                });
             });
-        });
-        socket.broadcast.emit('receiveMessage', msg, sender, receiver);
+            socket.broadcast.emit('receiveMessage', msg, sender, receiver);
+        }
     });
 
     socket.on('loadMessageRequest', (user) => {
@@ -260,8 +261,9 @@ io.sockets.on('connection', (socket) => {
     });
 
 
-    socket.on('joinGame', (id) => {
+    socket.on('joinGame', (id, user) => {
         socket.join(id);
+        socket.join(user);
     });
 
     socket.on('startGame', (id) => {
@@ -275,37 +277,37 @@ io.sockets.on('connection', (socket) => {
     });
 
     socket.on('getMoveList', (id, xOrigin, yOrigin) => {
-        console.log('getMoveList');
-        let pointOrigin = listGameInstance[id].getCase(new Point(xOrigin, yOrigin));
-        console.log(pointOrigin);
-        if (pointOrigin !== undefined) {
-            let moveList = pointOrigin.getMoveList(listGameInstance[id]);
-            console.log(moveList);
-            socket.emit('giveMoveList', listGameInstance[id], moveList);
+        if (listGameInstance[id] !== undefined) {
+            let pointOrigin = listGameInstance[id].getCase(new Point(xOrigin, yOrigin));
+            if (pointOrigin !== undefined) {
+                let moveList = pointOrigin.getMoveList(listGameInstance[id]);
+                socket.emit('giveMoveList', listGameInstance[id], moveList);
+            }
         }
     });
 
     socket.on('moveRequest', (id, xOrigin, yOrigin, xDestination, yDestination) => {
-        let origin = new Point(xOrigin, yOrigin);
-        let destination = new Point(xDestination, yDestination);
-        let newMove = new Move(origin, destination);
-        let pointOrigin = listGameInstance[id].getCase(origin);
-        let moveList = pointOrigin.getMoveList(listGameInstance[id]);
-        let inTheList = false;
+        if (listGameInstance[id] !== undefined) {
+            let origin = new Point(xOrigin, yOrigin);
+            let destination = new Point(xDestination, yDestination);
+            let newMove = new Move(origin, destination);
+            let pointOrigin = listGameInstance[id].getCase(origin);
+            let moveList = pointOrigin.getMoveList(listGameInstance[id]);
+            let inTheList = false;
 
-        if (pointOrigin !== undefined) {
-            for (let i = 0; i < moveList.length; i++) {
-                console.log(moveList[i]);
-                if (moveList[i].isEqual(newMove)) {
-                    inTheList = true;
+            if (pointOrigin !== undefined) {
+                for (let i = 0; i < moveList.length; i++) {
+                    if (moveList[i].isEqual(newMove)) {
+                        inTheList = true;
+                    }
                 }
-            }
 
-            if (inTheList) {
-                listGameInstance[id].move(newMove);
-                listGameInstance[id].color === 'white' ? listGameInstance[id].color = 'black' : listGameInstance[id].color = 'white';
-                listGameInstance[id].turn++;
-                io.to(id).emit('playTurn', listGameInstance[id]);
+                if (inTheList) {
+                    listGameInstance[id].move(newMove);
+                    listGameInstance[id].color === 'white' ? listGameInstance[id].color = 'black' : listGameInstance[id].color = 'white';
+                    listGameInstance[id].turn++;
+                    io.to(id).emit('playTurn', listGameInstance[id]);
+                }
             }
         }
     });
@@ -314,6 +316,14 @@ io.sockets.on('connection', (socket) => {
         socket.to(id).emit('backMenu', opponent);
         io.emit('backInfo', localPlayer, opponent);
     });
+
+    socket.on('pingUser', (pseudo, user) => {       //Demande de ping par 'pseudo' vers 'user'
+        socket.to(user).emit('pingRequest', pseudo);
+    });
+
+    socket.on('pongUser', (pseudo, user, inGame) => {       //Réponse au ping demandé par 'user' à 'pseudo'
+        socket.to(user).emit('pongResponse', pseudo, inGame);
+    })
 });
 
 server.listen(port);
