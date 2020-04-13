@@ -67,7 +67,7 @@ class Rook extends Piece {
         isEnd = false;
         i = this.getPosition().y - 1;
         while (!isEnd && i >= 0) {
-            point = new Point(this.getPosition().x, j);
+            point = new Point(this.getPosition().x, i);
             piece = board.getCase(point);
 
             if (!piece) {
@@ -84,7 +84,7 @@ class Rook extends Piece {
         isEnd = false;
         i = this.getPosition().y + 1;
         while (!isEnd && i < 8) {
-            point = new Point(this.getPosition().x, j);
+            point = new Point(this.getPosition().x, i);
             piece = board.getCase(point);
 
             if (!piece) {
