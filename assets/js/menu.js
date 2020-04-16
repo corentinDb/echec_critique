@@ -130,6 +130,7 @@ function addUserRow(pseudo, user, table) {      //Création d'une ligne pour un 
 
     let userCell = document.createElement("td");
     newRow.appendChild(userCell);
+    userCell.id = 'userCell';
     userCell.appendChild(document.createTextNode(user));
 
     let linkCell = document.createElement("td");
@@ -137,24 +138,21 @@ function addUserRow(pseudo, user, table) {      //Création d'une ligne pour un 
 
     let linkChat = document.createElement("button");
     linkCell.appendChild(linkChat);
+    linkChat.className = 'userButton';
     linkChat.innerHTML = 'discussion';
 
 
     let waitingMsg = document.createElement("td");
     newRow.appendChild(waitingMsg);
     waitingMsg.id = 'waitingMsg_' + user;
+    waitingMsg.className = 'waitingMsg';
     waitingMsg.style.color = 'red';
 
-    let formPlay = document.createElement("form");
-    linkCell.appendChild(formPlay);
-    formPlay.action = "/menu";
-    formPlay.method = "post";
-
-    let connectionButton = document.createElement("input");
-    formPlay.appendChild(connectionButton);
-    connectionButton.type = 'button';
-    connectionButton.value = 'jouer avec ' + user;
+    let connectionButton = document.createElement("button");
+    linkCell.appendChild(connectionButton);
+    connectionButton.innerHTML = 'jouer avec ' + user;
     connectionButton.id = 'play_with_' + user;
+    connectionButton.className = 'userButton';
 
 
     createTabChat(pseudo, user);
