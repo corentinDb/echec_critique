@@ -83,12 +83,14 @@
         boardCache = gameInstance;
         gameOver = true;
         console.log(boardCache.color + ' est en échec et mat !');
+        text.text = 'Partie terminée ,' + boardCache.color + ' est en échec et mat !'
     });
 
     socket.on('pat', (gameInstance) => {
         boardCache = gameInstance;
         gameOver = true;
         console.log(boardCache.color + ' est en pat !');
+        text.text = "Partie terminée, Il y Pat!"
     });
 
     socket.on('promotion', (gameInstance, pawn) => {
@@ -98,16 +100,19 @@
     });
 
 
-    let game = new Phaser.Game(window.innerWidth - 50, window.innerHeight - 110, Phaser.AUTO, 'phaser-example', {
+    let game = new Phaser.Game(window.innerWidth, window.innerHeight * (65/100), Phaser.AUTO, 'phaser-example', {
         preload: preload,
         create: create,
         update: update
     });
 
+
+
     let tile;
     let missing;
     let promote;
     let selectedTile;
+    let text;
 
     //chargement des images
     function preload() {
@@ -130,7 +135,7 @@
 
     //donne la taille du plateau
     function getBoardSize() {
-        return Math.min(game.world.height * 70 / 100, game.world.width * 70 / 100);
+        return Math.min(game.world.height * 80 / 100, game.world.width * 70 / 100);
     }
 
     //donne la taille d'une case
@@ -153,7 +158,7 @@
     //creation de l'interface de jeu
     function create() {
 
-        game.stage.backgroundColor = "#eee7bc";
+        game.stage.backgroundColor = "#dddddd";
 
         let boardSize = getBoardSize();
 
@@ -274,6 +279,16 @@
             }
 
         }
+
+        let style = { font: "bold 32px Arial", fill: "#000000", boundsAlignH: "center", boundsAlignV: "middle" };
+        text = game.add.text(0, 0, "", style);
+
+        text.setTextBounds(boardBack.x - getBoardSize()/2, boardBack.y - getBoardSize()/2 - getTileSize(), boardBack.width, getTileSize());
+
+        let chat = document.createElement("div");
+        chat.setAttribute('id', 'mainChatBox');
+        chat.textContent="Ici le chat";
+        document.body.appendChild(chat);
 
     }
 
@@ -629,4 +644,6 @@
 
 
     }
+
+
 })();
