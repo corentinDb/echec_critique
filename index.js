@@ -304,9 +304,9 @@ io.sockets.on('connection', (socket) => {
                     if (listGameInstance[id].getCase(destination).name === 'Pawn') {
                         if (exceptionMod.promotion(listGameInstance[id].getCase(destination))) {
                             io.to(id).emit('promotion', listGameInstance[id], listGameInstance[id].getCase(destination));
-                            socket.on('promotionResponse', (piece, color) => {
-                                let newPiece;
-                                switch (piece) {
+                            socket.on('promotionResponse', (promoteResult) => {
+                                let color = promoteResult.color;
+                                switch (promoteResult.piece) {
                                     case 'Bishop':
                                         listGameInstance[id].insert(new Bishop(color, xDestination, yDestination), new Point(xDestination, yDestination));
                                         break;
@@ -323,7 +323,6 @@ io.sockets.on('connection', (socket) => {
                                         listGameInstance[id].insert(new Queen(color, xDestination, yDestination), new Point(xDestination, yDestination));
                                         break;
                                 }
-                                listGameInstance[id].insert(newPiece, destination);
                                 if (exceptionMod.checkmate(listGameInstance[id], listGameInstance[id].color)) {
                                     io.to(id).emit('checkmate', listGameInstance[id]);
                                 } else if (exceptionMod.pat(listGameInstance[id], listGameInstance[id].color)) {

@@ -93,7 +93,8 @@
 
     socket.on('promotion', (gameInstance, pawn) => {
         boardCache = gameInstance;
-        console.log(pawn);
+        tempBoard = boardCache.board.slice();
+        getPromotion(pawn.position);
     });
 
 
@@ -541,6 +542,7 @@
             let promoteResult = choosePromote(promote, game.input.mousePointer);
             if (promoteResult !== undefined) {
                 console.log('envoie de la promotion pour la pièce :', promoteResult);
+                socket.emit('promotionResponse', promoteResult);
                 promote.destroy(true);
                 promote = undefined;
             }
