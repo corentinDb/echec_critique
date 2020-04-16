@@ -325,15 +325,15 @@ io.sockets.on('connection', (socket) => {
                                             listGameInstance[id].insert(new Queen(color, xDestination, yDestination), new Point(xDestination, yDestination));
                                             break;
                                     }
-                                    if (exceptionMod.checkmate(listGameInstance[id], listGameInstance[id].color)) {
-                                        io.to(id).emit('checkmate', listGameInstance[id]);
-                                    } else if (exceptionMod.pat(listGameInstance[id], listGameInstance[id].color)) {
-                                        io.to(id).emit('pat', listGameInstance[id]);
-                                    } else {
-                                        io.to(id).emit('playTurn', listGameInstance[id]);
-                                    }
                                 });
                             }, 500);
+                        }
+                        if (exceptionMod.checkmate(listGameInstance[id], listGameInstance[id].color)) {
+                            io.to(id).emit('checkmate', listGameInstance[id]);
+                        } else if (exceptionMod.pat(listGameInstance[id], listGameInstance[id].color)) {
+                            io.to(id).emit('pat', listGameInstance[id]);
+                        } else {
+                            io.to(id).emit('playTurn', listGameInstance[id]);
                         }
                     } else if (exceptionMod.checkmate(listGameInstance[id], listGameInstance[id].color)) {
                         io.to(id).emit('checkmate', listGameInstance[id]);
