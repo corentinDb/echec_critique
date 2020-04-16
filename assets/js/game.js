@@ -10,6 +10,7 @@
     let pong = false;
     let boardCache;
     let moveList = [];
+    let tempBoard;
 
     //Initialise les paramètres de socket io
     socket.emit('joinGame', gameID, localPlayer);
@@ -72,7 +73,6 @@
 
     socket.on('playTurn', (gameInstance) => {   //Début du tour
         boardCache = gameInstance;      //Update du board
-        console.table(gameInstance.board);
     });
 
     socket.on('giveMoveList', (gameInstance, serverMoveList) => {     //Réception de la moveList
@@ -97,16 +97,18 @@
     });
 
 
-    let game = new Phaser.Game(window.innerWidth - 200, window.innerHeight - 240, Phaser.AUTO, 'phaser-example', {
+    let game = new Phaser.Game(window.innerWidth - 50, window.innerHeight - 110, Phaser.AUTO, 'phaser-example', {
         preload: preload,
         create: create,
         update: update
     });
 
     let tile;
+    let missing;
+    let promote;
     let selectedTile;
 
-
+    //chargement des images
     function preload() {
 
         game.load.image('whiteKnight', '../images/cavalier blanc.png');
@@ -125,6 +127,29 @@
 
     }
 
+    //donne la taille du plateau
+    function getBoardSize() {
+        return Math.min(game.world.height * 70 / 100, game.world.width * 70 / 100);
+    }
+
+    //donne la taille d'une case
+    function getTileSize() {
+        return (getBoardSize() - getBoardSize() * 0.06) / 8;
+    }
+
+    //transforme l'id d'une case en coordonnées du plateau
+    function BoardIdToPosition(id, color) {
+        if (color === 'white') return {x: id % 8, y: 7 - Math.floor(id / 8)};
+        if (color === 'black') return {x: 7 - id % 8, y: Math.floor(id / 8)};
+    }
+
+    //transforme les coordonnées du plateau en id de case
+    function positionToBoardId(position, color) {
+        if (color === 'white') return Number((7 - position.y) * 8 + position.x);
+        if (color === 'black') return Number(position.y * 8 + 7 - position.x);
+    }
+
+    //creation de l'interface de jeu
     function create() {
 
         game.stage.backgroundColor = "#eee7bc";
@@ -135,6 +160,7 @@
         texture.fill(17, 17, 17);
 
         let boardBack = game.add.sprite(game.world.centerX, game.world.centerY, texture);
+        boardBack.anchor.setTo(0.5);
 
         let sizeCase = getTileSize();
 
@@ -145,8 +171,8 @@
         blackCase.fill(209, 139, 71);
 
         let origin = {
-            x: boardBack.x - boardBack.width / 2 + 30,
-            y: boardBack.y - boardBack.height / 2 + 30
+            x: boardBack.x - boardBack.width / 2 + getBoardSize() * 0.03,
+            y: boardBack.y - boardBack.height / 2 + getBoardSize() * 0.03
         };
 
         tile = game.add.group();
@@ -199,44 +225,171 @@
             }
         }
 
-        texture.line(28, 28, 28, texture.height - 28, "#ffffff", 6);
-        texture.line(25, texture.height - 27, texture.width - 25, texture.height - 27, "#ffffff", 6);
-        texture.line(texture.width - 28, 28, texture.width - 28, texture.height - 28, "#ffffff", 6);
-        texture.line(25, 27, texture.width - 25, 27, "#ffffff", 6);
+        missing = {
+            whiteGroup: game.add.group(),
+            white: 0,
+            blackGroup: game.add.group(),
+            black: 0
+        };
 
-        boardBack.anchor.setTo(0.5);
+        let originWhite = {
+            x: boardBack.x - getTileSize() - getBoardSize() / 2,
+            y: boardBack.y + boardBack.height - getBoardSize() / 2 - getTileSize() - getBoardSize() * 0.03
+        };
+
+        for (let j = 0; j < 2; j++) {
+
+            for (let i = 0; i < 8; i++) {
+
+                let position = {
+                    x: originWhite.x - getTileSize() * j,
+                    y: originWhite.y - getTileSize() * i
+                };
+
+                let missingCase = game.make.bitmapData(sizeCase, sizeCase);
+                let sprite = game.add.sprite(position.x, position.y, missingCase);
+                missing.whiteGroup.add(sprite);
+            }
+
+        }
+
+        let originBlack = {
+            x: boardBack.x + boardBack.width - getBoardSize() / 2,
+            y: boardBack.y + boardBack.height - getBoardSize() / 2 - getTileSize() - getBoardSize() * 0.03
+        };
+
+        for (let j = 0; j < 2; j++) {
+
+            for (let i = 0; i < 8; i++) {
+
+                let position = {
+                    x: originBlack.x + getTileSize() * j,
+                    y: originBlack.y - getTileSize() * i
+                };
+
+                let missingCase = game.make.bitmapData(sizeCase, sizeCase);
+                let sprite = game.add.sprite(position.x, position.y, missingCase);
+                missing.blackGroup.add(sprite);
+            }
+
+        }
+
     }
 
-    function getBoardSize() {
-        return Math.min(game.world.height * 80 / 100, game.world.width * 80 / 100);
+    //permet de superposer une texture sur un sprite
+    function changeTexture(sprite, key, opacity, size) {
+
+        let width = sprite.width;
+        let height = sprite.height;
+
+        let texture = sprite.key;
+
+        if (size !== undefined) texture.copy(key, 0, 0, 73, 73, texture.width / 2, texture.height / 2, width, height, 0, 0.5, 0.5, size, size, opacity, null, false);
+        else if (opacity !== undefined) texture.copy(key, 0, 0, 73, 73, texture.width / 2, texture.height / 2, width, height, 0, 0.5, 0.5, 0.9, 0.9, opacity, null, false);
+        else texture.copy(key, 0, 0, 73, 73, texture.width / 2, texture.height / 2, width, height, 0, 0.5, 0.5, 0.9, 0.9);
     }
 
-    function getTileSize() {
-        return (getBoardSize() - 60) / 8;
+    //compare 2 plateaux
+    function compare(board1, board2) {
+
+        let sameTile = 0;
+
+        for (let i = 0; i < 8; i++) {
+            for (let j = 0; j < 8; j++) {
+                if (board1[i][j] === board2[i][j]) sameTile++;
+            }
+        }
+
+        return sameTile === 64;
+
     }
 
-    function BoardIdToPosition(id, color) {
+    //donne l'inventaire du plateau
+    function inventory(board) {
 
-        if (color === 'white')
-            return {
-                x: id % 8,
-                y: 7 - Math.floor(id / 8)
-            };
-        if (color === 'black')
-            return {
-                x: 7 - id % 8,
-                y: Math.floor(id / 8)
+        let inventory = {
+            white: {pawn: 0, rook: 0, knight: 0, bishop: 0, queen: 0, king: 0},
+            black: {pawn: 0, rook: 0, knight: 0, bishop: 0, queen: 0, king: 0}
+        };
 
-            };
+        for (let i = 0; i < 8; i++) {
+            for (let j = 0; j < 8; j++) {
+
+                if (board[i][j] !== null) {
+
+                    let colorInventory = (board[i][j].color === 'white') ? inventory.white : inventory.black;
+
+                    switch (board[i][j].name) {
+                        case('Pawn'):
+                            colorInventory.pawn++;
+                            break;
+                        case('Rook'):
+                            colorInventory.rook++;
+                            break;
+                        case('Knight'):
+                            colorInventory.knight++;
+                            break;
+                        case('Bishop'):
+                            colorInventory.bishop++;
+                            break;
+                        case('Queen'):
+                            colorInventory.queen++;
+                            break;
+                        case('King'):
+                            colorInventory.king++;
+                            break;
+                    }
+                }
+            }
+        }
+
+        return inventory;
+
     }
 
+    //ajoute les pièces manquantes sur les cotés du plateau
+    function addMissingPiece(board, tempBoard) {
 
-    function positionToBoardId(position, color) {
-        if (color === 'white') return Number((7 - position.y) * 8 + position.x);
-        if (color === 'black') return Number(position.y * 8 + 7 - position.x);
+        let boardInventory = inventory(board);
+        let tempBoardInventory = inventory(tempBoard);
+
+        console.log('maj board');
+
+        let totalBoardInventoryWhite = boardInventory.white.pawn + boardInventory.white.rook + boardInventory.white.knight + boardInventory.white.bishop + boardInventory.white.queen + boardInventory.white.king;
+        let totalTempBoardInventoryWhite = tempBoardInventory.white.pawn + tempBoardInventory.white.rook + tempBoardInventory.white.knight + tempBoardInventory.white.bishop + tempBoardInventory.white.queen + tempBoardInventory.white.king;
+
+        let totalBoardInventoryBlack = boardInventory.black.pawn + boardInventory.black.rook + boardInventory.black.knight + boardInventory.black.bishop + boardInventory.black.queen + boardInventory.black.king;
+        let totalTempBoardInventoryBlack = tempBoardInventory.black.pawn + tempBoardInventory.black.rook + tempBoardInventory.black.knight + tempBoardInventory.black.bishop + tempBoardInventory.black.queen + tempBoardInventory.black.king;
+
+        if (totalBoardInventoryWhite < totalTempBoardInventoryWhite) {
+
+            if (boardInventory.white.pawn < tempBoardInventory.white.pawn) changeTexture(missing.whiteGroup.children[missing.white], 'whitePawn');
+            if (boardInventory.white.rook < tempBoardInventory.white.rook) changeTexture(missing.whiteGroup.children[missing.white], 'whiteRook');
+            if (boardInventory.white.knight < tempBoardInventory.white.knight) changeTexture(missing.whiteGroup.children[missing.white], 'whiteKnight');
+            if (boardInventory.white.bishop < tempBoardInventory.white.bishop) changeTexture(missing.whiteGroup.children[missing.white], 'whiteBishop');
+            if (boardInventory.white.queen < tempBoardInventory.white.queen) changeTexture(missing.whiteGroup.children[missing.white], 'whiteQueen');
+            if (boardInventory.white.king < tempBoardInventory.white.king) changeTexture(missing.whiteGroup.children[missing.white], 'whiteKing');
+
+            missing.white++;
+
+        }
+
+        if (totalBoardInventoryBlack < totalTempBoardInventoryBlack) {
+
+            if (boardInventory.black.pawn < tempBoardInventory.black.pawn) changeTexture(missing.blackGroup.children[missing.black], 'blackPawn');
+            if (boardInventory.black.rook < tempBoardInventory.black.rook) changeTexture(missing.blackGroup.children[missing.black], 'blackRook');
+            if (boardInventory.black.knight < tempBoardInventory.black.knight) changeTexture(missing.blackGroup.children[missing.black], 'blackKnight');
+            if (boardInventory.black.bishop < tempBoardInventory.black.bishop) changeTexture(missing.blackGroup.children[missing.black], 'blackBishop');
+            if (boardInventory.black.queen < tempBoardInventory.black.queen) changeTexture(missing.blackGroup.children[missing.black], 'blackQueen');
+            if (boardInventory.black.king < tempBoardInventory.black.king) changeTexture(missing.blackGroup.children[missing.black], 'blackKing');
+
+            missing.black++;
+
+        }
+
     }
 
-
+    //charge le plateau
     function loadBoard(board) {
 
         for (let sprite of tile.children) {
@@ -244,19 +397,31 @@
             sprite.move = false;
         }
 
+        if (board !== undefined && board !== null) {
 
-        for (let i = 0; i < 8; i++) {
-            for (let j = 0; j < 8; j++) {
-                if (board !== undefined && board !== null) {
+            for (let i = 0; i < 8; i++) {
+                for (let j = 0; j < 8; j++) {
                     if (board.board[j][i] !== null) {
                         let id = positionToBoardId({x: j, y: i}, color);
                         changeTexture(tile.children[id], board.board[j][i].color + board.board[j][i].name);
                     }
+
                 }
             }
+
+            if (tempBoard === undefined) tempBoard = boardCache.board.slice();
+
+            if (!compare(boardCache.board, tempBoard)) {
+
+                addMissingPiece(boardCache.board, tempBoard);
+                //getPromotion({x: 0, y: 6});
+                tempBoard = boardCache.board.slice();
+            }
+
         }
     }
 
+    //renvoie le sprite pour une position sur l'écran
     function tilePosition(mouse) {
 
         for (let sprite of tile.children) {
@@ -265,16 +430,7 @@
         return undefined;
     }
 
-    function changeTexture(sprite, key) {
-
-        let width = sprite.width;
-        let height = sprite.height;
-
-        let texture = sprite.key;
-        texture.copy(key, 0, 0, 73, 73, texture.width / 2, texture.height / 2, width, height, 0, 0.5, 0.5, 0.9, 0.9);
-
-    }
-
+    //renvoie tous les sprites de la move liste d'un sprite donné
     function getSpriteMoveList(sprite) {
         let spriteMoveList = [];
         if (moveList[0] !== undefined) {
@@ -287,91 +443,178 @@
         return spriteMoveList;
     }
 
-    function showMoveList(spriteMoveList) {
+    //affiche une moveList
+    function showMoveList(spriteMoveList, originPiece) {
         for (let spriteMove of spriteMoveList) {
-            spriteMove.key.circle(getTileSize() / 2, getTileSize() / 2, getTileSize() / 8);
+            //changeTexture(spriteMove, originPiece.color + originPiece.name, 0.5);
+            //changeTexture(spriteMove, 'moveTile');
+            if (originPiece.color === 'white') spriteMove.key.circle(getTileSize() / 2, getTileSize() / 2, getTileSize() / 8, '#FFFFFF');
+            else spriteMove.key.circle(getTileSize() / 2, getTileSize() / 2, getTileSize() / 8);
             spriteMove.move = true;
         }
+    }
+
+    //déclanche une promotion
+    function getPromotion(position) {
+
+        let tileId = positionToBoardId(position, color);
+        let promoteTile = tile.children[tileId];
+        let promotePiece = boardCache.board[position.x][position.y];
+
+        if (color === promotePiece.color) {
+
+            let origin = {
+                x: promoteTile.x - (3 / 2) * getTileSize(),
+                y: promoteTile.y - getTileSize() / 2
+            };
+
+            let texture = ['Rook', 'Knight', 'Bishop', 'Queen'];
+
+            promote = game.add.group();
+
+            for (let i = 0; i < 4; i++) {
+                let tileTexture = game.make.bitmapData(getTileSize(), getTileSize());
+                tileTexture.circle(getTileSize() / 2, getTileSize() / 2, getTileSize() / 2 - 1, '#000000');
+                tileTexture.circle(getTileSize() / 2, getTileSize() / 2, getTileSize() / 2 - 2, '#F5F5F5');
+                if (i !== 3) tileTexture.rect(getTileSize() / 2, 1, getTileSize() / 2, getTileSize() - 2, '#000000');
+                if (i !== 0) tileTexture.rect(0, 1, getTileSize() / 2, getTileSize() - 2, '#000000');
+                if (i !== 3) tileTexture.rect(getTileSize() / 2 - 1, 2, getTileSize() / 2 + 2, getTileSize() - 4, '#F5F5F5');
+                if (i !== 0) tileTexture.rect(-1, 2, getTileSize() / 2 + 2, getTileSize() - 4, '#F5F5F5');
+                let spritePosition = {x: origin.x + i * getTileSize(), y: origin.y};
+                let sprite = game.add.sprite(spritePosition.x, spritePosition.y, tileTexture);
+                changeTexture(sprite, promotePiece.color + texture[i], 0.6, 0.6);
+                let originTexture = game.make.bitmapData(getTileSize(), getTileSize());
+                originTexture.copy(sprite.key);
+                sprite.originTexture = originTexture;
+                sprite.pieceKey = promotePiece.color + texture[i];
+                sprite.promoteColor = promotePiece.color;
+                sprite.promotePiece = texture[i];
+                sprite.tilePosition = position;
+                promote.add(sprite);
+            }
+        }
+    }
+
+    //fonction qui permet la selection d'une promotion
+    function choosePromote(promote, mouse) {
+
+        let hoverSprite = undefined;
+
+        for (let sprite of promote.children) {
+            sprite.key.copy(sprite.originTexture);
+            if (sprite.getBounds().contains(mouse.x, mouse.y)) hoverSprite = sprite;
+        }
+
+        if (hoverSprite !== undefined) {
+
+            changeTexture(hoverSprite, hoverSprite.pieceKey, 1, 0.6);
+
+            if (game.input.activePointer.leftButton.isDown && promoteClick) {
+
+                promoteClick = false;
+                return {
+                    color: hoverSprite.promoteColor,
+                    piece: hoverSprite.promotePiece,
+                    position: hoverSprite.tilePosition
+                };
+            }
+        }
+
+        return undefined;
     }
 
     let selectorClick = true;
     let resetClick = true;
     let moveClick = true;
+    let promoteClick = true;
     let gameOver = false;
 
     let canSelect;
     color === 'white' ? canSelect = 0 : canSelect = 1;
 
+
+    //Boucle principal du jeu
     function update() {
 
-        //chargement du plateau
-        loadBoard(boardCache);
+        //si promotion en cours
+        if (promote !== undefined) {
+            let promoteResult = choosePromote(promote, game.input.mousePointer);
+            if (promoteResult !== undefined) {
+                console.log('envoie de la promotion pour la pièce :', promoteResult);
+                promote.destroy(true);
+                promote = undefined;
+            }
+        } else {
 
-        //affichage texture selectionné
-        if (selectedTile !== undefined) changeTexture(selectedTile, 'selectedTile');
+            //chargement du plateau
+            loadBoard(boardCache);
 
-        //recperation du tile survolé
-        let hoverTile = tilePosition(game.input.mousePointer);
+            //affichage texture selectionné
+            if (selectedTile !== undefined) changeTexture(selectedTile, 'selectedTile');
 
-        //action sur le tile survolé
-        if (hoverTile !== undefined) {
+            //recperation du tile survolé
+            let hoverTile = tilePosition(game.input.mousePointer);
 
-            //changement de texture
-            changeTexture(hoverTile, 'selectedTile');
+            //action sur le tile survolé
+            if (hoverTile !== undefined) {
 
-            //si click alors on selectionne la texture
-            if (game.input.activePointer.leftButton.isDown && selectorClick && boardCache.turn % 2 === canSelect && !gameOver) {
+                //changement de texture
+                changeTexture(hoverTile, 'selectedTile');
 
-                //on recupère la pièce et on demande les deplacement
-                let hoverPiece = boardCache.board[hoverTile.coord.x][hoverTile.coord.y];
-                if (hoverPiece !== null && hoverPiece.color === color) {
-                    selectedTile = hoverTile;
-                    console.log('demande de moveList pour', selectedTile.coord);
-                    if (boardCache.color === color) {
-                        socket.emit('getMoveList', gameID, selectedTile.coord.x, selectedTile.coord.y);
+                //si click alors on selectionne la texture
+                if (game.input.activePointer.leftButton.isDown && selectorClick && boardCache.turn % 2 === canSelect && !gameOver) {
+
+                    //on recupère la pièce et on demande les deplacement
+                    let hoverPiece = boardCache.board[hoverTile.coord.x][hoverTile.coord.y];
+                    if (hoverPiece !== null && hoverPiece.color === color) {
+                        selectedTile = hoverTile;
+                        console.log('demande de moveList pour', selectedTile.coord);
+                        if (boardCache.color === color) {
+                            socket.emit('getMoveList', gameID, selectedTile.coord.x, selectedTile.coord.y);
+                        }
                     }
-                }
-                selectorClick = false;
-            }
-
-        }
-
-        //action sur tile secectionné
-        if (selectedTile !== undefined) {
-
-            //on recupère la pièce
-            let selectedPiece = boardCache.board[selectedTile.coord.x][selectedTile.coord.y];
-
-            //on recupère les tile où le deplacment est possible
-            let spriteMoveList = getSpriteMoveList(selectedTile);
-
-            //on affiche les déplacement possible
-            showMoveList(spriteMoveList);
-
-            //envoie du move si l'on click sur un move
-            if (game.input.activePointer.leftButton.isDown && moveClick) {
-                let moveTile = hoverTile;
-                if (moveTile !== undefined && moveTile.move) {
-                    socket.emit('moveRequest', gameID, selectedTile.coord.x, selectedTile.coord.y, moveTile.coord.x, moveTile.coord.y);
-                    console.log('envoie du move pour la position', moveTile.coord);
+                    selectorClick = false;
                 }
 
             }
 
-            //reset si l'on clique autre part
-            if (game.input.activePointer.leftButton.isDown && resetClick) {
+            //action sur tile secectionné
+            if (selectedTile !== undefined) {
 
-                let resetTile = hoverTile;
+                //on recupère la pièce
+                let selectedPiece = boardCache.board[selectedTile.coord.x][selectedTile.coord.y];
 
-                if (resetTile !== undefined) {
+                //on recupère les tile où le deplacment est possible
+                let spriteMoveList = getSpriteMoveList(selectedTile);
 
-                    let resetPiece = boardCache.board[resetTile.coord.x][resetTile.coord.y];
-                    if (resetPiece === null || resetPiece.color !== color) selectedTile = undefined;
-                } else selectedTile = undefined;
+                //on affiche les déplacement possible
+                showMoveList(spriteMoveList, selectedPiece);
 
-                resetClick = false;
+                //envoie du move si l'on click sur un move
+                if (game.input.activePointer.leftButton.isDown && moveClick) {
+                    let moveTile = hoverTile;
+                    if (moveTile !== undefined && moveTile.move) {
+                        socket.emit('moveRequest', gameID, selectedTile.coord.x, selectedTile.coord.y, moveTile.coord.x, moveTile.coord.y);
+                        console.log('envoie du move pour la position', moveTile.coord);
+                    }
+
+                }
+
+                //reset si l'on clique autre part
+                if (game.input.activePointer.leftButton.isDown && resetClick) {
+
+                    let resetTile = hoverTile;
+
+                    if (resetTile !== undefined) {
+
+                        let resetPiece = boardCache.board[resetTile.coord.x][resetTile.coord.y];
+                        if (resetPiece === null || resetPiece.color !== color) selectedTile = undefined;
+                    } else selectedTile = undefined;
+
+                    resetClick = false;
+                }
+
             }
-
         }
 
         //click relevé
@@ -379,6 +622,7 @@
             selectorClick = true;
             resetClick = true;
             moveClick = true;
+            promoteClick = true;
         }
 
 
