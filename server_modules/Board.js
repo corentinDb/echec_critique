@@ -85,7 +85,17 @@ class Board {
 
         this.getCase(destination).moved();
 
-        this.replay[this.turn] = move;
+        this.replay.push(move);
+    }
+
+    simulateMove(move) {
+        let origin = move.getOrigin();
+        let destination = move.getDestination();
+
+        this.insert(this.getCase(origin), destination);
+        this.destruct(origin);
+
+        this.getCase(destination).setPosition(destination);
     }
 
     //reset le plateau

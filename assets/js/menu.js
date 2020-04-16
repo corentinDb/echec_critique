@@ -3,7 +3,6 @@ let pong = [];
     const socket = io.connect('http://localhost:4269');
 
     const pseudo = document.getElementById('pseudo').innerHTML;  //Pseudo de l'utilisateur
-    const id = Math.floor(Math.random() * Math.pow(10, 42));
 
     document.getElementById('pseudoGraphics').appendChild(document.createTextNode(pseudo));     //On affiche le pseudo de l'utilisateur
 
@@ -11,27 +10,29 @@ let pong = [];
 
     let table = document.getElementById('tablePlayer');
 
-    socket.on('newUserResponse', (user) => {    //Si un nouveau utilisateur se connecte au serveur, on l'ajoute à la liste
+    socket.on('newUserResponse', (user, inGame) => {    //Si un nouveau utilisateur se connecte au serveur, on l'ajoute à la liste
         if (user === pseudo) {
-            socket.emit('close', pseudo, id);
+            socket.emit('close', pseudo);
         } else {
             if (!document.getElementById(user) && user !== pseudo) {
                 addUserRow(pseudo, user, table);
             }
+            document.getElementById('play_with_' + user).disabled = inGame;
             socket.emit('giveConnectionInfo', pseudo, user);
         }
     });
 
-    socket.on('close', (user, closeID) => {
-        if (closeID !== id && pseudo === user) {
+    socket.on('close', (user) => {
+        if (pseudo === user) {
             window.location = 'http://localhost:4269/?error=existing';
         }
     });
 
-    socket.on('giveConnectionInfo', (user) => {
+    socket.on('giveConnectionInfo', (user, inGame) => {
         if (!document.getElementById(user)) {
             addUserRow(pseudo, user, table);
         }
+        document.getElementById("play_with_" + user).disabled = inGame;
     });
 
     socket.on('removeUserResponse', (user) => {     //Si un utilisateur se déconnecte du serveur, on le supprime de la liste
@@ -41,11 +42,19 @@ let pong = [];
         }
     });
 
-    socket.on('pingRequest', (user) => {        //Réponse à une demande de ping
+    socket.on('pingRequest', (user, inGame) => {        //Réponse à une demande de ping
+        if (!document.getElementById(user)) {
+            addUserRow(pseudo, user, table);
+        }
+        document.getElementById("play_with_" + user).disabled = inGame;
         socket.emit('pongUser', pseudo, user);
     });
 
-    socket.on('pongResponse', (user) => {       //Réception de la réponse du ping
+    socket.on('pongResponse', (user, inGame) => {       //Réception de la réponse du ping
+        if (!document.getElementById(user)) {
+            addUserRow(pseudo, user, table);
+        }
+        document.getElementById("play_with_" + user).disabled = inGame;
         pong[user] = true;
     });
 
@@ -85,8 +94,18 @@ let pong = [];
                 alert(sender + ' a refusé de jouer avec vous :\'(\nC\'est vraiment pas un(e) ami(e) !');
             }
         } else if (response && sender !== pseudo) {
-            document.getElementById("play_with_" + sender).disabled = true;
-            document.getElementById("play_with_" + receiver).disabled = true;
+            let playWithSender = document.getElementById("play_with_" + sender);
+            let playWithReceiver = document.getElementById("play_with_" + receiver);
+            if (playWithSender === undefined || playWithSender === null) {
+                socket.emit('pingUser', pseudo, sender);
+            } else {
+                playWithSender.disabled = true;
+            }
+            if (playWithReceiver === undefined || playWithReceiver === null) {
+                socket.emit('pingUser', pseudo, receiver);
+            } else {
+                playWithReceiver.disabled = true;
+            }
         }
     });
 
@@ -154,7 +173,7 @@ function addUserRow(pseudo, user, table) {      //Création d'une ligne pour un 
                 pong[user] = false;
             }
         }, 500);
-    }, 3000);
+    }, 2000);
 
     linkChat.addEventListener('click', () => {      //Bouton pour ouvrir le chat avec l'utilisateur
         let mainDivChat = document.getElementById('mainChatBox');
