@@ -354,7 +354,6 @@
         let boardInventory = inventory(board);
         let tempBoardInventory = inventory(tempBoard);
 
-        console.log('maj board');
 
         let totalBoardInventoryWhite = boardInventory.white.pawn + boardInventory.white.rook + boardInventory.white.knight + boardInventory.white.bishop + boardInventory.white.queen + boardInventory.white.king;
         let totalTempBoardInventoryWhite = tempBoardInventory.white.pawn + tempBoardInventory.white.rook + tempBoardInventory.white.knight + tempBoardInventory.white.bishop + tempBoardInventory.white.queen + tempBoardInventory.white.king;
@@ -415,8 +414,9 @@
             if (!compare(boardCache.board, tempBoard)) {
 
                 addMissingPiece(boardCache.board, tempBoard);
-                //getPromotion({x: 0, y: 6});
                 tempBoard = boardCache.board.slice();
+                console.log('maj board');
+
             }
 
         }
@@ -537,6 +537,9 @@
     //Boucle principal du jeu
     function update() {
 
+        //chargement du plateau
+        loadBoard(boardCache);
+
         //si promotion en cours
         if (promote !== undefined) {
             let promoteResult = choosePromote(promote, game.input.mousePointer);
@@ -547,9 +550,6 @@
                 promote = undefined;
             }
         } else {
-
-            //chargement du plateau
-            loadBoard(boardCache);
 
             //affichage texture selectionné
             if (selectedTile !== undefined) changeTexture(selectedTile, 'selectedTile');

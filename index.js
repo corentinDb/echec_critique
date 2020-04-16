@@ -303,34 +303,37 @@ io.sockets.on('connection', (socket) => {
                     listGameInstance[id].color === 'white' ? listGameInstance[id].color = 'black' : listGameInstance[id].color = 'white';
                     if (listGameInstance[id].getCase(destination).name === 'Pawn') {
                         if (exceptionMod.promotion(listGameInstance[id].getCase(destination))) {
-                            io.to(id).emit('promotion', listGameInstance[id], listGameInstance[id].getCase(destination));
-                            socket.on('promotionResponse', (promoteResult) => {
-                                let color = promoteResult.color;
-                                switch (promoteResult.piece) {
-                                    case 'Bishop':
-                                        listGameInstance[id].insert(new Bishop(color, xDestination, yDestination), new Point(xDestination, yDestination));
-                                        break;
-                                    case 'Rook':
-                                        listGameInstance[id].insert(new Rook(color, xDestination, yDestination), new Point(xDestination, yDestination));
-                                        break;
-                                    case 'Knight':
-                                        listGameInstance[id].insert(new Knight(color, xDestination, yDestination), new Point(xDestination, yDestination));
-                                        break;
-                                    case 'Queen':
-                                        listGameInstance[id].insert(new Queen(color, xDestination, yDestination), new Point(xDestination, yDestination));
-                                        break;
-                                    default:
-                                        listGameInstance[id].insert(new Queen(color, xDestination, yDestination), new Point(xDestination, yDestination));
-                                        break;
-                                }
-                                if (exceptionMod.checkmate(listGameInstance[id], listGameInstance[id].color)) {
-                                    io.to(id).emit('checkmate', listGameInstance[id]);
-                                } else if (exceptionMod.pat(listGameInstance[id], listGameInstance[id].color)) {
-                                    io.to(id).emit('pat', listGameInstance[id]);
-                                } else {
-                                    io.to(id).emit('playTurn', listGameInstance[id]);
-                                }
-                            });
+                            io.to(id).emit('giveBoard', listGameInstance[id]);
+                            setTimeout(function () {
+                                socket.emit('promotion', listGameInstance[id], listGameInstance[id].getCase(destination));
+                                socket.on('promotionResponse', (promoteResult) => {
+                                    let color = promoteResult.color;
+                                    switch (promoteResult.piece) {
+                                        case 'Bishop':
+                                            listGameInstance[id].insert(new Bishop(color, xDestination, yDestination), new Point(xDestination, yDestination));
+                                            break;
+                                        case 'Rook':
+                                            listGameInstance[id].insert(new Rook(color, xDestination, yDestination), new Point(xDestination, yDestination));
+                                            break;
+                                        case 'Knight':
+                                            listGameInstance[id].insert(new Knight(color, xDestination, yDestination), new Point(xDestination, yDestination));
+                                            break;
+                                        case 'Queen':
+                                            listGameInstance[id].insert(new Queen(color, xDestination, yDestination), new Point(xDestination, yDestination));
+                                            break;
+                                        default:
+                                            listGameInstance[id].insert(new Queen(color, xDestination, yDestination), new Point(xDestination, yDestination));
+                                            break;
+                                    }
+                                    if (exceptionMod.checkmate(listGameInstance[id], listGameInstance[id].color)) {
+                                        io.to(id).emit('checkmate', listGameInstance[id]);
+                                    } else if (exceptionMod.pat(listGameInstance[id], listGameInstance[id].color)) {
+                                        io.to(id).emit('pat', listGameInstance[id]);
+                                    } else {
+                                        io.to(id).emit('playTurn', listGameInstance[id]);
+                                    }
+                                });
+                            }, 500);
                         }
                     } else if (exceptionMod.checkmate(listGameInstance[id], listGameInstance[id].color)) {
                         io.to(id).emit('checkmate', listGameInstance[id]);
