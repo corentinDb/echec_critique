@@ -1,18 +1,47 @@
 body {
     display: flex;
     justify-content: space-between;
+    background-color: #dddddd;
+
+}
+
+#divUser,#mainChatBox{
+    margin-bottom: 50px;
+}
+
+#pseudoGraphics{
+    text-align: center;
+}
+
+#play_with_azer,#chat{
+    background-color: #4CAF50;
+    color: white;
+    padding: 6px;
+    border: none;
+    border-radius: 4px;
+    display: flex;
+    margin: auto;
+}
+
+#divUser {
+    width: 600px;
+    border-radius: 5px;
+    padding: 20px;
+    background-color: #ffffff;
+
 }
 
 #userList, #pseudo {
     display: none;
 }
 
-#divUser {
-    flex: 1;
+#play_with_azer{
+    margin-bottom: 5px;
 }
 
 #mainChatBox {
     flex: 1;
+    margin-left: 20px;
 }
 
 .chatBox {
@@ -22,8 +51,21 @@ body {
 
 .pseudoBox, .messageBox {
     border: 1px solid #e4e4e4;
+    background-color: #ffffff;
     padding: 15px;
     margin-bottom: 15px;
+    border-radius: 5px;
+}
+
+#deconnection {
+    background-color: #4CAF50;
+    color: white;
+    width: auto;
+    padding: 8px;
+    border: none;
+    border-radius: 4px;
+    display: flex;
+    margin: auto;
 }
 
 .messageBox {
@@ -53,10 +95,18 @@ body {
 .newMessage {
     flex-grow: 1;
     border: 1px solid #dfdfdf;
+    border-radius: 5px;
     padding: 10px 15px;
     font-size: 16px;
 }
 
 .submitMessage {
     margin: 10px;
+    background-color: #4CAF50;
+    color: white;
+    width: auto;
+    padding: 6px;
+    border: none;
+    border-radius: 4px;
+    display: flex;
 }
