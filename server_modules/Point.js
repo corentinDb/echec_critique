@@ -11,6 +11,10 @@ class Point {
         this.x = this.y;
         this.y = tmp;
     }
+
+    isEqual(point) {
+        return this.x === point.x && this.y === point.y;
+    }
 }
 
 module.exports = Point;
