@@ -146,7 +146,6 @@ function addUserRow(pseudo, user, table) {      //Création d'une ligne pour un 
     newRow.appendChild(waitingMsg);
     waitingMsg.id = 'waitingMsg_' + user;
     waitingMsg.className = 'waitingMsg';
-    waitingMsg.style.color = 'red';
 
     let connectionButton = document.createElement("button");
     linkCell.appendChild(connectionButton);
