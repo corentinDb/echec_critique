@@ -7,7 +7,6 @@
     const color = document.getElementById('color').innerHTML;
     const gameID = document.getElementById('gameID').innerHTML;
 
-    const id = Math.floor(Math.random() * Math.pow(10, 42));
     let pong = false;
     let boardCache;
     let moveList = [];
@@ -17,9 +16,9 @@
 
     socket.on('newUserResponse', (user) => {    //Si un nouveau utilisateur se connecte au serveur, s'il a le même nom, on lui demande de se déconnecter, sinon on le prévient qu'on est connecté
         if (user === localPlayer) {
-            socket.emit('close', localPlayer, id);
+            socket.emit('close', localPlayer);
         } else {
-            socket.emit('giveConnectionInfo', localPlayer, user);
+            socket.emit('giveConnectionInfo', localPlayer, user, true);
         }
     });
 
@@ -33,20 +32,25 @@
         }
     });
 
-    let pingPong = setInterval(() => {     //Ping de l'utilisateur toutes les 5 secondes pour vérifier qu'il est toujours connecté à la partie, sinon on retourne au menu et on arrête le ping régulier
+    socket.on('timeOut', () => {
+        alert('Délai dépassé, vous allez être redirigé vers le menu');
+        window.location = 'http://localhost:4269/menu';
+    });
+
+    let pingPong = setInterval(() => {     //Ping de l'utilisateur toutes les 3 secondes pour vérifier qu'il est toujours connecté à la partie, sinon on retourne au menu et on arrête le ping régulier
         socket.emit('pingUser', localPlayer, opponent);
+        socket.emit('giveConnectionInfo', localPlayer, '', true);
         setTimeout(() => {
             if (pong === false) {
+                socket.emit('timeOut', opponent);
                 alert('L\'adversaire est parti, vous allez être redirigé vers le menu');
-                setTimeout(() => {
-                    window.location = 'http://game.delhon-bugard.fr:4269/menu';
-                }, 1000);
+                window.location = 'http://localhost:4269/menu';
                 clearInterval(pingPong);
             } else {
                 pong = false;
             }
-        }, 1000);
-    }, 5000);
+        }, 2000);
+    }, 20000);
 
 
     //Si le joueur est blanc, il lance la partie, s'il est noir, on demande le board après 500ms (pour être sur que la partie est bien commencé
@@ -57,6 +61,10 @@
             socket.emit('getBoard', gameID);
         }, 500);
     }
+
+    setInterval(function () {
+        socket.emit('getBoard', gameID);
+    }, 1000);
 
     socket.on('giveBoard', (gameInstance) => {
         boardCache = gameInstance;
@@ -69,6 +77,23 @@
 
     socket.on('giveMoveList', (gameInstance, serverMoveList) => {     //Réception de la moveList
         moveList = serverMoveList;
+    });
+
+    socket.on('checkmate', (gameInstance) => {
+        boardCache = gameInstance;
+        gameOver = true;
+        console.log(boardCache.color + ' est en échec et mat !');
+    });
+
+    socket.on('pat', (gameInstance) => {
+        boardCache = gameInstance;
+        gameOver = true;
+        console.log(boardCache.color + ' est en pat !');
+    });
+
+    socket.on('promotion', (gameInstance, pawn) => {
+        boardCache = gameInstance;
+        console.log(pawn);
     });
 
 
@@ -222,7 +247,7 @@
 
         for (let i = 0; i < 8; i++) {
             for (let j = 0; j < 8; j++) {
-                if (board !== undefined) {
+                if (board !== undefined && board !== null) {
                     if (board.board[j][i] !== null) {
                         let id = positionToBoardId({x: j, y: i}, color);
                         changeTexture(tile.children[id], board.board[j][i].color + board.board[j][i].name);
@@ -272,6 +297,7 @@
     let selectorClick = true;
     let resetClick = true;
     let moveClick = true;
+    let gameOver = false;
 
     let canSelect;
     color === 'white' ? canSelect = 0 : canSelect = 1;
@@ -294,7 +320,7 @@
             changeTexture(hoverTile, 'selectedTile');
 
             //si click alors on selectionne la texture
-            if (game.input.activePointer.leftButton.isDown && selectorClick && boardCache.turn % 2 === canSelect) {
+            if (game.input.activePointer.leftButton.isDown && selectorClick && boardCache.turn % 2 === canSelect && !gameOver) {
 
                 //on recupère la pièce et on demande les deplacement
                 let hoverPiece = boardCache.board[hoverTile.coord.x][hoverTile.coord.y];

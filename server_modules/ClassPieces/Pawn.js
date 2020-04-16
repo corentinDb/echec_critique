@@ -63,6 +63,18 @@ class Pawn extends Piece {
             if (eat2 && eat2.getColor() !== this.getColor()) {
                 this.moveList.push(new Move(this.getPosition(), eat2.getPosition()));
             }
+
+
+            if (this.getPosition().x < 7 && board.getCase(new Point(this.getPosition().x + 1, this.getPosition().y)) !== undefined) {
+                if (board.getCase(new Point(this.getPosition().x + 1, this.getPosition().y)).name === 'Pawn' && board.getCase(new Point(this.getPosition().x + 1, this.getPosition().y)).color !== this.color && board.replay.length > 0 && board.replay[board.replay.length - 1].getOrigin().y - board.replay[board.replay.length - 1].getDestination().y === 2 && board.replay[board.replay.length - 1].getOrigin().x === this.getPosition().x + 1) {
+                    this.moveList.push(new Move(this.getPosition(), new Point(this.getPosition().x + 1, this.getPosition().y + 1)));
+                }
+            }
+            if (this.getPosition().x > 0 && board.getCase(new Point(this.getPosition().x - 1, this.getPosition().y)) !== undefined) {
+                if (board.getCase(new Point(this.getPosition().x - 1, this.getPosition().y)).name === 'Pawn' && board.getCase(new Point(this.getPosition().x - 1, this.getPosition().y)).color !== this.color && board.replay.length > 0 && board.replay[board.replay.length - 1].getOrigin().y - board.replay[board.replay.length - 1].getDestination().y === 2 && board.replay[board.replay.length - 1].getOrigin().x === this.getPosition().x - 1) {
+                    this.moveList.push(new Move(this.getPosition(), new Point(this.getPosition().x - 1, this.getPosition().y + 1)));
+                }
+            }
         }
         //S'il est noir, on décrémente y au lieu de l'incrémenter
         else if (this.getColor() === 'black') {
@@ -98,6 +110,16 @@ class Pawn extends Piece {
                 this.moveList.push(new Move(this.getPosition(), eat2.getPosition()));
             }
 
+            if (this.getPosition().x < 7 && board.getCase(new Point(this.getPosition().x + 1, this.getPosition().y)) !== undefined) {
+                if (board.getCase(new Point(this.getPosition().x + 1, this.getPosition().y)).name === 'Pawn' && board.getCase(new Point(this.getPosition().x + 1, this.getPosition().y)).color !== this.color && board.replay.length > 0 && board.replay[board.replay.length - 1].getDestination().y - board.replay[board.replay.length - 1].getOrigin().y === 2 && board.replay[board.replay.length - 1].getOrigin().x === this.getPosition().x + 1) {
+                    this.moveList.push(new Move(this.getPosition(), new Point(this.getPosition().x + 1, this.getPosition().y - 1)));
+                }
+            }
+            if (this.getPosition().x > 0 && board.getCase(new Point(this.getPosition().x - 1, this.getPosition().y)) !== undefined) {
+                if (board.getCase(new Point(this.getPosition().x - 1, this.getPosition().y)).name === 'Pawn' && board.getCase(new Point(this.getPosition().x - 1, this.getPosition().y)).color !== this.color && board.replay.length > 0 && board.replay[board.replay.length - 1].getDestination().y - board.replay[board.replay.length - 1].getOrigin().y === 2 && board.replay[board.replay.length - 1].getOrigin().x === this.getPosition().x - 1) {
+                    this.moveList.push(new Move(this.getPosition(), new Point(this.getPosition().x - 1, this.getPosition().y - 1)));
+                }
+            }
         }
         //Sinon on renvoie une erreur
         else {

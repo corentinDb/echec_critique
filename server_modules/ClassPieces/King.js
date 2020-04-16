@@ -2,6 +2,7 @@ const Piece = require('./Piece');
 const Point = require('./../Point');
 const Move = require('./../Move');
 const Board = require('./../Board');
+const exceptionMod = require('./../exceptionModule');
 
 class King extends Piece {
     constructor(color, x, y) {
@@ -19,7 +20,7 @@ class King extends Piece {
         return this.check;
     }
 
-    //Se déplace d'une case dans toute les directions s'il n'est pas en échec
+    //Se déplace d'une case dans toute les directions
     getMoveList(board) {
         //On reset la moveList de la pièce
         super.getMoveList();
@@ -33,7 +34,7 @@ class King extends Piece {
             //On récupère la pièce sur la case
             let piece = board.getCase(point);
             //Si la case est vide ou si la pièce est ennemie (sauf roi)
-            if ((!piece || (piece.color !== this.color)) /*&& pas en échec*/) {
+            if ((!piece || (piece.color !== this.color))) {
                 //On ajoute le mouvement à moveList
                 this.moveList.push(new Move(this.getPosition(), point));
             }
@@ -44,7 +45,7 @@ class King extends Piece {
             point = new Point(this.getPosition().x, this.getPosition().y + 1);
             let piece = board.getCase(point);
 
-            if ((!piece || (piece.color !== this.color)) /*&& pas en échec*/) {
+            if ((!piece || (piece.color !== this.color))) {
                 this.moveList.push(new Move(this.getPosition(), point));
             }
         }
@@ -53,7 +54,7 @@ class King extends Piece {
             point = new Point(this.getPosition().x - 1, this.getPosition().y + 1);
             let piece = board.getCase(point);
 
-            if ((!piece || (piece.color !== this.color)) /*&& pas en échec*/) {
+            if ((!piece || (piece.color !== this.color))) {
                 this.moveList.push(new Move(this.getPosition(), point));
             }
         }
@@ -62,7 +63,7 @@ class King extends Piece {
             point = new Point(this.getPosition().x - 1, this.getPosition().y);
             let piece = board.getCase(point);
 
-            if ((!piece || (piece.color !== this.color)) /*&& pas en échec*/) {
+            if ((!piece || (piece.color !== this.color))) {
                 this.moveList.push(new Move(this.getPosition(), point));
             }
         }
@@ -71,7 +72,7 @@ class King extends Piece {
             point = new Point(this.getPosition().x - 1, this.getPosition().y - 1);
             let piece = board.getCase(point);
 
-            if ((!piece || (piece.color !== this.color)) /*&& pas en échec*/) {
+            if ((!piece || (piece.color !== this.color))) {
                 this.moveList.push(new Move(this.getPosition(), point));
             }
         }
@@ -80,7 +81,7 @@ class King extends Piece {
             point = new Point(this.getPosition().x, this.getPosition().y - 1);
             let piece = board.getCase(point);
 
-            if ((!piece || (piece.color !== this.color)) /*&& pas en échec*/) {
+            if ((!piece || (piece.color !== this.color))) {
                 this.moveList.push(new Move(this.getPosition(), point));
             }
         }
@@ -89,16 +90,16 @@ class King extends Piece {
             point = new Point(this.getPosition().x + 1, this.getPosition().y - 1);
             let piece = board.getCase(point);
 
-            if ((!piece || (piece.color !== this.color)) /*&& pas en échec*/) {
+            if ((!piece || (piece.color !== this.color))) {
                 this.moveList.push(new Move(this.getPosition(), point));
             }
         }
 
         if (this.getPosition().x < 7) {
-            point = new Point(this.getPosition().x + 1, this.getPosition().y)
+            point = new Point(this.getPosition().x + 1, this.getPosition().y);
             let piece = board.getCase(point);
 
-            if ((!piece || (piece.color !== this.color)) /*&& pas en échec*/) {
+            if ((!piece || (piece.color !== this.color))) {
                 this.moveList.push(new Move(this.getPosition(), point));
             }
         }
