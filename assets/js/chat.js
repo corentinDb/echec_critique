@@ -89,7 +89,7 @@ let chatMod = (function () {
 
             let spanAuthor = document.createElement("span");    //Affichage de l'auteur du message
             spanAuthor.className = 'author';
-            spanAuthor.appendChild(document.createTextNode(sender + ' :'));
+            spanAuthor.appendChild(document.createTextNode(sender + ' : '));
 
             divNewMessage.appendChild(spanAuthor);
             divNewMessage.appendChild(document.createTextNode(msg));
