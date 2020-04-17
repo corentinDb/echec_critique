@@ -2,7 +2,7 @@
     const socket = io.connect('http://localhost:4269');
 
     const pseudo = document.getElementById('pseudo').innerHTML;
-    const userID = Number(document.getElementById('userID').innerHTML);
+    const userID = document.getElementById('userID').innerHTML;
     const existingConnection = document.getElementById('existingConnection').innerHTML === 'true';
 
 
@@ -29,7 +29,9 @@
         socket.on('connect', () => {
             window.location = 'http://localhost:4269';
         });
-        document.getElementById('loading').innerHTML = 'Serveur deconnecté !';
+        setTimeout(function () {
+            document.getElementById('loading').innerHTML = 'Serveur deconnecté !';
+        }, 100);
     });
 
     let time = 0;
@@ -40,25 +42,31 @@
         progressBar.setAttribute('aria-valuenow', time.toString());
         if (time >= 100) {
             clearInterval(timer);
-            let form = document.createElement("form");
-            form.method = 'post';
-            form.action = '/menu';
+            setTimeout(function () {
+                let form = document.createElement("form");
+                form.method = 'post';
+                form.action = '/loading';
 
-            let user = document.createElement("input");
-            user.type = 'hidden';
-            user.value = pseudo;
-            user.name = 'user';
+                let user = document.createElement("input");
+                user.type = 'hidden';
+                user.value = pseudo;
+                user.name = 'user';
 
-            let idInput = document.createElement("input");
-            idInput.type = 'hidden';
-            idInput.value = userID;
-            idInput.name = 'userID';
+                let idInput = document.createElement("input");
+                idInput.type = 'hidden';
+                idInput.value = userID;
+                idInput.name = 'userID';
 
-            form.appendChild(user);
-            form.appendChild(idInput);
+                let authorization = document.createElement("input");
+                authorization.type = 'hidden';
+                authorization.name = 'authorization';
 
-            document.body.appendChild(form);
-            form.submit();
+                form.appendChild(user);
+                form.appendChild(idInput);
+
+                document.body.appendChild(form);
+                form.submit();
+            }, 500);
         }
         let txt = document.getElementById('loading');
         switch (time % 24) {

@@ -3,11 +3,12 @@ let pingPong = [];
 (function () {
     const socket = io.connect('http://localhost:4269');
 
-    const pseudo = document.getElementById('pseudo').innerHTML;  //Pseudo de l'utilisateur
+    const pseudo = document.getElementById('localPlayer').innerHTML;  //Pseudo de l'utilisateur
 
     document.getElementById('pseudoGraphics').appendChild(document.createTextNode(pseudo));     //On affiche le pseudo de l'utilisateur
 
     socket.emit('getUserInfo', pseudo);          //On prévient les autres users qu'on se connecte
+    chatMod.joinChat(pseudo);
 
     let table = document.getElementById('tablePlayer');
 
@@ -30,7 +31,6 @@ let pingPong = [];
         }
         document.getElementById("play_with_" + user).disabled = inGame;
     });
-
 
     socket.on('removeUser', (user) => {     //Si un utilisateur se déconnecte du serveur, on le supprime de la liste
         if (document.getElementById(user)) {
@@ -62,18 +62,6 @@ let pingPong = [];
         }
         document.getElementById("play_with_" + user).disabled = inGame;
         pong[user] = true;
-    });
-
-    socket.on('receiveMessage', (msg, sender, receiver) => {     //Quand l'utilisateur reçoit un message, on l'affiche dans la zone de chat correspondant à l'expéditeur
-        if (receiver === pseudo) {
-            addMessage(msg, sender, sender);
-            if (document.getElementById('chatBox_' + sender).style.display === 'none') {
-                let waitingMsg = document.getElementById('waitingMsg_' + sender);
-                let oldCount = Number(waitingMsg.innerHTML);
-                waitingMsg.innerHTML = '';
-                waitingMsg.appendChild(document.createTextNode((oldCount + 1).toString()));
-            }
-        }
     });
 
     socket.on('playRequestToClient', (sender, receiver) => {
@@ -160,7 +148,7 @@ function addUserRow(pseudo, user, table) {      //Création d'une ligne pour un 
     connectionButton.className = 'userButton';
 
 
-    createTabChat(pseudo, user);
+    chatMod.createTabChat(pseudo, user);
 
 
     let pingPongInterval = setInterval(() => {     //Ping de l'utilisateur toutes les 3 secondes pour vérifier qu'il est toujours connecté, sinon on retire la ligne de cette utilisateur et on arrête le ping régulier
@@ -181,99 +169,24 @@ function addUserRow(pseudo, user, table) {      //Création d'une ligne pour un 
     pingPong.push(pingPongInterval);
 
     linkChat.addEventListener('click', () => {      //Bouton pour ouvrir le chat avec l'utilisateur
-        let mainDivChat = document.getElementById('mainChatBox');
-        if (mainDivChat.hasChildNodes()) {
-            let listChatBox = mainDivChat.childNodes;
-            for (let i = 1; i < listChatBox.length; i++) {
-                listChatBox[i].style.display = 'none';
+        if (document.getElementById('chatBox_' + user).style.display !== 'block') {
+            let mainDivChat = document.getElementById('mainChatBox');
+            if (mainDivChat.hasChildNodes()) {
+                let listChatBox = mainDivChat.childNodes;
+                for (let i = 1; i < listChatBox.length; i++) {
+                    listChatBox[i].style.display = 'none';
+                }
             }
+            document.getElementById('chatBox_' + user).style.display = 'block';
+            document.getElementById('waitingMsg_' + user).innerHTML = '';
+        } else {
+            document.getElementById('chatBox_' + user).style.display = 'none';
         }
-        document.getElementById('chatBox_' + user).style.display = 'block';
-        document.getElementById('waitingMsg_' + user).innerHTML = '';
     });
 
     connectionButton.addEventListener('click', () => {  //Bouton play
         socket.emit("playRequestToServer", pseudo, user);
     });
-}
-
-function createTabChat(localUser, corresponding) {      //Création d'une zone de chat entre l'utilisateur local (localUser) et un utilisateur connecté au serveur (corresponding)
-    const socket = io.connect('http://localhost:4269');
-
-    if (!document.getElementById('chatBox_' + corresponding)) {
-        //main div
-        let mainDivChat = document.getElementById('mainChatBox');
-
-        let userChat = document.createElement("div");   //div du chat avec l'utilisateur 'user'
-        mainDivChat.appendChild(userChat);
-        userChat.id = 'chatBox_' + corresponding;
-        userChat.className = 'chatBox';
-        userChat.style.display = 'none';
-
-        let divName = document.createElement("div");    //div pour afficher le nom de l'utilisateur
-        userChat.appendChild(divName);
-        divName.id = 'pseudoBox_' + corresponding;
-        divName.appendChild(document.createTextNode('Vous parlez à ' + corresponding));
-        divName.className = 'pseudoBox';
-
-        let divMessage = document.createElement("div");    //div qui contient tous les messages
-        userChat.appendChild(divMessage);
-        divMessage.id = 'messageBox_' + corresponding;
-        divMessage.className = 'messageBox';
-
-        let formChat = document.createElement("form");      //formulaire pour l'enoive de message
-        userChat.appendChild(formChat);
-        formChat.className = 'chatForm';
-
-        let inputText = document.createElement("input");    //input text
-        formChat.appendChild(inputText);
-        inputText.type = 'text';
-        inputText.placeholder = 'Écrivez un message à ' + corresponding;
-        inputText.className = 'newMessage';
-
-        let inputSubmit = document.createElement("input");  //input submit
-        formChat.appendChild(inputSubmit);
-        inputSubmit.type = 'submit';
-        inputSubmit.value = 'Envoyez';
-        inputSubmit.className = 'submitMessage';
-
-        formChat.addEventListener('submit', (e) => {    //Envoie le message
-            e.preventDefault();
-            let msg = inputText.value;
-            if (msg.trim() !== '') {
-                inputText.value = '';
-                addMessage(msg, localUser, corresponding);
-                socket.emit('sendMessage', msg, localUser, corresponding);
-            }
-        });
-
-        //Ajout des messages déjà existant dans la session
-        socket.emit('loadMessageRequest', localUser);
-
-        socket.on('loadMessageResponse', (data) => {
-            if (data[corresponding] !== undefined) {     //Si il y a bien des messages enregistré entre l'utilisateur local et le correspondant, on les affiche
-                data[corresponding].forEach((elem) => {
-                    addMessage(elem['msg'], elem['sender'], corresponding);
-                });
-            }
-        });
-    }
-}
-
-function addMessage(msg, sender, corresponding) {    //Ajout d'un message dans la zone de chat
-    let divAllMessage = document.getElementById('messageBox_' + corresponding); //Div qui contient tous les messages
-
-    let divNewMessage = document.createElement("div");  //Nouvelle div pour le message qu'on ajoute
-    divAllMessage.appendChild(divNewMessage);
-    divNewMessage.className = 'message';
-    divAllMessage.scrollTop = divAllMessage.scrollHeight - divAllMessage.clientHeight;
-
-    let spanAuthor = document.createElement("span");    //Affichage de l'auteur du message
-    spanAuthor.className = 'author';
-    spanAuthor.appendChild(document.createTextNode(sender + ' :'));
-
-    divNewMessage.appendChild(spanAuthor);
-    divNewMessage.appendChild(document.createTextNode(msg));
 }
 
 function startGame(player, color, id) {     //Redirige vers la page de jeu avec les informations nécessaire

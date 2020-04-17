@@ -14,6 +14,7 @@
 
     //Initialise les paramètres de socket io
     socket.emit('joinGame', gameID, localPlayer);
+    chatMod.joinChat(localPlayer);
 
     socket.on('newUserRequest', (user) => {
         if (user === localPlayer) {
@@ -47,6 +48,11 @@
         window.location = 'http://localhost:4269/menu';
     });
 
+    socket.on('disconnectUser', () => {
+        alert('L\'adversaire est parti, vous allez être redirigé vers le menu');
+        window.location = 'http://localhost:4269/menu';
+    });
+
     let pingPong = setInterval(() => {     //Ping de l'utilisateur toutes les 3 secondes pour vérifier qu'il est toujours connecté à la partie, sinon on retourne au menu et on arrête le ping régulier
         socket.emit('pingUser', localPlayer, opponent);
         socket.emit('giveConnectionInfo', localPlayer, '', true);
@@ -62,6 +68,10 @@
         }, 2000);
     }, 5000);
 
+    document.getElementById('back').addEventListener('click', () => {
+        socket.emit('disconnectOpponent', opponent);
+        window.location = 'http://localhost:4269/menu';
+    });
 
     //Si le joueur est blanc, il lance la partie, s'il est noir, on demande le board après 500ms (pour être sur que la partie est bien commencé
     if (color === 'white') {
@@ -109,12 +119,11 @@
     });
 
 
-    let game = new Phaser.Game(window.innerWidth, window.innerHeight * (65/100), Phaser.AUTO, 'phaser-example', {
+    let game = new Phaser.Game(window.innerWidth, window.innerHeight * (65 / 100), Phaser.AUTO, 'phaser-example', {
         preload: preload,
         create: create,
         update: update
     });
-
 
 
     let tile;
@@ -289,16 +298,17 @@
 
         }
 
-        let style = { font: "bold 32px Arial", fill: "#000000", boundsAlignH: "center", boundsAlignV: "middle" };
+        let style = {font: "bold 32px Arial", fill: "#000000", boundsAlignH: "center", boundsAlignV: "middle"};
         text = game.add.text(0, 0, "", style);
 
-        text.setTextBounds(boardBack.x - getBoardSize()/2, boardBack.y - getBoardSize()/2 - getTileSize(), boardBack.width, getTileSize());
+        text.setTextBounds(boardBack.x - getBoardSize() / 2, boardBack.y - getBoardSize() / 2 - getTileSize(), boardBack.width, getTileSize());
 
-        let chat = document.createElement("div");
-        chat.setAttribute('id', 'mainChatBox');
-        chat.textContent="Ici le chat";
-        document.body.appendChild(chat);
+        let mainChatBox = document.createElement("div");
+        document.body.appendChild(mainChatBox);
+        mainChatBox.id = 'mainChatBox';
 
+        chatMod.createTabChat(localPlayer, opponent);
+        document.getElementById('chatBox_' + opponent).style.display = 'block';
     }
 
     //permet de superposer une texture sur un sprite
@@ -471,8 +481,6 @@
     //affiche une moveList
     function showMoveList(spriteMoveList, originPiece) {
         for (let spriteMove of spriteMoveList) {
-            //changeTexture(spriteMove, originPiece.color + originPiece.name, 0.5);
-            //changeTexture(spriteMove, 'moveTile');
             if (originPiece.color === 'white') spriteMove.key.circle(getTileSize() / 2, getTileSize() / 2, getTileSize() / 8, '#FFFFFF');
             else spriteMove.key.circle(getTileSize() / 2, getTileSize() / 2, getTileSize() / 8);
             spriteMove.move = true;

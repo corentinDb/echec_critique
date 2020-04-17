@@ -122,7 +122,7 @@ app.post('/registration', (req, res) => {     //Traitement des informations de c
 
                     serverMod.resetMessage(pseudo);   //Ajout de l'utilisateur dans le fichier message.json
 
-                    res.render('loading', {pseudo: pseudo, userID: userID, existingConnection: existingConnection});
+                    res.render('loading', {pseudo: pseudo, userID: userID, existingConnection: false});
                 });
             } else {
                 res.redirect('/registration?error=' + errorMsg);
@@ -136,19 +136,29 @@ app.post('/registration', (req, res) => {     //Traitement des informations de c
 
 app.get('/menu', (req, res) => {      //Page du menu principal
     if (req.session.connectionID) {         //Si l'utilisateur est bien connecté
-        res.render('loading', {pseudo: req.session.pseudo, userID: req.session.connectionID, existingConnection: true});    //On revérifie qu'il est bien connecté
+        res.render('loading', {pseudo: req.session.pseudo, userID: req.session.connectionID, existingConnection: true});
     } else {
         res.redirect('/');
     }
 });
 
-app.post('/menu', (req, res) => {
-    if (req.body.user !== undefined && req.body.userID !== undefined) {
+app.post('/loading', (req, res) => {
+    if (req.body.user !== undefined) {
         req.session.connectionID = req.body.userID;
         req.session.pseudo = req.body.user;
-        res.render('menu', {pseudo: req.session.pseudo});
+        serverMod.resetMessage(req.session.pseudo);
+        res.redirect(307, '/menu');
     }
 });
+
+app.post('/menu', (req, res) => {
+    if (req.session.connectionID) {
+        res.render('menu', {localPlayer: req.session.pseudo});
+    } else {
+        res.redirect('/');
+    }
+});
+
 
 app.get('/destroy', (req, res) => {       //Page de déconnexion
     let user = req.session.pseudo;
@@ -182,6 +192,10 @@ io.sockets.on('connection', (socket) => {
     socket.on('getUserInfo', (pseudo) => {
         socket.join(pseudo);
         socket.broadcast.emit('getUserInfo', pseudo);
+    });
+
+    socket.on('joinChat', (user) => {
+        socket.join(user);
     });
 
     socket.on('giveUserInfo', (pseudo, user, inGame) => {     //On informe l'utilisateur 'user' que l'utilisateur 'pseudo' est déjà connecté au serveur
@@ -230,7 +244,7 @@ io.sockets.on('connection', (socket) => {
                     }
                 });
             });
-            socket.broadcast.emit('receiveMessage', msg, sender, receiver);
+            socket.to(receiver).emit('receiveMessage', msg, sender, receiver);
         }
     });
 
@@ -262,6 +276,10 @@ io.sockets.on('connection', (socket) => {
         listGameInstance[id] = new Board();
         listGameInstance[id].color = 'white';
         io.to(id).emit('playTurn', listGameInstance[id]);
+    });
+
+    socket.on('disconnectOpponent', (opponent) => {
+        io.to(opponent).emit('disconnectUser');
     });
 
     socket.on('getBoard', (id) => {
