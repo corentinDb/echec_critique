@@ -10,12 +10,14 @@
     form['confirmPassword'] = confirmPassword;
     form['email'] = email;
 
-    document.getElementById('return').addEventListener('click', () => { //Bouton retour vers la page de connexion
+    //Bouton retour vers la page de connexion
+    document.getElementById('return').addEventListener('click', () => {
         window.location = '/';
     });
 
 
-    switch (getURLData('error')) {     //Traitement des messages d'erreur
+    //Traitement des messages d'erreur
+    switch (getURLData('error')) {
         case 'wrongPseudo':
             document.getElementById('errorReturn').innerHTML = 'Pseudo déjà utilisé !';
             break;

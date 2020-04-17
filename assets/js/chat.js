@@ -15,7 +15,7 @@ let chatMod = (function () {
     });
 
     return {
-        joinChat(pseudo) {
+        joinChat(pseudo) {          //Création d'une room socket.io au nom de l'utilisateur
             socket.emit('joinChat', pseudo);
         },
         createTabChat(localUser, corresponding) {      //Création d'une zone de chat entre l'utilisateur local (localUser) et un utilisateur connecté au serveur (corresponding)

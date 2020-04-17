@@ -2,13 +2,20 @@
     display: none;
 }
 
+#loading {
+    margin-top: 45vh;
+    height: 10vh;
+}
+
 #progressBar {
     width: 50%;
     margin-left: 25%;
+    height: 50px;
+    font-size: 20px;
 }
 
-#loading {
-    margin-top: 450px;
+#loadingTxt {
     margin-bottom: 10px;
     text-align: center;
+    font-size: 20px;
 }

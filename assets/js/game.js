@@ -16,51 +16,58 @@
     socket.emit('joinGame', gameID, localPlayer);
     chatMod.joinChat(localPlayer);
 
+    //Force la fermeture si un utilisateur avec le même pseudo se connecte
     socket.on('newUserRequest', (user) => {
         if (user === localPlayer) {
             socket.emit('close', localPlayer);
         }
     });
 
-    socket.on('getUserInfo', (user) => {    //Si un nouveau utilisateur se connecte au serveur, on l'ajoute à la liste
+    //Si un nouveau utilisateur se connecte au serveur, on l'ajoute à la liste
+    socket.on('getUserInfo', (user) => {
         socket.emit('giveUserInfo', localPlayer, user, true);
     });
 
+    //Si le socket est déconnecté du serveur, on redirige vers la page principale
     socket.on('disconnect', () => {
-        clearInterval(pingPong);
-        socket.on('connect', () => {
+        setTimeout(() => {
             window.location = 'http://localhost:4269';
-        })
+        }, 200);
     });
 
-    socket.on('pingRequest', (user) => {    //Réponse à une demande de ping
-        socket.emit('pongUser', localPlayer, user, true);   //On ajoute un booléen à true dans la réponse pour préciser que l'utilisateur est en jeux
+    //Réponse à une demande de ping
+    socket.on('pingRequest', (user) => {
+        socket.emit('pongUser', localPlayer, user, true);   //On ajoute true dans la réponse pour préciser que l'utilisateur est en jeux
     });
 
-    socket.on('pongResponse', (user, inGame) => {   //Réception de la réponse du ping
+    //Réception de la réponse du ping
+    socket.on('pongResponse', (user, inGame) => {
         if (inGame) {
             pong = true;
         }
     });
 
+    //Si on a pas répondu à une demande de ping de l'adversaire, celui ci nous déconnecte
     socket.on('timeOut', () => {
         alert('Délai dépassé, vous allez être redirigé vers le menu');
-        window.location = 'http://localhost:4269/menu';
+        backMenu();
     });
 
+    //Si l'adversaire est partie, on retourne au menu
     socket.on('disconnectUser', () => {
         alert('L\'adversaire est parti, vous allez être redirigé vers le menu');
-        window.location = 'http://localhost:4269/menu';
+        backMenu();
     });
 
-    let pingPong = setInterval(() => {     //Ping de l'utilisateur toutes les 3 secondes pour vérifier qu'il est toujours connecté à la partie, sinon on retourne au menu et on arrête le ping régulier
+    //Ping de l'utilisateur toutes les 3 secondes pour vérifier qu'il est toujours connecté à la partie, sinon on retourne au menu et on arrête le ping régulier
+    let pingPong = setInterval(() => {
         socket.emit('pingUser', localPlayer, opponent);
         socket.emit('giveConnectionInfo', localPlayer, '', true);
         setTimeout(() => {
             if (pong === false) {
                 socket.emit('timeOut', opponent);
                 alert('L\'adversaire est parti, vous allez être redirigé vers le menu');
-                window.location = 'http://localhost:4269/menu';
+                backMenu();
                 clearInterval(pingPong);
             } else {
                 pong = false;
@@ -68,50 +75,47 @@
         }, 2000);
     }, 5000);
 
+    //Bouton retour au menu
     document.getElementById('back').addEventListener('click', () => {
         socket.emit('disconnectOpponent', opponent);
-        window.location = 'http://localhost:4269/menu';
+        backMenu();
     });
 
-    //Si le joueur est blanc, il lance la partie, s'il est noir, on demande le board après 500ms (pour être sur que la partie est bien commencé
-    if (color === 'white') {
-        socket.emit('startGame', gameID);
-    } else {
-        setTimeout(function () {
-            socket.emit('getBoard', gameID);
-        }, 500);
-    }
 
+    //Récupération du board au chargement puis toutes les 2 secondes
+    //Les blancs commencent toujours
+    socket.emit('getBoard', gameID);
     setInterval(function () {
         socket.emit('getBoard', gameID);
-    }, 1000);
+    }, 2000);
 
+    //Update du board, le passage au tour suivant s'effectue automatiquement lorsque la couleur est modifié
     socket.on('giveBoard', (gameInstance) => {
         boardCache = gameInstance;
     });
 
-    socket.on('playTurn', (gameInstance) => {   //Début du tour
-        boardCache = gameInstance;      //Update du board
-    });
-
-    socket.on('giveMoveList', (gameInstance, serverMoveList) => {     //Réception de la moveList
+    //Réception de la liste de mouvement
+    socket.on('giveMoveList', (gameInstance, serverMoveList) => {
         moveList = serverMoveList;
     });
 
+    //Informe de l'echec et mat
     socket.on('checkmate', (gameInstance) => {
         boardCache = gameInstance;
         gameOver = true;
         console.log(boardCache.color + ' est en échec et mat !');
-        text.text = 'Partie terminée ,' + boardCache.color + ' est en échec et mat !'
+        text.text = 'Partie terminée, ' + boardCache.color + ' est en échec et mat !'
     });
 
+    //Informe du pat
     socket.on('pat', (gameInstance) => {
         boardCache = gameInstance;
         gameOver = true;
         console.log(boardCache.color + ' est en pat !');
-        text.text = "Partie terminée, Il y Pat!"
+        text.text = "Partie terminée, il y Pat!"
     });
 
+    //Informe de la promotion du pion et demande à l'utilisateur de choisir
     socket.on('promotion', (gameInstance, pawn) => {
         boardCache = gameInstance;
         tempBoard = boardCache.board.slice();
@@ -336,7 +340,6 @@
         }
 
         return sameTile === 64;
-
     }
 
     //donne l'inventaire du plateau
@@ -377,9 +380,7 @@
                 }
             }
         }
-
         return inventory;
-
     }
 
     //ajoute les pièces manquantes sur les cotés du plateau
@@ -405,7 +406,6 @@
             if (boardInventory.white.king < tempBoardInventory.white.king) changeTexture(missing.whiteGroup.children[missing.white], 'whiteKing');
 
             missing.white++;
-
         }
 
         if (totalBoardInventoryBlack < totalTempBoardInventoryBlack) {
@@ -418,7 +418,6 @@
             if (boardInventory.black.king < tempBoardInventory.black.king) changeTexture(missing.blackGroup.children[missing.black], 'blackKing');
 
             missing.black++;
-
         }
 
     }
@@ -439,7 +438,6 @@
                         let id = positionToBoardId({x: j, y: i}, color);
                         changeTexture(tile.children[id], board.board[j][i].color + board.board[j][i].name);
                     }
-
                 }
             }
 
@@ -450,9 +448,7 @@
                 addMissingPiece(boardCache.board, tempBoard);
                 tempBoard = boardCache.board.slice();
                 console.log('maj board');
-
             }
-
         }
     }
 
@@ -468,6 +464,7 @@
     //renvoie tous les sprites de la move liste d'un sprite donné
     function getSpriteMoveList(sprite) {
         let spriteMoveList = [];
+
         if (moveList[0] !== undefined) {
             if (moveList[0].origin.x === sprite.coord.x && moveList[0].origin.y === sprite.coord.y) {
                 for (let move of moveList) {
@@ -552,7 +549,6 @@
                 };
             }
         }
-
         return undefined;
     }
 
@@ -609,7 +605,6 @@
                     }
                     selectorClick = false;
                 }
-
             }
 
             //action sur tile secectionné
@@ -631,7 +626,6 @@
                         socket.emit('moveRequest', gameID, selectedTile.coord.x, selectedTile.coord.y, moveTile.coord.x, moveTile.coord.y);
                         console.log('envoie du move pour la position', moveTile.coord);
                     }
-
                 }
 
                 //reset si l'on clique autre part
@@ -647,7 +641,6 @@
 
                     resetClick = false;
                 }
-
             }
         }
 
@@ -658,9 +651,16 @@
             moveClick = true;
             promoteClick = true;
         }
-
-
     }
-
-
 })();
+
+
+//Fonction pour retour au menu sans passer par la page de loading
+function backMenu() {
+    let form = document.createElement("form");
+    form.method = 'post';
+    form.action = '/menu';
+
+    document.body.appendChild(form);
+    form.submit();
+}

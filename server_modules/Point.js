@@ -6,12 +6,7 @@ class Point {
         this.y = y;
     }
 
-    reverse() {
-        let tmp = this.x;
-        this.x = this.y;
-        this.y = tmp;
-    }
-
+    //Test d'égalité
     isEqual(point) {
         return this.x === point.x && this.y === point.y;
     }

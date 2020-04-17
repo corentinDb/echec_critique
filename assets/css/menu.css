@@ -2,7 +2,8 @@ body {
     display: flex;
     justify-content: space-between;
     background-color: #dddddd;
-
+    margin: 50px;
+    max-height: 800px;
 }
 
 #localPlayer {

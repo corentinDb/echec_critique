@@ -64,7 +64,7 @@ class Pawn extends Piece {
                 this.moveList.push(new Move(this.getPosition(), eat2.getPosition()));
             }
 
-
+            //Prise en passant
             if (this.getPosition().x < 7 && board.getCase(new Point(this.getPosition().x + 1, this.getPosition().y)) !== undefined && board.getCase(new Point(this.getPosition().x + 1, this.getPosition().y)).name === 'Pawn' && board.getCase(new Point(this.getPosition().x + 1, this.getPosition().y)).color !== this.color && board.replay.length > 0 && board.replay[board.replay.length - 1].getOrigin().y - board.replay[board.replay.length - 1].getDestination().y === 2 && board.replay[board.replay.length - 1].getOrigin().x === this.getPosition().x + 1) {
                 this.moveList.push(new Move(this.getPosition(), new Point(this.getPosition().x + 1, this.getPosition().y + 1)));
             }

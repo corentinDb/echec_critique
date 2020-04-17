@@ -52,6 +52,9 @@ class Board {
         //initialisation du nombre de tour à 0
         this.turn = 0;
 
+        //initialisation de la couleur
+        this.color = 'white';
+
         //creation du replay (contient les deplacements effectués)
         this.replay = [];
     }

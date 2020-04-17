@@ -1,11 +1,12 @@
-#opponent, #localPlayer, #color, #gameID {
-    display: none;
-}
 body {
     background-color: #dddddd;
     margin: 0;
     padding: 0;
-    height: 100%
+    height: 100%;
+}
+
+#opponent, #localPlayer, #color, #gameID {
+    display: none;
 }
 
 button {
