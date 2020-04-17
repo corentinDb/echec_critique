@@ -23,7 +23,7 @@
             document.getElementById('errorReturn').innerHTML = 'Email déjà utilisé !';
             break;
         case 'undefined':
-            document.getElementById('errorReturn').innerHTML = 'Une erreur inconnue est survenue, merci de recommencer<br>Si cette erreur persiste, merci de contacter un admin';
+            document.getElementById('errorReturn').innerHTML = 'Une erreur inconnue est survenue, merci de recommencer<br>Si cette erreur persiste, merci de nous contacter : nicolas.bouillet@isen.yncrea.fr';
             break;
         default:
             document.getElementById('errorReturn').innerHTML = '';

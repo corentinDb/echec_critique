@@ -15,12 +15,21 @@
     //Initialise les paramètres de socket io
     socket.emit('joinGame', gameID, localPlayer);
 
-    socket.on('newUserResponse', (user) => {    //Si un nouveau utilisateur se connecte au serveur, s'il a le même nom, on lui demande de se déconnecter, sinon on le prévient qu'on est connecté
+    socket.on('newUserRequest', (user) => {
         if (user === localPlayer) {
             socket.emit('close', localPlayer);
-        } else {
-            socket.emit('giveConnectionInfo', localPlayer, user, true);
         }
+    });
+
+    socket.on('getUserInfo', (user) => {    //Si un nouveau utilisateur se connecte au serveur, on l'ajoute à la liste
+        socket.emit('giveUserInfo', localPlayer, user, true);
+    });
+
+    socket.on('disconnect', () => {
+        clearInterval(pingPong);
+        socket.on('connect', () => {
+            window.location = 'http://localhost:4269';
+        })
     });
 
     socket.on('pingRequest', (user) => {    //Réponse à une demande de ping
@@ -51,7 +60,7 @@
                 pong = false;
             }
         }, 2000);
-    }, 20000);
+    }, 5000);
 
 
     //Si le joueur est blanc, il lance la partie, s'il est noir, on demande le board après 500ms (pour être sur que la partie est bien commencé

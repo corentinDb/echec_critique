@@ -2,18 +2,18 @@ const Point = require('./Point');
 const Move = require('./Move');
 
 module.exports = {
-    check(board, position, color) {
+    check(gameInstance, position) {
         if (position === '') {
-            position = board.searchPiece('King', color)[0].getPosition();
+            position = gameInstance.searchPiece('King', gameInstance.color)[0].getPosition();
         }
         let ls;
-        if (color === 'black') {
-            ls = board.searchPiece('', 'white');
+        if (gameInstance.color === 'black') {
+            ls = gameInstance.searchPiece('', 'white');
         } else {
-            ls = board.searchPiece('', 'black');
+            ls = gameInstance.searchPiece('', 'black');
         }
         for (let piece of ls) {
-            let moveList = piece.getMoveList(board);
+            let moveList = piece.getMoveList(gameInstance);
             for (let i = 0; i < moveList.length; i++) {
                 if (moveList[i].getDestination().isEqual(position)) {
                     return true;
@@ -22,7 +22,7 @@ module.exports = {
         }
         return false;
     },
-    moveListWithCheck(gameInstance, pointOrigin, color) {
+    moveListWithCheck(gameInstance, pointOrigin) {
         let moveList = pointOrigin.getMoveList(gameInstance);
 
         let newMoveList = [];
@@ -30,11 +30,11 @@ module.exports = {
             let tempPiece = gameInstance.getCase(move.getDestination());
             gameInstance.simulateMove(move);
             if (pointOrigin.name === 'King') {
-                if (!this.check(gameInstance, move.getDestination(), color)) {
+                if (!this.check(gameInstance, move.getDestination())) {
                     newMoveList.push(move);
                 }
             } else {
-                if (!this.check(gameInstance, '', color)) {
+                if (!this.check(gameInstance, '')) {
                     newMoveList.push(move);
                 }
             }
@@ -57,12 +57,12 @@ module.exports = {
         }
         return newMoveList;
     },
-    checkmate(board, color) {
-        if (this.check(board, '', color) === true) {
+    checkmate(gameInstance) {
+        if (this.check(gameInstance, '') === true) {
             let ls;
-            ls = board.searchPiece('', color);
+            ls = gameInstance.searchPiece('', gameInstance.color);
             for (let piece of ls) {
-                if (this.moveListWithCheck(board, piece, color).length !== 0) {
+                if (this.moveListWithCheck(gameInstance, piece).length !== 0) {
                     return false;
                 }
             }
@@ -70,12 +70,12 @@ module.exports = {
         }
         return false;
     },
-    pat(board, color) {
-        if (this.check(board, '', color) === false) {
+    pat(gameInstance) {
+        if (this.check(gameInstance, '') === false) {
             let ls;
-            ls = board.searchPiece('', color);
+            ls = gameInstance.searchPiece('', gameInstance.color);
             for (let piece of ls) {
-                if (this.moveListWithCheck(board, piece, color).length !== 0) {
+                if (this.moveListWithCheck(gameInstance, piece).length !== 0) {
                     return false;
                 }
             }
@@ -83,23 +83,23 @@ module.exports = {
         }
         return false;
     },
-    castling(board, king, rook) {
+    castling(gameInstance, king, rook) {
         if (king.getColor() !== rook.getColor()) return false;
         if (!king.hasMoved && !rook.hasMoved) {
             if (rook.getPosition().x > king.getPosition().x) {
                 for (let i = king.getPosition().x + 1; i < king.getPosition().x + 3; i++) {
-                    if (board.getCase(new Point(i, king.getPosition().y)) !== undefined) {
+                    if (gameInstance.getCase(new Point(i, king.getPosition().y)) !== undefined) {
                         return false;
-                    } else if (/*king.getPosition().x + 3 - i && */this.check(board, new Point(i, king.getPosition().y), king.getColor())) {
+                    } else if (this.check(gameInstance, new Point(i, king.getPosition().y))) {
                         return false;
                     }
                 }
             } else {
                 for (let i = king.getPosition().x - 1; i > king.getPosition().x - 4; i--) {
 
-                    if (board.getCase(new Point(i, king.getPosition().y)) !== undefined) {
+                    if (gameInstance.getCase(new Point(i, king.getPosition().y)) !== undefined) {
                         return false;
-                    } else if (/*i - king.getPosition().x - 4 && */this.check(board, new Point(i, king.getPosition().y), king.getColor())) {
+                    } else if (this.check(gameInstance, new Point(i, king.getPosition().y))) {
                         return false;
                     }
                 }

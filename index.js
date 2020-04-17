@@ -45,37 +45,38 @@ con.connect((err) => {  //Connexion à la base de donnée
 });
 
 
-app.get('/error', (req, res, next) => {
+app.get('/error', (req, res) => {
     res.sendFile(__dirname + '/assets/views/error.html');
 });
 
 
-app.get('/', (req, res, next) => {      //Page principale du serveur = page de connexion
-    if (req.query.error === 'existing') {
-        res.sendFile(__dirname + '/assets/views/connection.html');
-    } else if (req.session.connectionID) {
-        res.redirect('/menu');
+app.get('/', (req, res) => {      //Page principale du serveur = page de connexion
+    if (req.session.connectionID) {
+        res.render('loading', {pseudo: req.session.pseudo, userID: req.session.connectionID, existingConnection: true});
     } else {
         res.sendFile(__dirname + '/assets/views/connection.html');
     }
 });
 
-app.post('/', (req, res, next) => {     //Traitement des informations de connexion
+app.post('/', (req, res) => {     //Traitement des informations de connexion
     if (req.body.login !== undefined && req.body.password !== undefined) {  //On vérifie si les informations de connexion existe bien (condition normalement toujours vrai car vérifié avant l'envoie du formulaire mais au cas où on revérifie)
         con.query('SELECT * FROM connection', (error, responseSelect) => {
             let connectionSuccessful = false;
+            let userID = 0;
+            let pseudo = "";
             responseSelect.forEach((row) => {
                 if (serverMod.hashPassword(req.body.password) === row['password'] && req.body.login === row['pseudo']) {  //On vérifie chaque couple pseudo/password enregistré en BDD par rapport à celui entré par l'utilisateur
-                    req.session.connectionID = row['userID'];
-                    req.session.pseudo = row['pseudo'];
-
+                    userID = row['userID'];
+                    pseudo = row['pseudo'];
                     connectionSuccessful = true;
                 }
             });
             //Redirection en fonction des résultats de la tentative de connexion
+            let existingConnection;
+            req.session.connectionID ? existingConnection = true : existingConnection = false;
+
             if (connectionSuccessful) {
-                serverMod.resetMessage(req.session.pseudo);   //Par précaution, on reset les messages
-                res.redirect('/menu');
+                res.render('loading', {pseudo: pseudo, userID: userID, existingConnection: existingConnection});
             } else {
                 res.redirect('/?error=wrongLogin');
             }
@@ -86,15 +87,15 @@ app.post('/', (req, res, next) => {     //Traitement des informations de connexi
 });
 
 
-app.get('/registration', (req, res, next) => {      //Page de création de compte
+app.get('/registration', (req, res) => {      //Page de création de compte
     if (req.session.connectionID) {
-        res.redirect('/menu');
+        res.render('loading', {pseudo: req.session.pseudo, userID: req.session.connectionID, existingConnection: true});
     } else {
         res.sendFile(__dirname + '/assets/views/registration.html');
     }
 });
 
-app.post('/registration', (req, res, next) => {     //Traitement des informations de création de compte
+app.post('/registration', (req, res) => {     //Traitement des informations de création de compte
     if (req.body.pseudo !== undefined && req.body.password !== undefined && req.body.email !== undefined) {     //On vérifie si les informations de connexion existe bien (condition normalement toujours vrai car vérifié avant l'envoie du formulaire mais au cas où on revérifie)
         con.query('SELECT * FROM connection', (error, responseSelect) => {
             if (error) throw error;
@@ -117,12 +118,11 @@ app.post('/registration', (req, res, next) => {     //Traitement des information
                 con.query('INSERT INTO connection (`pseudo`, `password`, `email`) VALUES (?)', [data], (error, resp) => {   //On ajoute l'utilisteur en base de donnée
                     if (error) throw error;
                     let pseudo = req.body.pseudo;
-                    req.session.connectionID = resp.insertId;
-                    req.session.pseudo = pseudo;
+                    let userID = resp.insertId;
 
                     serverMod.resetMessage(pseudo);   //Ajout de l'utilisateur dans le fichier message.json
 
-                    res.redirect('/menu');
+                    res.render('loading', {pseudo: pseudo, userID: userID, existingConnection: existingConnection});
                 });
             } else {
                 res.redirect('/registration?error=' + errorMsg);
@@ -134,31 +134,38 @@ app.post('/registration', (req, res, next) => {     //Traitement des information
 });
 
 
-app.get('/menu', (req, res, next) => {      //Page du menu principal
+app.get('/menu', (req, res) => {      //Page du menu principal
     if (req.session.connectionID) {         //Si l'utilisateur est bien connecté
-        res.render('menu', {pseudo: req.session.pseudo});
+        res.render('loading', {pseudo: req.session.pseudo, userID: req.session.connectionID, existingConnection: true});    //On revérifie qu'il est bien connecté
     } else {
         res.redirect('/');
     }
 });
 
+app.post('/menu', (req, res) => {
+    if (req.body.user !== undefined && req.body.userID !== undefined) {
+        req.session.connectionID = req.body.userID;
+        req.session.pseudo = req.body.user;
+        res.render('menu', {pseudo: req.session.pseudo});
+    }
+});
 
-app.get('/destroy', (req, res, next) => {       //Page de déconnexion
+app.get('/destroy', (req, res) => {       //Page de déconnexion
     let user = req.session.pseudo;
     if (user !== undefined && user !== null) {  //Si le pseudo n'est pas undefined ou null, pour éviter les bugs si l'utilisateur charge cette page sans être connecté
         req.session.destroy(function (err) {    //Suppression de la session
             serverMod.resetMessage(user);     //Suppression des messages de l'utilisateur 'user'
             res.redirect('/');
-        })
+        });
     }
 });
 
-app.get('/game', (req, res, next) => {      //Si l'utilisateur charge la page /game directement dans l'url, on le revoit au menu
+app.get('/game', (req, res) => {      //Si l'utilisateur charge la page /game directement dans l'url, on le revoit au menu
     res.redirect('/menu');
 });
 
-app.post('/game', (req, res, next) => {
-    if (req.session.connectionID) {         //Si l'utilisateur est bien connecté
+app.post('/game', (req, res) => {
+    if (req.session.connectionID && req.body.opponent !== undefined && req.body.color !== undefined && req.body.gameID !== undefined) {         //Si l'utilisateur est bien connecté et que les paramètres existent
         res.render('game', {localPlayer: req.session.pseudo, opponent: req.body.opponent, color: req.body.color, gameID: req.body.gameID});
     } else {
         res.redirect('/');
@@ -169,16 +176,20 @@ app.post('/game', (req, res, next) => {
 io.sockets.on('connection', (socket) => {
 
     socket.on('newUserRequest', (user) => {     //Quand un utilisateur se connecte, on prévient les autres
-        socket.join(user);
-        socket.broadcast.emit('newUserResponse', user);
+        socket.broadcast.emit('newUserRequest', user);
     });
 
-    socket.on('giveConnectionInfo', (pseudo, user, inGame) => {     //On informe l'utilisateur 'user' que l'utilisateur 'pseudo' est déjà connecté au serveur
-        user === '' ? io.emit('giveConnectionInfo', pseudo, inGame) : io.to(user).emit('giveConnectionInfo', pseudo, inGame);
+    socket.on('getUserInfo', (pseudo) => {
+        socket.join(pseudo);
+        socket.broadcast.emit('getUserInfo', pseudo);
     });
 
-    socket.on('removeUserRequest', (user) => {  //Quand un utilisateur se déconnecte, on prévient les autres
-        socket.broadcast.emit('removeUserResponse', user);
+    socket.on('giveUserInfo', (pseudo, user, inGame) => {     //On informe l'utilisateur 'user' que l'utilisateur 'pseudo' est déjà connecté au serveur
+        io.to(user).emit('giveUserInfo', pseudo, inGame);
+    });
+
+    socket.on('removeUser', (user) => {  //Quand un utilisateur se déconnecte, on prévient les autres
+        socket.broadcast.emit('removeUser', user);
     });
 
     socket.on('pingUser', (pseudo, user, inGame) => {       //Demande de ping par 'pseudo' vers 'user'
@@ -261,7 +272,7 @@ io.sockets.on('connection', (socket) => {
         if (listGameInstance[id] !== undefined) {
             let pointOrigin = listGameInstance[id].getCase(new Point(xOrigin, yOrigin));
             if (pointOrigin !== undefined) {
-                socket.emit('giveMoveList', listGameInstance[id], exceptionMod.moveListWithCheck(listGameInstance[id], pointOrigin, listGameInstance[id].color));
+                socket.emit('giveMoveList', listGameInstance[id], exceptionMod.moveListWithCheck(listGameInstance[id], pointOrigin));
             }
         }
     });
@@ -272,7 +283,7 @@ io.sockets.on('connection', (socket) => {
             let destination = new Point(xDestination, yDestination);
             let newMove = new Move(origin, destination);
             let pointOrigin = listGameInstance[id].getCase(origin);
-            let moveList = exceptionMod.moveListWithCheck(listGameInstance[id], pointOrigin, listGameInstance[id].color);
+            let moveList = exceptionMod.moveListWithCheck(listGameInstance[id], pointOrigin);
             let inTheList = false;
 
             if (pointOrigin !== undefined) {
@@ -328,16 +339,10 @@ io.sockets.on('connection', (socket) => {
                                 });
                             }, 500);
                         }
-                        if (exceptionMod.checkmate(listGameInstance[id], listGameInstance[id].color)) {
-                            io.to(id).emit('checkmate', listGameInstance[id]);
-                        } else if (exceptionMod.pat(listGameInstance[id], listGameInstance[id].color)) {
-                            io.to(id).emit('pat', listGameInstance[id]);
-                        } else {
-                            io.to(id).emit('playTurn', listGameInstance[id]);
-                        }
-                    } else if (exceptionMod.checkmate(listGameInstance[id], listGameInstance[id].color)) {
+                    }
+                    if (exceptionMod.checkmate(listGameInstance[id])) {
                         io.to(id).emit('checkmate', listGameInstance[id]);
-                    } else if (exceptionMod.pat(listGameInstance[id], listGameInstance[id].color)) {
+                    } else if (exceptionMod.pat(listGameInstance[id])) {
                         io.to(id).emit('pat', listGameInstance[id]);
                     } else {
                         io.to(id).emit('playTurn', listGameInstance[id]);

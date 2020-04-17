@@ -1,4 +1,5 @@
 let pong = [];
+let pingPong = [];
 (function () {
     const socket = io.connect('http://localhost:4269');
 
@@ -6,40 +7,45 @@ let pong = [];
 
     document.getElementById('pseudoGraphics').appendChild(document.createTextNode(pseudo));     //On affiche le pseudo de l'utilisateur
 
-    socket.emit('newUserRequest', pseudo);          //On prévient les autres users qu'on se connecte
+    socket.emit('getUserInfo', pseudo);          //On prévient les autres users qu'on se connecte
 
     let table = document.getElementById('tablePlayer');
 
-    socket.on('newUserResponse', (user, inGame) => {    //Si un nouveau utilisateur se connecte au serveur, on l'ajoute à la liste
+    socket.on('newUserRequest', (user) => {
         if (user === pseudo) {
             socket.emit('close', pseudo);
-        } else {
-            if (!document.getElementById(user) && user !== pseudo) {
-                addUserRow(pseudo, user, table);
-            }
-            document.getElementById('play_with_' + user).disabled = inGame;
-            socket.emit('giveConnectionInfo', pseudo, user);
         }
     });
 
-    socket.on('close', (user) => {
-        if (pseudo === user) {
-            window.location = 'http://localhost:4269/?error=existing';
+    socket.on('getUserInfo', (user) => {    //Si un nouveau utilisateur se connecte au serveur, on l'ajoute à la liste
+        if (!document.getElementById(user)) {
+            addUserRow(pseudo, user, table);
         }
+        socket.emit('giveUserInfo', pseudo, user, false);
     });
 
-    socket.on('giveConnectionInfo', (user, inGame) => {
+    socket.on('giveUserInfo', (user, inGame) => {
         if (!document.getElementById(user)) {
             addUserRow(pseudo, user, table);
         }
         document.getElementById("play_with_" + user).disabled = inGame;
     });
 
-    socket.on('removeUserResponse', (user) => {     //Si un utilisateur se déconnecte du serveur, on le supprime de la liste
+
+    socket.on('removeUser', (user) => {     //Si un utilisateur se déconnecte du serveur, on le supprime de la liste
         if (document.getElementById(user)) {
             document.getElementById('mainChatBox').removeChild(document.getElementById('chatBox_' + user));
             table.removeChild(document.getElementById(user));
         }
+    });
+
+    socket.on('disconnect', () => {
+        for (let interval of pingPong) {
+            clearInterval(interval);
+        }
+        socket.on('connect', () => {
+            window.location = 'http://localhost:4269';
+        })
     });
 
     socket.on('pingRequest', (user, inGame) => {        //Réponse à une demande de ping
@@ -116,7 +122,7 @@ let pong = [];
 
 
     document.getElementById("deconnection").addEventListener('click', () => {   //Bouton déconnexion
-        socket.emit('removeUserRequest', pseudo);
+        socket.emit('removeUser', pseudo);
         window.location = "http://localhost:4269/destroy";
     });
 })();
@@ -157,7 +163,7 @@ function addUserRow(pseudo, user, table) {      //Création d'une ligne pour un 
     createTabChat(pseudo, user);
 
 
-    let pingPong = setInterval(() => {     //Ping de l'utilisateur toutes les 3 secondes pour vérifier qu'il est toujours connecté, sinon on retire la ligne de cette utilisateur et on arrête le ping régulier
+    let pingPongInterval = setInterval(() => {     //Ping de l'utilisateur toutes les 3 secondes pour vérifier qu'il est toujours connecté, sinon on retire la ligne de cette utilisateur et on arrête le ping régulier
         socket.emit('pingUser', pseudo, user);
         setTimeout(() => {
             if (pong[user] === false) {
@@ -171,6 +177,8 @@ function addUserRow(pseudo, user, table) {      //Création d'une ligne pour un 
             }
         }, 500);
     }, 2000);
+
+    pingPong.push(pingPongInterval);
 
     linkChat.addEventListener('click', () => {      //Bouton pour ouvrir le chat avec l'utilisateur
         let mainDivChat = document.getElementById('mainChatBox');
