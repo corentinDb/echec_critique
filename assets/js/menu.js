@@ -36,8 +36,8 @@ let pong = [];
         if (!document.getElementById(user)) {
             addUserRow(pseudo, user, table);
         }
-        document.getElementById("play_with_" + user).disabled = inGame;
-        document.getElementById("chatButton_" + user).disabled = inGame;
+        disabledSwitch('play_with_' + user, inGame);
+        disabledSwitch('chatButton_' + user, inGame);
     });
 
     //Si un utilisateur se déconnecte du serveur, on le supprime de la liste
@@ -60,8 +60,8 @@ let pong = [];
         if (!document.getElementById(user)) {
             addUserRow(pseudo, user, table);
         }
-        document.getElementById("play_with_" + user).disabled = inGame;
-        document.getElementById("chatButton_" + user).disabled = inGame;
+        disabledSwitch('play_with_' + user, inGame);
+        disabledSwitch('chatButton_' + user, inGame);
         socket.emit('pongUser', pseudo, user);
     });
 
@@ -70,24 +70,14 @@ let pong = [];
         if (!document.getElementById(user)) {
             addUserRow(pseudo, user, table);
         }
-        document.getElementById("play_with_" + user).disabled = inGame;
-        document.getElementById("chatButton_" + user).disabled = inGame;
+        disabledSwitch('play_with_' + user, inGame);
+        disabledSwitch('chatButton_' + user, inGame);
         pong[user] = true;
     });
 
     //Réponse à une requête de 'sender' pour jouer avec 'receiver'
     socket.on('playRequestToClient', (sender, receiver) => {
-        let response = confirm(sender + ' veut jouer avec vous !');
-        let colorTab = ['black', 'white'];
-        let color1 = colorTab[Math.floor(Math.random() * 2)];
-        let color2;
-        color1 === 'black' ? color2 = 'white' : color2 = 'black';
-
-        let id = 'game' + sender + receiver;
-        socket.emit('playResponseToServer', pseudo, sender, response, color2, id);
-        if (response) {
-            startGame(sender, color1, id);
-        }
+        confirmBox(sender, receiver);
     });
 
     socket.on('playResponseToClient', (sender, receiver, response, color, id) => {
@@ -96,22 +86,22 @@ let pong = [];
             if (response) {
                 startGame(sender, color, id);
             } else {
-                alert(sender + ' a refusé de jouer avec vous :\'(\nC\'est vraiment pas un(e) ami(e) !');
+                alertBox(sender + ' a refusé de jouer avec vous :\'(<br>C\'est vraiment pas un(e) ami(e) !');
             }
         } else if (response && sender !== pseudo) {     //Sinon, si la réponse est positif, on bloque les boutons des joueurs qui commence leur partie
-            document.getElementById("play_with_" + sender).disabled = true;
-            document.getElementById("chatButton_" + sender).disabled = true;
-            document.getElementById("play_with_" + receiver).disabled = true;
-            document.getElementById("chatButton_" + receiver).disabled = true;
+            disabledSwitch('play_with_' + receiver, true);
+            disabledSwitch('chatButton_' + receiver, true);
+            disabledSwitch('play_with_' + sender, true);
+            disabledSwitch('chatButton_' + sender, true);
         }
     });
 
     //Informe que les utilisateurs 'user1' et 'user2' sont revenu de leur partie
     socket.on('backInfo', (user1, user2) => {
-        document.getElementById("play_with_" + user1).disabled = false;
-        document.getElementById("chatButton_" + user1).disabled = false;
-        document.getElementById("play_with_" + user2).disabled = false;
-        document.getElementById("chatButton_" + user2).disabled = false;
+        disabledSwitch('play_with_' + user1, false);
+        disabledSwitch('chatButton_' + user1, false);
+        disabledSwitch('play_with_' + user2, false);
+        disabledSwitch('chatButton_' + user2, false);
     });
 
 
@@ -128,6 +118,7 @@ function addUserRow(pseudo, user, table) {
 
     let newRow = document.createElement("tr");
     table.appendChild(newRow);
+    newRow.className = 'userRow';
     newRow.id = user.toString();
 
     let userCell = document.createElement("td");
@@ -137,14 +128,17 @@ function addUserRow(pseudo, user, table) {
 
 
     let linkCell = document.createElement("td");
+    linkCell.className = 'buttonCell';
     newRow.appendChild(linkCell);
 
     let linkChat = document.createElement("button");
     linkCell.appendChild(linkChat);
-    linkChat.className = 'userButton';
     linkChat.id = 'chatButton_' + user;
-    linkChat.innerHTML = 'discussion';
-
+    linkChat.className = 'userButton';
+    // linkChat.innerHTML = 'Discussion';
+    let spanButton1 = document.createElement("span");
+    spanButton1.appendChild(document.createTextNode('Discussion'));
+    linkChat.appendChild(spanButton1);
 
     let waitingMsg = document.createElement("td");
     newRow.appendChild(waitingMsg);
@@ -153,9 +147,12 @@ function addUserRow(pseudo, user, table) {
 
     let connectionButton = document.createElement("button");
     linkCell.appendChild(connectionButton);
-    connectionButton.innerHTML = 'jouer avec ' + user;
     connectionButton.id = 'play_with_' + user;
     connectionButton.className = 'userButton';
+    // connectionButton.innerHTML = 'Jouer';
+    let spanButton2 = document.createElement("span");
+    spanButton2.appendChild(document.createTextNode('Jouer'));
+    connectionButton.appendChild(spanButton2);
 
 
     chatMod.createTabChat(pseudo, user);
@@ -174,8 +171,8 @@ function addUserRow(pseudo, user, table) {
             } else {
                 pong[user] = false;
             }
-        }, 500);
-    }, 3000);
+        }, 1000);
+    }, 4000);
 
 
     //Bouton pour ouvrir le chat avec l'utilisateur
@@ -227,4 +224,109 @@ function startGame(player, color, id) {
 
     document.body.appendChild(form);
     form.submit();
+}
+
+function confirmBox(sender, receiver) {
+    if (!document.getElementById('alertDiv')) {
+
+        const socket = io.connect('http://localhost:4269');
+
+        for (let elem of document.body.children) {
+            elem.hidden = 'true';
+        }
+        document.body.id = 'alertBody';
+
+        let mainAlertDiv = document.getElementById('alertMenu');
+        mainAlertDiv.style.display = 'block';
+
+        let confirmDiv = document.createElement("div");
+        mainAlertDiv.appendChild(confirmDiv);
+        confirmDiv.id = 'alertDiv';
+
+
+        let confirmText = document.createElement("p");
+        confirmDiv.appendChild(confirmText);
+        confirmText.id = 'alertTxt';
+        confirmText.appendChild(document.createTextNode(sender + ' veut jouer avec vous !'));
+
+        let acceptButton = document.createElement("button");
+        confirmDiv.appendChild(acceptButton);
+        acceptButton.className = 'confirmButton';
+        acceptButton.innerHTML = 'Confirmer';
+
+        let refuseButton = document.createElement("button");
+        confirmDiv.appendChild(refuseButton);
+        refuseButton.className = 'confirmButton';
+        refuseButton.innerHTML = 'Refuser';
+
+        acceptButton.addEventListener('click', () => {
+            let colorTab = ['black', 'white'];
+            let color1 = colorTab[Math.floor(Math.random() * 2)];
+            let color2;
+            color1 === 'black' ? color2 = 'white' : color2 = 'black';
+
+            let id = 'game' + sender + receiver;
+            socket.emit('playResponseToServer', receiver, sender, true, color2, id);
+            startGame(sender, color1, id);
+        });
+
+        refuseButton.addEventListener('click', () => {
+            socket.emit('playResponseToServer', receiver, sender, false);
+            for (let elem of document.body.children) {
+                if (elem !== mainAlertDiv) {
+                    elem.hidden = '';
+                }
+            }
+            mainAlertDiv.style.display = 'none';
+            document.body.id = 'mainBody';
+            mainAlertDiv.removeChild(confirmDiv);
+        });
+    }
+}
+
+function alertBox(msg) {
+    if (!document.getElementById('alertDiv')) {
+
+        for (let elem of document.body.children) {
+            elem.hidden = 'true';
+        }
+        document.body.id = 'alertBody';
+
+        let mainAlertDiv = document.getElementById('alertMenu');
+        mainAlertDiv.style.display = 'block';
+
+        let alertDiv = document.createElement("div");
+        mainAlertDiv.appendChild(alertDiv);
+        alertDiv.id = 'alertDiv';
+
+
+        let alertText = document.createElement("p");
+        alertDiv.appendChild(alertText);
+        alertText.id = 'alertTxt';
+        alertText.innerHTML = msg;
+
+        let cryButton = document.createElement("button");
+        alertDiv.appendChild(cryButton);
+        cryButton.className = 'alertButton';
+        cryButton.innerHTML = 'Je vais pleurer tout(e) seul(e) dans mon coin :\'(';
+
+        cryButton.addEventListener('click', () => {
+            for (let elem of document.body.children) {
+                if (elem !== mainAlertDiv) {
+                    elem.hidden = '';
+                }
+            }
+            mainAlertDiv.style.display = 'none';
+            document.body.id = 'mainBody';
+            mainAlertDiv.removeChild(alertDiv);
+        })
+    }
+}
+
+function disabledSwitch(id, inGame) {
+    let elem = document.getElementById(id);
+    if (elem !== null && elem !== undefined) {
+        elem.disabled = inGame;
+        inGame ? elem.style.backgroundColor = 'rgba(76, 175, 80, 0.72)' : elem.style.backgroundColor = '#4CAF50';
+    }
 }

@@ -49,14 +49,12 @@
 
     //Si on a pas répondu à une demande de ping de l'adversaire, celui ci nous déconnecte
     socket.on('timeOut', () => {
-        alert('Délai dépassé, vous allez être redirigé vers le menu');
-        backMenu();
+        alertBox('Délai dépassé, vous allez être redirigé vers le menu');
     });
 
     //Si l'adversaire est partie, on retourne au menu
     socket.on('disconnectUser', () => {
-        alert('L\'adversaire est parti, vous allez être redirigé vers le menu');
-        backMenu();
+        alertBox('L\'adversaire est parti, vous allez être redirigé vers le menu');
     });
 
     //Ping de l'utilisateur toutes les 3 secondes pour vérifier qu'il est toujours connecté à la partie, sinon on retourne au menu et on arrête le ping régulier
@@ -66,8 +64,7 @@
         setTimeout(() => {
             if (pong === false) {
                 socket.emit('timeOut', opponent);
-                alert('L\'adversaire est parti, vous allez être redirigé vers le menu');
-                backMenu();
+                alertBox('L\'adversaire est parti, vous allez être redirigé vers le menu');
                 clearInterval(pingPong);
             } else {
                 pong = false;
@@ -81,9 +78,7 @@
         backMenu();
     });
 
-
     //Récupération du board au chargement puis toutes les 2 secondes
-    //Les blancs commencent toujours
     socket.emit('getBoard', gameID);
     setInterval(function () {
         socket.emit('getBoard', gameID);
@@ -129,7 +124,6 @@
         update: update
     });
 
-
     let tile;
     let missing;
     let promote;
@@ -138,7 +132,6 @@
 
     //chargement des images
     function preload() {
-
         game.load.image('whiteKnight', '../images/cavalier blanc.png');
         game.load.image('blackKnight', '../images/cavalier noir.png');
         game.load.image('whiteBishop', '../images/fou blanc.png');
@@ -152,7 +145,6 @@
         game.load.image('whiteRook', '../images/tour blanc.png');
         game.load.image('blackRook', '../images/tour noir.png');
         game.load.image('selectedTile', '../images/selectedTile.png');
-
     }
 
     //donne la taille du plateau
@@ -207,13 +199,11 @@
         let id = 0;
 
         for (let j = 0; j < 4; j++) {
-
             let sprite;
             let position;
             let tileTexture;
 
             for (let i = 0; i < 4; i++) {
-
                 position = {x: origin.x + i * 2 * sizeCase, y: origin.y + j * 2 * sizeCase};
                 tileTexture = game.make.bitmapData(sizeCase, sizeCase);
                 tileTexture.copy(whiteCase);
@@ -229,11 +219,9 @@
                 sprite.originTexture = blackCase;
                 sprite.coord = BoardIdToPosition(id++, color);
                 tile.add(sprite);
-
             }
 
             for (let i = 0; i < 4; i++) {
-
                 position = {x: origin.x + i * 2 * sizeCase, y: origin.y + sizeCase + j * 2 * sizeCase};
                 tileTexture = game.make.bitmapData(sizeCase, sizeCase);
                 tileTexture.copy(blackCase);
@@ -249,7 +237,6 @@
                 sprite.originTexture = whiteCase;
                 sprite.coord = BoardIdToPosition(id++, color);
                 tile.add(sprite);
-
             }
         }
 
@@ -266,9 +253,7 @@
         };
 
         for (let j = 0; j < 2; j++) {
-
             for (let i = 0; i < 8; i++) {
-
                 let position = {
                     x: originWhite.x - getTileSize() * j,
                     y: originWhite.y - getTileSize() * i
@@ -287,9 +272,7 @@
         };
 
         for (let j = 0; j < 2; j++) {
-
             for (let i = 0; i < 8; i++) {
-
                 let position = {
                     x: originBlack.x + getTileSize() * j,
                     y: originBlack.y - getTileSize() * i
@@ -317,7 +300,6 @@
 
     //permet de superposer une texture sur un sprite
     function changeTexture(sprite, key, opacity, size) {
-
         let width = sprite.width;
         let height = sprite.height;
 
@@ -330,7 +312,6 @@
 
     //compare 2 plateaux
     function compare(board1, board2) {
-
         let sameTile = 0;
 
         for (let i = 0; i < 8; i++) {
@@ -338,13 +319,11 @@
                 if (board1[i][j] === board2[i][j]) sameTile++;
             }
         }
-
         return sameTile === 64;
     }
 
     //donne l'inventaire du plateau
     function inventory(board) {
-
         let inventory = {
             white: {pawn: 0, rook: 0, knight: 0, bishop: 0, queen: 0, king: 0},
             black: {pawn: 0, rook: 0, knight: 0, bishop: 0, queen: 0, king: 0}
@@ -352,9 +331,7 @@
 
         for (let i = 0; i < 8; i++) {
             for (let j = 0; j < 8; j++) {
-
                 if (board[i][j] !== null) {
-
                     let colorInventory = (board[i][j].color === 'white') ? inventory.white : inventory.black;
 
                     switch (board[i][j].name) {
@@ -389,7 +366,6 @@
         let boardInventory = inventory(board);
         let tempBoardInventory = inventory(tempBoard);
 
-
         let totalBoardInventoryWhite = boardInventory.white.pawn + boardInventory.white.rook + boardInventory.white.knight + boardInventory.white.bishop + boardInventory.white.queen + boardInventory.white.king;
         let totalTempBoardInventoryWhite = tempBoardInventory.white.pawn + tempBoardInventory.white.rook + tempBoardInventory.white.knight + tempBoardInventory.white.bishop + tempBoardInventory.white.queen + tempBoardInventory.white.king;
 
@@ -397,7 +373,6 @@
         let totalTempBoardInventoryBlack = tempBoardInventory.black.pawn + tempBoardInventory.black.rook + tempBoardInventory.black.knight + tempBoardInventory.black.bishop + tempBoardInventory.black.queen + tempBoardInventory.black.king;
 
         if (totalBoardInventoryWhite < totalTempBoardInventoryWhite) {
-
             if (boardInventory.white.pawn < tempBoardInventory.white.pawn) changeTexture(missing.whiteGroup.children[missing.white], 'whitePawn');
             if (boardInventory.white.rook < tempBoardInventory.white.rook) changeTexture(missing.whiteGroup.children[missing.white], 'whiteRook');
             if (boardInventory.white.knight < tempBoardInventory.white.knight) changeTexture(missing.whiteGroup.children[missing.white], 'whiteKnight');
@@ -409,7 +384,6 @@
         }
 
         if (totalBoardInventoryBlack < totalTempBoardInventoryBlack) {
-
             if (boardInventory.black.pawn < tempBoardInventory.black.pawn) changeTexture(missing.blackGroup.children[missing.black], 'blackPawn');
             if (boardInventory.black.rook < tempBoardInventory.black.rook) changeTexture(missing.blackGroup.children[missing.black], 'blackRook');
             if (boardInventory.black.knight < tempBoardInventory.black.knight) changeTexture(missing.blackGroup.children[missing.black], 'blackKnight');
@@ -431,7 +405,6 @@
         }
 
         if (board !== undefined && board !== null) {
-
             for (let i = 0; i < 8; i++) {
                 for (let j = 0; j < 8; j++) {
                     if (board.board[j][i] !== null) {
@@ -454,7 +427,6 @@
 
     //renvoie le sprite pour une position sur l'écran
     function tilePosition(mouse) {
-
         for (let sprite of tile.children) {
             if (sprite.getBounds().contains(mouse.x, mouse.y)) return sprite;
         }
@@ -492,7 +464,6 @@
         let promotePiece = boardCache.board[position.x][position.y];
 
         if (color === promotePiece.color) {
-
             let origin = {
                 x: promoteTile.x - (3 / 2) * getTileSize(),
                 y: promoteTile.y - getTileSize() / 2
@@ -536,11 +507,9 @@
         }
 
         if (hoverSprite !== undefined) {
-
             changeTexture(hoverSprite, hoverSprite.pieceKey, 1, 0.6);
 
             if (game.input.activePointer.leftButton.isDown && promoteClick) {
-
                 promoteClick = false;
                 return {
                     color: hoverSprite.promoteColor,
@@ -587,7 +556,6 @@
 
             //action sur le tile survolé
             if (hoverTile !== undefined) {
-
                 //changement de texture
                 changeTexture(hoverTile, 'selectedTile');
 
@@ -630,11 +598,9 @@
 
                 //reset si l'on clique autre part
                 if (game.input.activePointer.leftButton.isDown && resetClick) {
-
                     let resetTile = hoverTile;
 
                     if (resetTile !== undefined) {
-
                         let resetPiece = boardCache.board[resetTile.coord.x][resetTile.coord.y];
                         if (resetPiece === null || resetPiece.color !== color) selectedTile = undefined;
                     } else selectedTile = undefined;
@@ -663,4 +629,38 @@ function backMenu() {
 
     document.body.appendChild(form);
     form.submit();
+}
+
+function alertBox(msg) {
+    if (!document.getElementById('alertDiv')) {
+
+        let mainAlertDiv = document.getElementById('alertMenu');
+        mainAlertDiv.style.display = 'block';
+
+        for (let elem of document.body.children) {
+            if (elem !== mainAlertDiv) {
+                elem.hidden = 'true';
+            }
+        }
+        document.body.id = 'alertBody';
+
+
+        let alertDiv = document.createElement("div");
+        mainAlertDiv.appendChild(alertDiv);
+        alertDiv.id = 'alertDiv';
+
+        let alertText = document.createElement("p");
+        alertDiv.appendChild(alertText);
+        alertText.id = 'alertTxt';
+        alertText.innerHTML = msg;
+
+        let cryButton = document.createElement("button");
+        alertDiv.appendChild(cryButton);
+        cryButton.className = 'gameButton';
+        cryButton.innerHTML = 'C\'est un(e) petit(e) joueur(euse) !<br>Il/Elle a peur de perdre !';
+
+        cryButton.addEventListener('click', () => {
+            backMenu();
+        })
+    }
 }

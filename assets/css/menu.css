@@ -1,4 +1,4 @@
-body {
+#mainBody {
     display: flex;
     justify-content: space-between;
     background-color: #dddddd;
@@ -15,11 +15,11 @@ body {
 }
 
 #divUser {
-    width: 600px;
+    width: 40vw;
+    min-width: 446px;
     border-radius: 5px;
     padding: 20px;
     background-color: #ffffff;
-
 }
 
 #pseudoGraphics{
@@ -35,6 +35,7 @@ body {
     border-radius: 4px;
     display: flex;
     margin: auto;
+    height: 35px;
 }
 
 #playerList {
@@ -46,9 +47,19 @@ body {
     text-align: center;
 }
 
+.userRow {
+    display: flex;
+    justify-content: center;
+    align-items: center;
+}
+
 #userCell {
-    width: 255px;
+    width: 145px;
     text-align: right;
+}
+
+.buttonCell {
+    width: 150px;
 }
 
 .userButton{
@@ -58,11 +69,15 @@ body {
     border: none;
     border-radius: 4px;
     display: flex;
+    justify-content: center;
+    align-items: center;
     margin: auto auto 5px;
+    height: 30px;
+    width: 80px;
 }
 
 .waitingMsg {
-    width: 225px;
+    width: 145px;
     color: red;
     text-align: left;
 }
@@ -111,19 +126,20 @@ body {
 
 .newMessage {
     flex-grow: 1;
-    border: 1px solid #dfdfdf;
-    border-radius: 5px;
+    border: none;
     padding: 10px 15px;
     font-size: 16px;
+    border-bottom-left-radius: 5px;
+    border-top-left-radius: 5px;
 }
 
 .submitMessage {
-    margin: 10px;
     background-color: #4CAF50;
     color: white;
     width: auto;
     padding: 6px;
     border: none;
-    border-radius: 4px;
     display: flex;
+    border-bottom-right-radius: 5px;
+    border-top-right-radius: 5px;
 }

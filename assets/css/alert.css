@@ -1,0 +1,40 @@
+#alertBody {
+    display: flex;
+    justify-content: center;
+    background-color: #dddddd;
+    margin: 50px;
+}
+
+#alertMenu {
+    background-color: #ffffff;
+    padding: 30px;
+    border-radius: 5px;
+    display: none;
+}
+
+.confirmButton, .alertButton, .gameButton {
+    background-color: #4CAF50;
+    color: white;
+    padding: 6px;
+    border: none;
+    border-radius: 4px;
+    display: flex;
+    justify-content: center;
+    align-items: center;
+    margin: auto auto 5px;
+}
+
+.confirmButton {
+    height: 30px;
+    width: 80px;
+}
+
+.alertButton {
+    height: 50px;
+    width: 150px;
+}
+
+.gameButton {
+    height: 60px;
+    width: 250px;
+}

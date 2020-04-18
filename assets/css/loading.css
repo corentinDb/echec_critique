@@ -1,15 +1,16 @@
+body {
+    display: flex;
+    justify-content: center;
+    align-items: center;
+    height: 100vh;
+}
+
 #pseudo, #userID, #existingConnection {
     display: none;
 }
 
-#loading {
-    margin-top: 45vh;
-    height: 10vh;
-}
-
 #progressBar {
-    width: 50%;
-    margin-left: 25%;
+    width: 50vw;
     height: 50px;
     font-size: 20px;
 }
