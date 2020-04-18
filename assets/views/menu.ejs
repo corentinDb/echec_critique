@@ -4,18 +4,17 @@
     <meta charset="UTF-8">
     <title>Menu</title>
     <link rel="stylesheet" type="text/css" href="../css/menu.css"/>
-    <link rel="stylesheet" type="text/css" href="../css/main.css"/>
 </head>
 <body>
-<p id="userList"><%= userList %></p>
-<p id="pseudo"><%= pseudo %></p>
+<div id="localPlayer"><%= localPlayer %></div>
 <div id="divUser">
+    <h2 id="pseudoGraphics">Votre pseudo : </h2>
     <input type="button" value="déconnexion" id="deconnection">
-    <p id="pseudoGraphics">Votre pseudo : </p>
-    <table>
-        <thead>
+
+    <table id="playerList">
+        <thead >
         <tr>
-            <th>Autre utilisateur :</th>
+            <th colspan="3" id="otherUser">Autres utilisateurs :</th>
         </tr>
         </thead>
         <tbody id="tablePlayer">
@@ -24,9 +23,8 @@
 </div>
 <div id="mainChatBox">
 </div>
-<script>
-</script>
 <script src="/socket.io/socket.io.js"></script>
+<script src="../js/chat.js"></script>
 <script src="../js/menu.js"></script>
 </body>
 </html>

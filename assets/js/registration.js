@@ -10,12 +10,14 @@
     form['confirmPassword'] = confirmPassword;
     form['email'] = email;
 
-    document.getElementById('return').addEventListener('click', () => { //Bouton retour vers la page de connexion
+    //Bouton retour vers la page de connexion
+    document.getElementById('return').addEventListener('click', () => {
         window.location = '/';
     });
 
 
-    switch (getURLData('error')) {     //Traitement des messages d'erreur
+    //Traitement des messages d'erreur
+    switch (getURLData('error')) {
         case 'wrongPseudo':
             document.getElementById('errorReturn').innerHTML = 'Pseudo déjà utilisé !';
             break;
@@ -23,7 +25,7 @@
             document.getElementById('errorReturn').innerHTML = 'Email déjà utilisé !';
             break;
         case 'undefined':
-            document.getElementById('errorReturn').innerHTML = 'Une erreur inconnue est survenue, merci de recommencer<br>Si cette erreur persiste, merci de contacter un admin';
+            document.getElementById('errorReturn').innerHTML = 'Une erreur inconnue est survenue, merci de recommencer<br>Si cette erreur persiste, merci de nous contacter : nicolas.bouillet@isen.yncrea.fr';
             break;
         default:
             document.getElementById('errorReturn').innerHTML = '';

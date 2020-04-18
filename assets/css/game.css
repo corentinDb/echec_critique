@@ -1,0 +1,66 @@
+body {
+    background-color: #dddddd;
+    margin: 0;
+    padding: 0;
+    height: 100%;
+}
+
+#opponent, #localPlayer, #color, #gameID {
+    display: none;
+}
+
+button {
+    background-color: transparent;
+    border: none;
+}
+
+canvas {
+    margin: auto;
+    overflow: hidden;
+}
+
+#mainChatBox {
+    margin: auto;
+    width: 50%;
+    text-align: center;
+}
+
+.pseudoBox, .messageBox {
+    background-color: #ffffff;
+}
+
+.pseudoBox {
+    padding: 10px;
+    font-size: 22px;
+    border-top-right-radius: 5px;
+    border-top-left-radius: 5px;
+    box-shadow: inset 2px 0 0 #979797;
+}
+
+.messageBox {
+    height: 5em;
+    overflow-y: scroll;
+    box-shadow: inset 2px 0 0 #979797;
+}
+
+.newMessage {
+    border-top: 1px solid #dfdfdf;
+    padding: 10px 15px;
+    width: 80%;
+    height: 46px;
+    font-size: 16px;
+    border-bottom-left-radius: 5px;
+
+}
+
+.submitMessage {
+    background-color: #4CAF50;
+    color: white;
+    padding: 6px;
+    border: none;
+    width: 20%;
+    height: 46px;
+    border-bottom-right-radius: 5px;
+}
+
+
