@@ -24,20 +24,25 @@ let chatMod = (function () {
                 //main div
                 let mainDivChat = document.getElementById('mainChatBox');
 
+
                 let userChat = document.createElement("div");   //div du chat avec l'utilisateur 'user'
                 mainDivChat.appendChild(userChat);
                 userChat.id = 'chatBox_' + corresponding;
                 userChat.className = 'chatBox';
                 userChat.style.display = 'none';
 
+                let newDiv = document.createElement("div");
+                newDiv.className = 'middleBox';
+                userChat.appendChild(newDiv);
+
                 let divName = document.createElement("div");    //div pour afficher le nom de l'utilisateur
-                userChat.appendChild(divName);
+                newDiv.appendChild(divName);
                 divName.id = 'pseudoBox_' + corresponding;
                 divName.appendChild(document.createTextNode('Vous parlez à ' + corresponding));
                 divName.className = 'pseudoBox';
 
                 let divMessage = document.createElement("div");    //div qui contient tous les messages
-                userChat.appendChild(divMessage);
+                newDiv.appendChild(divMessage);
                 divMessage.id = 'messageBox_' + corresponding;
                 divMessage.className = 'messageBox';
 

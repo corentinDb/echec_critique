@@ -1,4 +1,4 @@
-body {
+#mainBody {
     background-color: #dddddd;
     margin: 0;
     padding: 0;
@@ -25,8 +25,12 @@ canvas {
     text-align: center;
 }
 
-.pseudoBox, .messageBox {
+.pseudoBox, .messageBox, .message {
     background-color: #ffffff;
+}
+
+.middleBox {
+    overflow-y: scroll;
 }
 
 .pseudoBox {
@@ -34,23 +38,23 @@ canvas {
     font-size: 22px;
     border-top-right-radius: 5px;
     border-top-left-radius: 5px;
-    box-shadow: inset 2px 0 0 #979797;
+}
+
+.chatForm {
+    border-top: 1px solid #dfdfdf;
 }
 
 .messageBox {
     height: 5em;
-    overflow-y: scroll;
-    box-shadow: inset 2px 0 0 #979797;
 }
 
 .newMessage {
-    border-top: 1px solid #dfdfdf;
+    border: none;
     padding: 10px 15px;
     width: 80%;
     height: 46px;
     font-size: 16px;
     border-bottom-left-radius: 5px;
-
 }
 
 .submitMessage {

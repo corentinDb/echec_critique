@@ -5,13 +5,15 @@
     <title>Echec critique</title>
     <link rel="stylesheet" href="https://stackpath.bootstrapcdn.com/bootstrap/4.4.1/css/bootstrap.min.css" integrity="sha384-Vkoo8x4CGsO3+Hhxv8T/Q5PaXtkKtu6ug5TOeNV6gBiFeWPGFN9MuhOf23Q9Ifjh" crossorigin="anonymous">
     <link rel="stylesheet" type="text/css" href="../css/game.css"/>
+    <link rel="stylesheet" type="text/css" href="../css/alert.css"/>
 </head>
-<body>
+<body id="mainBody">
 <div id="localPlayer"><%= localPlayer %></div>
 <div id="opponent"><%= opponent %></div>
 <div id="color"><%= color %></div>
 <div id="gameID"><%= gameID %></div>
 
+<div id="alertMenu"></div>
 <nav class="navbar navbar-expand-lg navbar-light bg-light">
     <button class="navbar-brand" id="back">
         <img src="../images/tour%20noir.png" width="30" height="30" class="d-inline-block align-top" alt="">
