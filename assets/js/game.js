@@ -19,9 +19,7 @@
 
     //Force la fermeture si un utilisateur avec le même pseudo se connecte
     socket.on('newUserRequest', (user) => {
-        if (user === localPlayer) {
-            socket.emit('close', localPlayer);
-        }
+        if (user === localPlayer) socket.emit('close', localPlayer);
     });
 
     //Si un nouveau utilisateur se connecte au serveur, on l'ajoute à la liste
@@ -43,9 +41,7 @@
 
     //Réception de la réponse du ping
     socket.on('pongResponse', (user, inGame) => {
-        if (inGame) {
-            pong = true;
-        }
+        if (inGame) pong = true;
     });
 
     //Si on a pas répondu à une demande de ping de l'adversaire, celui ci nous déconnecte
@@ -110,18 +106,23 @@
         moveList = serverMoveList;
     });
 
+    //Reset du message d'information
+    socket.on('resetMessage', () => {
+        text.text = '';
+    })
+
     //Informe de l'echec et mat
     socket.on('checkmate', (gameInstance) => {
         boardCache = gameInstance;
         gameOver = true;
-        text.text = 'Partie terminée, ' + boardCache.color + ' est en échec et mat !'
+        text.text = 'Partie terminée, ' + boardCache.color + ' est en échec et mat !';
     });
 
     //Informe du pat
     socket.on('pat', (gameInstance) => {
         boardCache = gameInstance;
         gameOver = true;
-        text.text = "Partie terminée, il y Pat!"
+        text.text = 'Partie terminée, il y Pat!';
     });
 
     //Informe de la promotion du pion et demande à l'utilisateur de choisir
@@ -136,7 +137,6 @@
         boardCache = gameInstance;
         text.text = boardCache.color + ' est en échec !';
     });
-
 
     let game = new Phaser.Game(window.innerWidth, window.innerHeight * (65 / 100), Phaser.AUTO, 'phaser-example', {
         preload: preload,

@@ -401,6 +401,7 @@ io.sockets.on('connection', (socket) => {
                             }, 500);
                         }
                     }
+                    io.to(id).emit('resetMessage');
                     if (exceptionMod.checkmate(listGameInstance[id])) {     //Echec et mat
                         io.to(id).emit('checkmate', listGameInstance[id]);
                     } else if (exceptionMod.pat(listGameInstance[id])) {    //Pat
