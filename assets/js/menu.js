@@ -135,7 +135,6 @@ function addUserRow(pseudo, user, table) {
     linkCell.appendChild(linkChat);
     linkChat.id = 'chatButton_' + user;
     linkChat.className = 'userButton';
-    // linkChat.innerHTML = 'Discussion';
     let spanButton1 = document.createElement("span");
     spanButton1.appendChild(document.createTextNode('Discussion'));
     linkChat.appendChild(spanButton1);
@@ -148,11 +147,15 @@ function addUserRow(pseudo, user, table) {
     let connectionButton = document.createElement("button");
     linkCell.appendChild(connectionButton);
     connectionButton.id = 'play_with_' + user;
-    connectionButton.className = 'userButton';
-    // connectionButton.innerHTML = 'Jouer';
+    connectionButton.className = 'userButton popup';
     let spanButton2 = document.createElement("span");
-    spanButton2.appendChild(document.createTextNode('Jouer'));
     connectionButton.appendChild(spanButton2);
+    spanButton2.appendChild(document.createTextNode('Jouer'));
+    let spanPopup = document.createElement('popup');
+    connectionButton.appendChild(spanPopup);
+    spanPopup.id = 'play_popup_' + user;
+    spanPopup.className = 'popupText';
+    spanPopup.innerHTML = 'Demande envoyé';
 
 
     chatMod.createTabChat(pseudo, user);
@@ -194,6 +197,15 @@ function addUserRow(pseudo, user, table) {
 
     connectionButton.addEventListener('click', () => {  //Bouton play
         socket.emit("playRequestToServer", pseudo, user);
+        let popup = document.getElementById('play_popup_' + user);
+        popup.classList.toggle('show');
+        setTimeout(() => {
+            popup.classList.toggle('hidden');
+            popup.classList.remove('show');
+            setTimeout(() => {
+                popup.classList.remove('hidden');
+            }, 500);
+        }, 1500);
     });
 }
 

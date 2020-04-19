@@ -50,7 +50,7 @@
 
     //Si on a pas répondu à une demande de ping de l'adversaire, celui ci nous déconnecte
     socket.on('timeOut', () => {
-        alertBox('Délai dépassé, vous allez être redirigé vers le menu', 'Je rejourai quand j\'aurai la fibre');
+        alertBox('Délai dépassé, vous allez être redirigé vers le menu', 'Je rejouerai quand j\'aurai la fibre');
     });
 
     //Si l'adversaire est partie, on retourne au menu
@@ -74,7 +74,7 @@
         setTimeout(() => {
             if (pong === false) {
                 socket.emit('timeOut', opponent);
-                alertBox('L\'adversaire a dépassé le delai de connexion, vous allez être redirigé vers le menu', 'Je vais lui payer la fibre<br>Pour jouer avec lui');
+                alertBox('L\'adversaire a dépassé le delai de connexion, vous allez être redirigé vers le menu', 'Je vais lui payer la fibre<br>pour jouer avec lui !');
                 clearInterval(pingPong);
             } else {
                 pong = false;
@@ -91,7 +91,7 @@
     //Bouton abandon
     document.getElementById('surrender').addEventListener('click', () => {
         socket.emit('surrender', opponent);
-        alertBox('Il est trop fort ! J\'abandonne !', 'Je vais pleurer tout seul dans<br>mon coin !');
+        alertBox('Il/Elle est trop fort ! J\'abandonne !', 'Je vais pleurer tout(e) seul(e)<br>dans mon coin !');
     })
 
     //Récupération du board au chargement puis toutes les 2 secondes
@@ -114,7 +114,6 @@
     socket.on('checkmate', (gameInstance) => {
         boardCache = gameInstance;
         gameOver = true;
-        console.log(boardCache.color + ' est en échec et mat !');
         text.text = 'Partie terminée, ' + boardCache.color + ' est en échec et mat !'
     });
 
@@ -122,7 +121,6 @@
     socket.on('pat', (gameInstance) => {
         boardCache = gameInstance;
         gameOver = true;
-        console.log(boardCache.color + ' est en pat !');
         text.text = "Partie terminée, il y Pat!"
     });
 
@@ -131,6 +129,12 @@
         boardCache = gameInstance;
         tempBoard = boardCache.board.slice();
         getPromotion(pawn.position);
+    });
+
+    //Informe de l'echec mais sans mat
+    socket.on('check', (gameInstance) => {
+        boardCache = gameInstance;
+        text.text = boardCache.color + ' est en échec !';
     });
 
 
@@ -187,7 +191,6 @@
 
     //creation de l'interface de jeu
     function create() {
-
         game.stage.backgroundColor = "#dddddd";
 
         let boardSize = getBoardSize();
@@ -318,7 +321,6 @@
     function changeTexture(sprite, key, opacity, size) {
         let width = sprite.width;
         let height = sprite.height;
-
         let texture = sprite.key;
 
         if (size !== undefined) texture.copy(key, 0, 0, 73, 73, texture.width / 2, texture.height / 2, width, height, 0, 0.5, 0.5, size, size, opacity, null, false);
@@ -378,7 +380,6 @@
 
     //ajoute les pièces manquantes sur les cotés du plateau
     function addMissingPiece(board, tempBoard) {
-
         let boardInventory = inventory(board);
         let tempBoardInventory = inventory(tempBoard);
 
@@ -395,7 +396,6 @@
             if (boardInventory.white.bishop < tempBoardInventory.white.bishop) changeTexture(missing.whiteGroup.children[missing.white], 'whiteBishop');
             if (boardInventory.white.queen < tempBoardInventory.white.queen) changeTexture(missing.whiteGroup.children[missing.white], 'whiteQueen');
             if (boardInventory.white.king < tempBoardInventory.white.king) changeTexture(missing.whiteGroup.children[missing.white], 'whiteKing');
-
             missing.white++;
         }
 
@@ -406,7 +406,6 @@
             if (boardInventory.black.bishop < tempBoardInventory.black.bishop) changeTexture(missing.blackGroup.children[missing.black], 'blackBishop');
             if (boardInventory.black.queen < tempBoardInventory.black.queen) changeTexture(missing.blackGroup.children[missing.black], 'blackQueen');
             if (boardInventory.black.king < tempBoardInventory.black.king) changeTexture(missing.blackGroup.children[missing.black], 'blackKing');
-
             missing.black++;
         }
 
@@ -414,7 +413,6 @@
 
     //charge le plateau
     function loadBoard(board) {
-
         for (let sprite of tile.children) {
             sprite.key.copy(sprite.originTexture);
             sprite.move = false;
@@ -433,10 +431,8 @@
             if (tempBoard === undefined) tempBoard = boardCache.board.slice();
 
             if (!compare(boardCache.board, tempBoard)) {
-
                 addMissingPiece(boardCache.board, tempBoard);
                 tempBoard = boardCache.board.slice();
-                console.log('maj board');
             }
         }
     }
@@ -452,7 +448,6 @@
     //renvoie tous les sprites de la move liste d'un sprite donné
     function getSpriteMoveList(sprite) {
         let spriteMoveList = [];
-
         if (moveList[0] !== undefined) {
             if (moveList[0].origin.x === sprite.coord.x && moveList[0].origin.y === sprite.coord.y) {
                 for (let move of moveList) {
@@ -474,7 +469,6 @@
 
     //déclanche une promotion
     function getPromotion(position) {
-
         let tileId = positionToBoardId(position, color);
         let promoteTile = tile.children[tileId];
         let promotePiece = boardCache.board[position.x][position.y];
@@ -514,7 +508,6 @@
 
     //fonction qui permet la selection d'une promotion
     function choosePromote(promote, mouse) {
-
         let hoverSprite = undefined;
 
         for (let sprite of promote.children) {
@@ -548,7 +541,6 @@
 
     //Boucle principal du jeu
     function update() {
-
         //chargement du plateau
         loadBoard(boardCache);
 
@@ -556,13 +548,11 @@
         if (promote !== undefined) {
             let promoteResult = choosePromote(promote, game.input.mousePointer);
             if (promoteResult !== undefined) {
-                console.log('envoie de la promotion pour la pièce :', promoteResult);
                 socket.emit('promotionResponse', promoteResult);
                 promote.destroy(true);
                 promote = undefined;
             }
         } else {
-
             //affichage texture selectionné
             if (selectedTile !== undefined) changeTexture(selectedTile, 'selectedTile');
 
@@ -581,7 +571,6 @@
                     let hoverPiece = boardCache.board[hoverTile.coord.x][hoverTile.coord.y];
                     if (hoverPiece !== null && hoverPiece.color === color) {
                         selectedTile = hoverTile;
-                        console.log('demande de moveList pour', selectedTile.coord);
                         if (boardCache.color === color) {
                             socket.emit('getMoveList', gameID, selectedTile.coord.x, selectedTile.coord.y);
                         }
@@ -592,7 +581,6 @@
 
             //action sur tile secectionné
             if (selectedTile !== undefined) {
-
                 //on recupère la pièce
                 let selectedPiece = boardCache.board[selectedTile.coord.x][selectedTile.coord.y];
 
@@ -607,7 +595,6 @@
                     let moveTile = hoverTile;
                     if (moveTile !== undefined && moveTile.move) {
                         socket.emit('moveRequest', gameID, selectedTile.coord.x, selectedTile.coord.y, moveTile.coord.x, moveTile.coord.y);
-                        console.log('envoie du move pour la position', moveTile.coord);
                     }
                 }
 
@@ -648,7 +635,6 @@ function backMenu() {
 
 function alertBox(msg, button) {
     if (!document.getElementById('alertDiv')) {
-
         let mainAlertDiv = document.getElementById('alertMenu');
         mainAlertDiv.style.display = 'block';
 
@@ -658,7 +644,6 @@ function alertBox(msg, button) {
             }
         }
         document.body.id = 'alertBody';
-
 
         let alertDiv = document.createElement("div");
         mainAlertDiv.appendChild(alertDiv);

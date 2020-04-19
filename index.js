@@ -405,6 +405,8 @@ io.sockets.on('connection', (socket) => {
                         io.to(id).emit('checkmate', listGameInstance[id]);
                     } else if (exceptionMod.pat(listGameInstance[id])) {    //Pat
                         io.to(id).emit('pat', listGameInstance[id]);
+                    } else if (exceptionMod.check(listGameInstance[id], null)){
+                        io.to(id).emit('check', listGameInstance[id]);
                     } else {
                         io.to(id).emit('giveBoard', listGameInstance[id]);   //Tour suivant
                     }
