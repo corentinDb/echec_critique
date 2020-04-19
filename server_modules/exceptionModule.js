@@ -87,7 +87,7 @@ module.exports = {
     //Détecte si le roque, pour le roi et la tour entrée, est possible
     castling(gameInstance, king, rook) {
         if (king.getColor() !== rook.getColor()) return false;
-        if (!king.hasMoved && !rook.hasMoved) {
+        if (!king.hasMoved && !rook.hasMoved && !this.check(gameInstance, null)) {
             if (rook.getPosition().x > king.getPosition().x) {
                 for (let i = king.getPosition().x + 1; i < king.getPosition().x + 3; i++) {
                     if (gameInstance.getCase(new Point(i, king.getPosition().y)) !== undefined) {
