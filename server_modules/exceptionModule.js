@@ -72,6 +72,9 @@ module.exports = {
     },
     //Détecte le pat pour la couleur courante du board
     pat(gameInstance) {
+        if (gameInstance.searchPiece('', 'white').length === 1 && gameInstance.searchPiece('', 'black').length === 1) {
+            return true;
+        }
         if (this.check(gameInstance, null) === false) {
             let ls;
             ls = gameInstance.searchPiece('', gameInstance.color);
@@ -98,7 +101,6 @@ module.exports = {
                 }
             } else {
                 for (let i = king.getPosition().x - 1; i > king.getPosition().x - 4; i--) {
-
                     if (gameInstance.getCase(new Point(i, king.getPosition().y)) !== undefined) {
                         return false;
                     } else if (this.check(gameInstance, new Point(i, king.getPosition().y))) {
