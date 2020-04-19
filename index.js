@@ -375,7 +375,7 @@ io.sockets.on('connection', (socket) => {
                         io.to(id).emit('giveBoard', listGameInstance[id]);
                         setTimeout(function () {
                             socket.emit('promotion', listGameInstance[id], listGameInstance[id].getCase(destination));
-                            socket.on('promotionResponse', (promoteResult) => {
+                            socket.on('promotionResponseTurn' + listGameInstance[id].turn, (promoteResult) => {
                                 let color = promoteResult.color;
                                 switch (promoteResult.piece) {
                                     case 'Bishop':

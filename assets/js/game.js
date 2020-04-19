@@ -60,7 +60,11 @@
 
     //Si l'adversaire abandonne, on retourne au menu
     socket.on('surrender', () => {
-        alertBox('L\'adversaire a abandonné !<br>Félicitation, vous êtes le grand vainqueur !', 'C\'est un(e) petit(e) joueur(euse) !<br>Il/Ellle ne fini pas la partie !');
+        if (!gameOver) {
+            alertBox('L\'adversaire a abandonné !<br>Félicitation, vous êtes le grand vainqueur !', 'C\'est un(e) petit(e) joueur(euse) !<br>Il/Ellle ne fini pas la partie !');
+        } else {
+            alertBox('Félicitation, vous êtes le grand vainqueur !<br>Vous avez explosé l\'adversaire !', 'Laisser l\'adversaire repenser au sens de sa vie');
+        }
     })
 
     //Ping de l'utilisateur toutes les 3 secondes pour vérifier qu'il est toujours connecté à la partie, sinon on retourne au menu et on arrête le ping régulier
@@ -87,7 +91,11 @@
     //Bouton abandon
     document.getElementById('surrender').addEventListener('click', () => {
         socket.emit('surrender', opponent);
-        alertBox('Il/Elle est trop fort ! J\'abandonne !', 'Je vais pleurer tout(e) seul(e)<br>dans mon coin !');
+        if (!gameOver) {
+            alertBox('Il/Elle est trop fort(e) ! J\'abandonne !', 'Je vais pleurer tout(e) seul(e)<br>dans mon coin !');
+        } else {
+            alertBox('Il/Elle est trop fort(e) ! Je me suis fait explosé !', 'Je vais repenser au sens de ma vie');
+        }
     })
 
     //Récupération du board au chargement puis toutes les 2 secondes
@@ -548,7 +556,7 @@
         if (promote !== undefined) {
             let promoteResult = choosePromote(promote, game.input.mousePointer);
             if (promoteResult !== undefined) {
-                socket.emit('promotionResponse', promoteResult);
+                socket.emit('promotionResponseTurn' + boardCache.turn, promoteResult);
                 promote.destroy(true);
                 promote = undefined;
             }
