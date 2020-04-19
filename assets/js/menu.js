@@ -171,8 +171,8 @@ function addUserRow(pseudo, user, table) {
             } else {
                 pong[user] = false;
             }
-        }, 1000);
-    }, 4000);
+        }, 2000);
+    }, 5000);
 
 
     //Bouton pour ouvrir le chat avec l'utilisateur
