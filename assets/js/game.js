@@ -11,6 +11,7 @@
     let boardCache;
     let moveList = [];
     let tempBoard;
+    let gameOver = false;
 
     //Initialise les paramètres de socket io
     socket.emit('joinGame', gameID, localPlayer);
@@ -49,13 +50,22 @@
 
     //Si on a pas répondu à une demande de ping de l'adversaire, celui ci nous déconnecte
     socket.on('timeOut', () => {
-        alertBox('Délai dépassé, vous allez être redirigé vers le menu');
+        alertBox('Délai dépassé, vous allez être redirigé vers le menu', 'Je rejourai quand j\'aurai la fibre');
     });
 
     //Si l'adversaire est partie, on retourne au menu
     socket.on('disconnectUser', () => {
-        alertBox('L\'adversaire est parti, vous allez être redirigé vers le menu');
+        if (!gameOver) {
+            alertBox('L\'adversaire est parti, vous allez être redirigé vers le menu', 'C\'est un(e) petit(e) joueur(euse) !<br>Il/Elle a peur de perdre !');
+        } else {
+            alertBox('La partie est fini', 'Retourner au menu');
+        }
     });
+
+    //Si l'adversaire abandonne, on retourne au menu
+    socket.on('surrender', () => {
+        alertBox('L\'adversaire a abandonné !<br>Félicitation, vous êtes le grand vainqueur !', 'C\'est un(e) petit(e) joueur(euse) !<br>Il/Ellle ne fini pas la partie !');
+    })
 
     //Ping de l'utilisateur toutes les 3 secondes pour vérifier qu'il est toujours connecté à la partie, sinon on retourne au menu et on arrête le ping régulier
     let pingPong = setInterval(() => {
@@ -64,7 +74,7 @@
         setTimeout(() => {
             if (pong === false) {
                 socket.emit('timeOut', opponent);
-                alertBox('L\'adversaire est parti, vous allez être redirigé vers le menu');
+                alertBox('L\'adversaire a dépassé le delai de connexion, vous allez être redirigé vers le menu', 'Je vais lui payer la fibre<br>Pour jouer avec lui');
                 clearInterval(pingPong);
             } else {
                 pong = false;
@@ -77,6 +87,12 @@
         socket.emit('disconnectOpponent', opponent);
         backMenu();
     });
+
+    //Bouton abandon
+    document.getElementById('surrender').addEventListener('click', () => {
+        socket.emit('surrender', opponent);
+        alertBox('Il est trop fort ! J\'abandonne !', 'Je vais pleurer tout seul dans<br>mon coin !');
+    })
 
     //Récupération du board au chargement puis toutes les 2 secondes
     socket.emit('getBoard', gameID);
@@ -525,7 +541,6 @@
     let resetClick = true;
     let moveClick = true;
     let promoteClick = true;
-    let gameOver = false;
 
     let canSelect;
     color === 'white' ? canSelect = 0 : canSelect = 1;
@@ -631,7 +646,7 @@ function backMenu() {
     form.submit();
 }
 
-function alertBox(msg) {
+function alertBox(msg, button) {
     if (!document.getElementById('alertDiv')) {
 
         let mainAlertDiv = document.getElementById('alertMenu');
@@ -654,12 +669,12 @@ function alertBox(msg) {
         alertText.id = 'alertTxt';
         alertText.innerHTML = msg;
 
-        let cryButton = document.createElement("button");
-        alertDiv.appendChild(cryButton);
-        cryButton.className = 'gameButton';
-        cryButton.innerHTML = 'C\'est un(e) petit(e) joueur(euse) !<br>Il/Elle a peur de perdre !';
+        let returnButton = document.createElement("button");
+        alertDiv.appendChild(returnButton);
+        returnButton.className = 'gameButton';
+        returnButton.innerHTML = button;
 
-        cryButton.addEventListener('click', () => {
+        returnButton.addEventListener('click', () => {
             backMenu();
         })
     }

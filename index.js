@@ -313,6 +313,11 @@ io.sockets.on('connection', (socket) => {
         io.to(opponent).emit('disconnectUser');
     });
 
+    //Information à l'adversaire qu'on abandonne
+    socket.on('surrender', (opponent) => {
+        io.to(opponent).emit('surrender');
+    })
+
     //Envoie du board
     socket.on('getBoard', (id) => {
         socket.emit('giveBoard', listGameInstance[id]);
