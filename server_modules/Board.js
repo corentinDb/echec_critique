@@ -111,23 +111,6 @@ class Board {
 
     }
 
-    //permet de revenir n tours precédement
-    rewind(turn) {
-
-        let moves = this.replay;
-
-        for (let i = 0; i < turn; i++) {
-            moves.pop();
-        }
-
-        this.reset();
-
-        for (let move of moves) {
-            this.move(move);
-        }
-
-    }
-
     //permet de trouver une pièce sur l'échiquier
     searchPiece(name, color) {
         let tab = [];
