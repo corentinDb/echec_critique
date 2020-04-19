@@ -112,6 +112,10 @@ module.exports = {
     },
     //Détecte si la promotion d'un pion est possible
     promotion(pawn) {
-        return ((pawn.getColor() === 'black' && pawn.getPosition().y === 0) || (pawn.getColor() === 'white' && pawn.getPosition().y === 7))
+        if (pawn.name === 'Pawn') {
+            return ((pawn.getColor() === 'black' && pawn.getPosition().y === 0) || (pawn.getColor() === 'white' && pawn.getPosition().y === 7))
+        } else {
+            return false;
+        }
     }
 };
