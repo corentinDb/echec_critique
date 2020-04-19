@@ -146,7 +146,7 @@
         text.text = boardCache.color + ' est en échec !';
     });
 
-    let game = new Phaser.Game(window.innerWidth, window.innerHeight * (65 / 100), Phaser.AUTO, 'phaser-example', {
+    let game = new Phaser.Game(window.innerHeight * (80 / 100), window.innerHeight * (65 / 100), Phaser.AUTO, 'phaser-example', {
         preload: preload,
         create: create,
         update: update
